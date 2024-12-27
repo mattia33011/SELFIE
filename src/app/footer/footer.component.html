@@ -1,11 +1,11 @@
-<div class="w-full h-full">
-  <div class="flex flex-row items-center gap-6 pb-3 px-3 pt-2 justify-content-center w-dw bottom-menu">
+<div class="w-full h-full flex justify-content-center">
+  <div class="flex flex-row items-center gap-6 pb-3 px-6 pt-2 mb-1 rounded-full border-2 border-primary-500 justify-content-center w-fit bottom-menu ">
     @for (item of items; track $index) { 
         @switch (item.type) {
             @case ('note') {
                 <p-speed-dial direction="up">
                     <ng-template #button let-toggleCallback="toggleCallback">
-                        <p-button [icon]="item.icon"  [rounded]="true" (click)="toggleCallback($event)" />
+                        <button pButton [icon]="item.icon"  [rounded]="true" (click)="toggleCallback($event)" ></button>
                     </ng-template>
                 </p-speed-dial> 
             }
@@ -19,7 +19,7 @@
             @case ('tomato') {
                 <p-speed-dial direction="up">
                     <ng-template #button let-toggleCallback="toggleCallback">
-                        <p-button [icon]="item.icon"  [rounded]="true" (click)="toggleCallback($event)" />
+                        <button pButton [icon]="item.icon"  [rounded]="true" (click)="toggleCallback($event)" ></button>
                     </ng-template>
                 </p-speed-dial>
             }

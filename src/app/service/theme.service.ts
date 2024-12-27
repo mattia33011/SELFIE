@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 export class ThemeService {
   constructor() {}
 
-  private isSystemDarkMode = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  private readonly isSystemDarkMode = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
 
   initTheme() {    
     const element = document.querySelector('html');

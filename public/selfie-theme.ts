@@ -34,9 +34,9 @@ export const SelfieTheme = definePreset(Aura, {
           500: '{zinc.500}',
           600: '{zinc.600}',
           700: '{zinc.700}',
-          800: '{zinc.800}',
-          900: '{zinc.900}',
-          950: '{zinc.950}',
+          800: '{coconutWhite.800}',
+          900: '{coconutWhite.900}',
+          950: '{coconutWhite.950}',
         },
       },
       dark: {

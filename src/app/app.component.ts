@@ -14,9 +14,11 @@ import { ThemeService } from './service/theme.service';
 export class AppComponent {
   title = 'selfie';
 
-  constructor(private translateService: TranslateService, private themeService: ThemeService) {
-    translateService.addLangs(['en'])
-    themeService.initTheme()
+  constructor(private readonly translateService: TranslateService, private readonly themeService: ThemeService) { }
+
+   ngOnInit(){
+    this.translateService.addLangs(['en'])
+    this.themeService.initTheme()
    }
 
 

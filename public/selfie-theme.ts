@@ -1,6 +1,6 @@
 import { definePreset } from '@primeng/themes';
 import Aura from '@primeng/themes/aura';
-import { Brown, CoconutWhite, PrimaryGreen } from './palettes';
+import { Brown, ChocolateBrown, CoconutWhite, PrimaryGreen } from './palettes';
 
 export const SelfieTheme = definePreset(Aura, {
   semantic: {
@@ -24,20 +24,7 @@ export const SelfieTheme = definePreset(Aura, {
           color: CoconutWhite[0],
           focusColor: CoconutWhite[0],
         },
-        surface: {
-          0: '#ffffff',
-          50: '{zinc.50}',
-          100: '{zinc.100}',
-          200: '{zinc.200}',
-          300: '{zinc.300}',
-          400: '{zinc.400}',
-          500: '{zinc.500}',
-          600: '{zinc.600}',
-          700: '{zinc.700}',
-          800: '{coconutWhite.800}',
-          900: '{coconutWhite.900}',
-          950: '{coconutWhite.950}',
-        },
+        surface: ChocolateBrown
       },
       dark: {
         primary: {

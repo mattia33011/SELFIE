@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { NavbarComponent } from "./navbar/navbar.component";
 import { FooterComponent } from "./footer/footer.component";
 import { ThemeService } from './service/theme.service';
+import { SessionService } from './service/session.service';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,7 @@ import { ThemeService } from './service/theme.service';
 export class AppComponent {
   title = 'selfie';
 
-  constructor(private readonly translateService: TranslateService, private readonly themeService: ThemeService) { }
+  constructor(private readonly translateService: TranslateService, protected readonly sessionService: SessionService, private readonly themeService: ThemeService) { }
 
    ngOnInit(){
     this.translateService.addLangs(['en'])

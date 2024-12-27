@@ -1,11 +1,16 @@
 <div class="h-full flex flex-col">
+  @if (sessionService.isLogged()) {
   <nav class="shadow-2">
     <app-navbar />
   </nav>
+  }
+
   <section class="grow my-6 container grow mx-auto">
     <router-outlet />
   </section>
+  @if (sessionService.isLogged()) {
   <footer>
     <app-footer />
   </footer>
+  }
 </div>

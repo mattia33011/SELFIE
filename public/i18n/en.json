@@ -1,4 +1,5 @@
 {
+    "user": "User",
     "login": {
         "welcome": "Welcome back to",
         "redirectRegister": "Don't have an account",
@@ -24,5 +25,9 @@
         "atLeast8Chars": "Minimum 8 characters",
         "signUp": "Sign up",
         "gdpr": "I have read, understood and accepted the terms and conditions for the purposes of articles 13 and 23 of Legislative Decree no. 196/2003, by signing this form, I give my consent to the processing of personal data provided following the report submitted."
+    },
+    "http": {
+        "error": "Error",
+        "404": "Not found" 
     }
 }

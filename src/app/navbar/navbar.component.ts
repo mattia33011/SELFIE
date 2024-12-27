@@ -30,7 +30,7 @@ export class NavbarComponent {
 
   private _checked: boolean = false;
 
-  constructor(private readonly themeService: ThemeService){}
+  constructor(protected readonly themeService: ThemeService){}
 
   get checked () {
     return this._checked

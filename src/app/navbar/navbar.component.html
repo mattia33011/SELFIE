@@ -3,7 +3,7 @@
     <div class="flex flex-row gap-4 items-center">
       <p-image
         class="lg:inline hidden cursor-pointer"
-        src="selfie-logo-light.png"
+        src="selfie-logo-{{themeService.isDarkMode() ? 'light' : 'dark'}}.png"
         width="100"
       />
       <span class="text-center text-sm md:text-base text-nowrap">

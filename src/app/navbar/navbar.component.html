@@ -8,7 +8,7 @@
       />
       <span class="text-center text-sm md:text-base text-nowrap">
         {{ today.toLocaleDateString() }}
-        <i class="pi pi-calendar text-sm md:text-base "></i>
+        <i class="pi pi-calendar text-sm md:text-base"></i>
       </span>
     </div>
   </ng-template>
@@ -19,6 +19,11 @@
   </ng-template>
   <ng-template #end>
     <div class="flex items-center justify-content-end gap-2">
+      <p-toggleswitch [(ngModel)]="checked">
+        <ng-template #handle let-checked="checked">
+          <i [ngClass]="['!text-xs', 'pi', checked ? 'pi-moon' : 'pi-sun']"></i>
+        </ng-template>
+      </p-toggleswitch>
       <input
         class="w-8 h-1/2"
         size="small"

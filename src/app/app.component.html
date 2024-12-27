@@ -1,13 +1,11 @@
 <div class="h-full flex flex-col">
-  <section class="grow" id="content">
-    <nav>
-      <app-navbar />
-    </nav>
-    <section class="container grow mx-auto">
-      <router-outlet />
-    </section>
+  <nav class="shadow-2">
+    <app-navbar />
+  </nav>
+  <section class="grow my-6 container grow mx-auto">
+    <router-outlet />
   </section>
-  <footer>
+  <footer class="shadow-2">
     <app-footer />
   </footer>
 </div>

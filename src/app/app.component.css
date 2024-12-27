@@ -4,3 +4,10 @@ footer{
     bottom: 0;
     width: 100%;
 }
+
+nav{
+    position: fixed;
+    background: var(--p-menubar-background);
+    top: 0;
+    width: 100%;
+}

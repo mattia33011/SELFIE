@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { NavbarComponent } from "./navbar/navbar.component";
 import { FooterComponent } from "./footer/footer.component";
+import { ThemeService } from './service/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -13,8 +14,9 @@ import { FooterComponent } from "./footer/footer.component";
 export class AppComponent {
   title = 'selfie';
 
-  constructor(private translateService: TranslateService) {
+  constructor(private translateService: TranslateService, private themeService: ThemeService) {
     translateService.addLangs(['en'])
+    themeService.initTheme()
    }
 
 

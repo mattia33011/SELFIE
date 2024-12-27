@@ -6,5 +6,16 @@
         "forgotPassword": "Password dimenticata",
         "signIn": "Accedi",
         "registerHere": "Registrati qui"
+    },
+    "register":{
+        "welcome": "Benvenuto su",
+        "redirectLogin": "Hai già un account",
+        "signIn": "Accedi",
+        "firstName": "Nome",
+        "lastName": "Cognome",
+        "phoneNumber": "Numero di telefono",
+        "confirmPassword": "Conferma password",
+        "signUp": "Registrati",
+        "gdpr": "Ho letto, compreso e accettato i termini e condizioni per gli effetti degli art. 13 e 23 del D.Lgs. n. 196/2003, con la sottoscrizione del presente modulo, il proprio consenso al trattamento dei dati personali forniti a seguito della segnalazione inoltrata."
     }
 }

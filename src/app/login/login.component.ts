@@ -15,8 +15,4 @@ import { RouterModule } from '@angular/router';
   standalone: true
 })
 export class LoginComponent {
-  toggleDarkMode() {
-    const element = document.querySelector('html');
-    element?.classList.toggle('selfie-dark');
-  }
 }

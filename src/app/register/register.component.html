@@ -1,68 +1,140 @@
 <div class="my-6 mx-auto lg:w-8">
-    <p-card class="shadow border-round lg:w-6">
-      <ng-template #header>
-          <div class="text-center p-5 mb-1">
-            <div class="text-900 text-3xl font-medium mb-2">
-              {{ "login.welcomeBack" | translate }} SELFIE!
-            </div>
-            <span class="text-600 font-medium line-height-3">
-              {{ "login.redirectRegister" | translate }}?
-            </span>
-            <a routerLink="/register" class="font-medium ml-2 underline cursor-pointer">
-              {{ "login.registerHere" | translate }}!
-            </a>
+  <p-card class="shadow border-round lg:w-6">
+    <ng-template #header>
+      <form>
+        <div class="text-center p-5 mb-1">
+          <div class="text-900 text-3xl font-medium mb-2">
+            {{ "register.welcome" | translate }} SELFIE!
           </div>
-  
-          <div class="px-5">
-            <label for="email1" class="block text-900 font-medium mb-2">
-              Email
-            </label>
+          <span class="text-600 font-medium line-height-3">
+            {{ "register.redirectLogin" | translate }}?
+          </span>
+          <a
+            routerLink="/login"
+            class="font-medium ml-2 underline cursor-pointer"
+          >
+            {{ "register.signIn" | translate }}!
+          </a>
+        </div>
+
+        <div class="px-5">
+          <label for="firstname" class="block text-900 font-medium mb-2">
+            {{ "register.firstName" | translate }}
+          </label>
+          <p-inputgroup styleClass="mb-3">
+            <p-inputgroup-addon>
+              <i class="pi pi-user"></i>
+            </p-inputgroup-addon>
             <input
-              id="email1"
+              id="firstname"
+              type="text"
+              [placeholder]="'register.firstName' | translate"
+              pInputText
+              class="w-full"
+            />
+          </p-inputgroup>
+
+          <label for="lastname" class="block text-900 font-medium mb-2">
+            {{ "register.lastName" | translate }}
+          </label>
+          <p-inputgroup styleClass="mb-3">
+            <p-inputgroup-addon>
+              <i class="pi pi-user"></i>
+            </p-inputgroup-addon>
+            <input
+              id="lastname"
+              type="text"
+              [placeholder]="'register.lastName' | translate"
+              pInputText
+              class="w-full"
+            />
+          </p-inputgroup>
+
+          <label for="email" class="block text-900 font-medium mb-2">
+            Email
+          </label>
+          <p-inputgroup styleClass="mb-3">
+            <p-inputgroup-addon>
+              <i class="pi pi-at"></i>
+            </p-inputgroup-addon>
+            <input
+              id="email"
               type="text"
               placeholder="Email address"
               pInputText
-              class="w-full mb-3"
+              class="w-full"
             />
-  
-            <label for="password1" class="block text-900 font-medium mb-2">
-              Password
-            </label>
+          </p-inputgroup>
+
+          <label for="phoneNumber" class="block text-900 font-medium mb-2">
+            {{ "register.phoneNumber" | translate }}
+          </label>
+          <p-inputgroup styleClass="mb-3">
+            <p-inputgroup-addon>
+              <i class="pi pi-phone"></i>
+            </p-inputgroup-addon>
             <input
-              id="password1"
+              id="phoneNumber"
+              type="text"
+              placeholder="000 000000"
+              pKeyFilter="int"
+              pInputText
+            />
+          </p-inputgroup>
+
+          <label for="password" class="block text-900 font-medium mb-2">
+            Password
+          </label>
+          <p-inputgroup styleClass="mb-3">
+            <p-inputgroup-addon>
+              <i class="pi pi-lock"></i>
+            </p-inputgroup-addon>
+            <input
+              id="password"
               type="password"
               placeholder="Password"
               pInputText
-              class="w-full mb-3"
+              class="w-full"
             />
-  
-            <div class="flex align-items-center justify-content-between mb-6">
-              <div class="flex align-items-center">
-                <p-checkbox
-                  id="rememberme1"
-                  [binary]="true"
-                  styleClass="mr-2"
-                ></p-checkbox>
-                <label for="rememberme1" class="text-900">
-                  {{ "login.rememberMe" | translate }}
-                </label>
-              </div>
-              <a
-                class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
-              >
-                {{ "login.forgotPassword" | translate }}?
-              </a>
+          </p-inputgroup>
+
+          <label for="password" class="block text-900 font-medium mb-2">
+            {{ "register.confirmPassword" | translate }}
+          </label>
+          <p-inputgroup styleClass="mb-3">
+            <p-inputgroup-addon>
+              <i class="pi pi-check"></i>
+            </p-inputgroup-addon>
+            <input
+              id="confirmPassword"
+              type="password"
+              [placeholder]="'register.confirmPassword' | translate"
+              pInputText
+              class="w-full"
+            />
+          </p-inputgroup>
+
+          <div class="flex align-items-center justify-content-between mb-6">
+            <div class="flex align-items-center">
+              <p-checkbox
+                id="gdpr"
+                [binary]="true"
+                styleClass="mr-2"
+              ></p-checkbox>
+              <label for="gdpr" class="text-sm">
+                {{ "register.gdpr" | translate }}
+              </label>
             </div>
-  
-            <button
-              (click)="toggleDarkMode()"
-              pButton
-              [label]="'login.signIn' | translate"
-              icon="pi pi-user"
-              class="w-full rounded"
-            ></button>
           </div>
-      </ng-template>
-    </p-card>
-  </div>
-  
+
+          <button
+            pButton
+            [label]="'register.signUp' | translate"
+            icon="pi pi-user"
+            class="w-full rounded"
+          ></button>
+        </div>
+      </form>
+    </ng-template>
+  </p-card>
+</div>

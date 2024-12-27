@@ -1,0 +1,6 @@
+footer{
+    position: fixed;
+    background: var(--p-menubar-background);
+    bottom: 0;
+    width: 100%;
+}

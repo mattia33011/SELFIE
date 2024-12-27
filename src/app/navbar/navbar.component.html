@@ -1,0 +1,36 @@
+<p-menubar [model]="items">
+  <ng-template #start>
+    <div class="flex flex-row gap-4 items-center">
+      <p-image
+        class="lg:inline hidden cursor-pointer"
+        src="selfie-logo-light.png"
+        width="100"
+      />
+      <span class="text-center text-sm md:text-base text-nowrap">
+        {{ today.toLocaleDateString() }}
+        <i class="pi pi-calendar text-sm md:text-base "></i>
+      </span>
+    </div>
+  </ng-template>
+  <ng-template #item let-item let-root="root">
+    <a pRipple class="flex items-center p-menubar-item-link">
+      <span>{{ item.label }}</span>
+    </a>
+  </ng-template>
+  <ng-template #end>
+    <div class="flex items-center justify-content-end gap-2">
+      <input
+        class="w-8 h-1/2"
+        size="small"
+        type="text"
+        pInputText
+        placeholder="Search"
+      />
+      <p-avatar
+        shape="circle"
+        class="cursor-pointer lg:inline-flex hidden"
+        label="P"
+      ></p-avatar>
+    </div>
+  </ng-template>
+</p-menubar>

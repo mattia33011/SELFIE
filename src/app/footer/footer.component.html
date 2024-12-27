@@ -1,0 +1,29 @@
+<div class="w-full h-full">
+  <div class="flex flex-row items-center gap-6 pb-3 px-3 pt-2 justify-content-center w-dw bottom-menu">
+    @for (item of items; track $index) { 
+        @switch (item.type) {
+            @case ('note') {
+                <p-speed-dial direction="up">
+                    <ng-template #button let-toggleCallback="toggleCallback">
+                        <p-button [icon]="item.icon"  [rounded]="true" (click)="toggleCallback($event)" />
+                    </ng-template>
+                </p-speed-dial> 
+            }
+            @case ('event') {
+                <div class="relative">
+                    <p-speed-dial [style]="{ position: 'absolute', left: 'calc(50% - 1.3rem)', bottom: 'calc(50% - 1.5rem)' }" [model]="items" direction="up">
+                    </p-speed-dial>
+                </div>
+                    
+            }
+            @case ('tomato') {
+                <p-speed-dial direction="up">
+                    <ng-template #button let-toggleCallback="toggleCallback">
+                        <p-button [icon]="item.icon"  [rounded]="true" (click)="toggleCallback($event)" />
+                    </ng-template>
+                </p-speed-dial>
+            }
+        }
+    }
+  </div>
+</div>

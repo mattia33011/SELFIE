@@ -1,0 +1,11 @@
+{
+    "login": {
+        "welcome": "Welcome back to",
+        "redirectRegister": "Don't have an account",
+        "rememberMe": "Remember me",
+        "forgotPassword": "Forgot password",
+        "signIn": "Sign In",
+        "registerHere": "Register here"
+
+    }
+}

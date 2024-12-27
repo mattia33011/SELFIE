@@ -1,0 +1,10 @@
+{
+    "login": {
+        "welcomeBack": "Bentornato su",
+        "redirectRegister": "Non hai un account",
+        "rememberMe": "Ricordami",
+        "forgotPassword": "Password dimenticata",
+        "signIn": "Accedi",
+        "registerHere": "Registrati qui"
+    }
+}

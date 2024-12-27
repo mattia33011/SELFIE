@@ -15,6 +15,12 @@
         "lastName": "Cognome",
         "phoneNumber": "Numero di telefono",
         "confirmPassword": "Conferma password",
+        "pickPassword": "Scegli una password",
+        "atLeastOneLowerCase": "Almeno un carattere minuscolo",
+        "atLeastOneUpperCase": "Almeno un carattere maiuscolo",
+        "atLeastOneSpecial": "Almeno un carattere speciale per esempio",
+        "atLeastOneNumber": "Almeno un numero",
+        "atLeast8Chars": "Almeno 8 caratteri",
         "signUp": "Registrati",
         "gdpr": "Ho letto, compreso e accettato i termini e condizioni per gli effetti degli art. 13 e 23 del D.Lgs. n. 196/2003, con la sottoscrizione del presente modulo, il proprio consenso al trattamento dei dati personali forniti a seguito della segnalazione inoltrata."
     }

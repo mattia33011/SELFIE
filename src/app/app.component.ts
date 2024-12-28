@@ -5,10 +5,11 @@ import { NavbarComponent } from "./navbar/navbar.component";
 import { FooterComponent } from "./footer/footer.component";
 import { ThemeService } from './service/theme.service';
 import { SessionService } from './service/session.service';
+import {ToastModule} from 'primeng/toast'
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NavbarComponent, FooterComponent],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, ToastModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

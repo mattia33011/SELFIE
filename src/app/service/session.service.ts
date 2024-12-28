@@ -8,10 +8,23 @@ export class SessionService {
   constructor() { }
 
   isLogged(){
-    return sessionStorage.getItem('sessionToken') != null
+    return this.getSession() != null
   }
   
-  setToken(token: string){
-    sessionStorage.setItem('sessionToken', token)
+  setToken(session: Session){
+    sessionStorage.setItem('session', JSON.stringify(session))
   }
+  getSession(): Session | undefined{
+    const session = sessionStorage.getItem('session')
+    if(session)
+      return JSON.parse(session)
+    return undefined;
+    }
 }
+
+export type Session = {
+  token: string,
+  user: {
+    email: string
+  }
+} 

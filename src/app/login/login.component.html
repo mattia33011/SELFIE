@@ -1,8 +1,9 @@
-<div class="my-6 mx-auto lg:w-8">
+<p-toast />
+
+<div class="mx-auto lg:w-8">
   <p-card class="shadow border-round lg:w-6">
     <ng-template #header>
       <form (ngSubmit)="submit()" [formGroup]="form">
-        <p-toast />
         <div class="text-center p-5 mb-1">
           <div class="text-900 text-3xl font-medium mb-2">
             {{ "login.welcomeBack" | translate }} SELFIE!

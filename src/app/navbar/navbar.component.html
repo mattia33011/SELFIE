@@ -28,10 +28,10 @@
       />
       <p-avatar
         shape="circle"
-        class="cursor-pointer lg:inline-flex hidden"
+        class="cursor-pointer "
         label="P"
       ></p-avatar>
-      <p-toggleswitch [(ngModel)]="checked">
+      <p-toggleswitch class="lg:inline-flex hidden" [(ngModel)]="checked">
         <ng-template #handle let-checked="checked">
           <i [ngClass]="['!text-xs', 'pi', checked ? 'pi-moon' : 'pi-sun']"></i>
         </ng-template>

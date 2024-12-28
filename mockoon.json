@@ -56,7 +56,7 @@
         },
         {
           "uuid": "a8152250-6732-474a-ab9c-14017bb77be2",
-          "body": "{\n  \"token\": \"abc\"\n}",
+          "body": "{\n  \"user\":{\n    \"email\":  \"{{body \"email\"}}\"\n  },\n  \"token\": \"abc\"\n}",
           "latency": 0,
           "statusCode": 200,
           "label": "",

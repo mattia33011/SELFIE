@@ -13,7 +13,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { LoginForm } from '../../types/register';
-import { ApiService } from '../service/api-service.service';
+import { ApiService } from '../service/api.service';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { SessionService } from '../service/session.service';
@@ -59,7 +59,7 @@ export class LoginComponent {
 
     this.apiService.login(loginForm).subscribe({
       next: (res) => {
-        this.sessionService.setToken(res.token)
+        this.sessionService.setToken(res)
         this.router.navigate(['/home'])
       },
       error: (err) => {

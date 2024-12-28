@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
@@ -13,6 +13,7 @@ import { RegisterForm, passwordRegex, phoneNumberRegex } from '../../types/regis
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PasswordModule } from 'primeng/password';
 import { DividerModule } from 'primeng/divider';
+import { ApiService } from '../service/api.service';
 
 @Component({
   selector: 'app-register',
@@ -37,6 +38,8 @@ import { DividerModule } from 'primeng/divider';
 })
 export class RegisterComponent {
 
+  constructor(private readonly apiService: ApiService, private readonly router: Router) { }
+  loading = false
 
   form: FormGroup = new FormGroup({
     firstName: new FormControl<string>('', [Validators.required, Validators.minLength(2)]),
@@ -61,19 +64,31 @@ export class RegisterComponent {
   isPasswordFieldPristine(){
     return this.form.get('password')?.pristine ?? false
   }
-  
   submit(){
     if(this.form.invalid)
       return;
-
+    this.loading = true
     const registerForm: RegisterForm = {
-      email: this.form.get('email')!.value,
-      firstName: this.form.get('firstName')!.value,
-      lastName: this.form.get('lastName')!.value,
-      password: this.form.get('password')!.value,
-      phoneNumber: this.form.get('phoneNumber')!.value
+      email: this.form.get('email')!.value.replaceAll(' ', ""),
+      firstName: this.form.get('firstName')!.value.replaceAll(' ', ""),
+      lastName: this.form.get('lastName')!.value.replaceAll(' ', ""),
+      password: this.form.get('password')!.value.replaceAll(' ', ""),
+      phoneNumber: this.form.get('phoneNumber')!.value.replaceAll(' ', "")
     }
-    console.log(registerForm);
+
+    this.apiService.register(registerForm).subscribe({
+      next: (res) => {
+        this.loading = true
+
+      },
+      error: (err) => {
+        this.loading = false
+      },
+      complete: () => {
+        this.router.navigate(['verify'])
+      }
+    })
+
     
   }
 

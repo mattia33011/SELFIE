@@ -25,6 +25,12 @@
         "signUp": "Registrati",
         "gdpr": "Ho letto, compreso e accettato i termini e condizioni per gli effetti degli art. 13 e 23 del D.Lgs. n. 196/2003, con la sottoscrizione del presente modulo, il proprio consenso al trattamento dei dati personali forniti a seguito della segnalazione inoltrata."
     },
+    "verify": {
+        "title": "Grazie per esserti registrato!",
+        "subtitle": "Manca solo un passaggio",
+        "instructions": "Per poter utilizzare il tuo account devi confermarlo attraverso l'email che ti abbiamo inviato",
+        "redirectBtn": "Clicca qui se hai già confermato il tuo account"
+    },
     "http": {
         "error": "Errore",
         "404": "Non trovato"

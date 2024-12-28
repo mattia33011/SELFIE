@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { LoginForm } from '../../types/register';
+import { LoginForm, RegisterForm } from '../../types/register';
 import { Session } from './session.service';
 
 @Injectable({
@@ -14,5 +14,9 @@ export class ApiService {
 
   login(form: LoginForm){
     return this.http.post<Session>(`${this.baseUrl}/login`, form)
+  }
+  
+  register(form: RegisterForm){
+    return this.http.post(`${this.baseUrl}/register`, form)
   }
 }

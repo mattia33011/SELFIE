@@ -9,11 +9,26 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { KeyFilterModule } from 'primeng/keyfilter';
-import { RegisterForm, passwordRegex, phoneNumberRegex } from '../../types/register';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  RegisterForm,
+  passwordRegex,
+  phoneNumberRegex,
+} from '../../types/register';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { PasswordModule } from 'primeng/password';
 import { DividerModule } from 'primeng/divider';
 import { ApiService } from '../service/api.service';
+import {
+  getPasswordErrors,
+  isPasswordFieldPristine,
+  passwordMatchValidator,
+} from '../../utils/password-utils';
 
 @Component({
   selector: 'app-register',
@@ -37,64 +52,76 @@ import { ApiService } from '../service/api.service';
   styleUrl: './register.component.css',
 })
 export class RegisterComponent {
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly router: Router
+  ) {}
+  loading = false;
 
-  constructor(private readonly apiService: ApiService, private readonly router: Router) { }
-  loading = false
+  form: FormGroup = new FormGroup(
+    {
+      firstName: new FormControl<string>('', [
+        Validators.required,
+        Validators.minLength(2),
+      ]),
+      lastName: new FormControl<string>('', [
+        Validators.required,
+        Validators.minLength(2),
+      ]),
+      email: new FormControl<string>('', [
+        Validators.required,
+        Validators.email,
+      ]),
+      phoneNumber: new FormControl<string>('', [
+        Validators.required,
+        Validators.pattern(phoneNumberRegex),
+      ]),
+      password: new FormControl<string>('', [
+        Validators.required,
+        Validators.pattern(passwordRegex),
+      ]),
+      confirmPassword: new FormControl<string>('', [
+        Validators.required,
+        Validators.pattern(passwordRegex),
+      ]),
+      gdpr: new FormControl<boolean>(false, Validators.requiredTrue),
+    },
+    this.passwordMatchValidator
+  );
 
-  form: FormGroup = new FormGroup({
-    firstName: new FormControl<string>('', [Validators.required, Validators.minLength(2)]),
-    lastName: new FormControl<string>('',[Validators.required, Validators.minLength(2)]),
-    email: new FormControl<string>('', [Validators.required, Validators.email]),
-    phoneNumber: new FormControl<string>('', [Validators.required, Validators.pattern(phoneNumberRegex)]),
-    password: new FormControl<string>('', [Validators.required, Validators.pattern(passwordRegex)]),
-    confirmPassword: new FormControl<string>('', [Validators.required, Validators.pattern(passwordRegex)]),
-    gdpr: new FormControl<boolean>(false, Validators.requiredTrue)
-  },passwordMatchValidator);
-
-  getPasswordErrors(type: 'lowercase' | 'uppercase' | 'minimum' | 'special' | 'numeric'){
-    const value = this.form.get('password')!.value as string
-    switch(type){
-      case "lowercase": return /(?=.*[a-z])/.exec(value)
-      case "uppercase": return /(?=.*[A-Z])/.exec(value)
-      case "minimum": return /(?=.{8,})/.exec(value)
-      case "numeric": return /(?=.*\d)/.exec(value)
-      case "special": return /(?=.*[^a-zA-Z0-9])/.exec(value)
-    }
+  passwordMatchValidator(form: any): any {
+    return passwordMatchValidator(form, 'password', 'confirmPassword');
   }
-  isPasswordFieldPristine(){
-    return this.form.get('password')?.pristine ?? false
+
+  getPasswordErrors(
+    type: 'lowercase' | 'uppercase' | 'minimum' | 'special' | 'numeric'
+  ) {
+    return getPasswordErrors(this.form, 'password', type);
   }
-  submit(){
-    if(this.form.invalid)
-      return;
-    this.loading = true
+  isPasswordFieldPristine() {
+    return isPasswordFieldPristine(this.form, 'password');
+  }
+  submit() {
+    if (this.form.invalid) return;
+    this.loading = true;
     const registerForm: RegisterForm = {
-      email: this.form.get('email')!.value.replaceAll(' ', ""),
-      firstName: this.form.get('firstName')!.value.replaceAll(' ', ""),
-      lastName: this.form.get('lastName')!.value.replaceAll(' ', ""),
-      password: this.form.get('password')!.value.replaceAll(' ', ""),
-      phoneNumber: this.form.get('phoneNumber')!.value.replaceAll(' ', "")
-    }
+      email: this.form.get('email')!.value.replaceAll(' ', ''),
+      firstName: this.form.get('firstName')!.value.replaceAll(' ', ''),
+      lastName: this.form.get('lastName')!.value.replaceAll(' ', ''),
+      password: this.form.get('password')!.value.replaceAll(' ', ''),
+      phoneNumber: this.form.get('phoneNumber')!.value.replaceAll(' ', ''),
+    };
 
     this.apiService.register(registerForm).subscribe({
       next: (res) => {
-        this.loading = true
-
+        this.loading = true;
       },
       error: (err) => {
-        this.loading = false
+        this.loading = false;
       },
       complete: () => {
-        this.router.navigate(['verify'])
-      }
-    })
-
-    
+        this.router.navigate(['verify']);
+      },
+    });
   }
-
-}
-
-function passwordMatchValidator(g: any): any {
-  return g.get('password')?.value === g.get('confirmPassword')?.value
-     ? null : {'mismatch': true};
 }

@@ -17,10 +17,12 @@ import { ApiService } from '../service/api.service';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { SessionService } from '../service/session.service';
+import { Password } from 'primeng/password';
 
 @Component({
   selector: 'app-login',
   imports: [
+    Password,
     ReactiveFormsModule,
     ButtonModule,
     Checkbox,

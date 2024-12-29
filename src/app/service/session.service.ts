@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
 
-  constructor() { }
+  constructor(private readonly router: Router) { }
 
   isLogged(){
     return this.getSession() != null
@@ -20,6 +21,12 @@ export class SessionService {
       return JSON.parse(session)
     return undefined;
     }
+
+    signOut(){
+      sessionStorage.removeItem('session')
+      this.router.navigate(['/login'])
+    }  
+
 }
 
 export type Session = {

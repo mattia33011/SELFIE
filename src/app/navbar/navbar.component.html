@@ -3,7 +3,7 @@
     <div class="flex flex-row gap-4 items-center">
       <p-image
         class="lg:inline hidden cursor-pointer"
-        src="selfie-logo-{{themeService.isDarkMode() ? 'light' : 'dark'}}.png"
+        src="selfie-logo-{{ themeService.isDarkMode() ? 'light' : 'dark' }}.png"
         width="100"
       />
       <span class="text-center text-sm md:text-base text-nowrap">
@@ -27,8 +27,9 @@
         placeholder="Search"
       />
       <p-avatar
+        (click)="profile.toggle($event)"
         shape="circle"
-        class="cursor-pointer "
+        class="cursor-pointer"
         label="P"
       ></p-avatar>
       <p-toggleswitch class="lg:inline-flex hidden" [(ngModel)]="checked">
@@ -39,3 +40,17 @@
     </div>
   </ng-template>
 </p-menubar>
+
+<p-popover #profile>
+  <ul class="list-none text-center">
+    @for (option of options; track $index) {
+    <li
+      class="rounded cursor-pointer hover:!bg-surface-500 px-2 py-1"
+      (click)="option.action()"
+    >
+      {{ option.name | translate }}
+    </li>
+    }
+    <li class="rounded px-3 text-rose-500 cursor-pointer hover:bg-white hover:text-primary-contrast" (click)="sessionService.signOut()">{{ "nav.signOut" | translate }}</li>
+  </ul>
+</p-popover>

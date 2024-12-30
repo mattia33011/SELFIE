@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { ApiService } from './api.service';
+import { LoginForm } from '../../types/register';
 
 @Injectable({
   providedIn: 'root',
@@ -11,11 +13,13 @@ export class SessionService {
     return this.getSession() != null;
   }
 
-  setToken(session: Session) {
+  setToken(session: Session, rememberMe?: boolean) {
+    if (rememberMe)
+      localStorage.setItem('session', JSON.stringify(session))
     sessionStorage.setItem('session', JSON.stringify(session));
   }
   getSession(): Session | undefined {
-    const sessionStr = sessionStorage.getItem('session');
+    const sessionStr = sessionStorage.getItem('session') ?? localStorage.getItem('session');
     if (sessionStr) {
       const session = JSON.parse(sessionStr) as Session;
       return {
@@ -28,6 +32,7 @@ export class SessionService {
   }
 
   signOut() {
+    localStorage.removeItem('session');
     sessionStorage.removeItem('session');
     this.router.navigate(['/login']);
   }

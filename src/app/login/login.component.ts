@@ -64,7 +64,7 @@ export class LoginComponent {
 
     this.apiService.login(loginForm).subscribe({
       next: (res) => {
-        this.sessionService.setToken(res);
+        this.sessionService.setToken(res, this.form.get('rememberMe')?.value ?? undefined);
         this.router.navigate(['/home']);
       },
       error: (err) => {

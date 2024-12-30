@@ -35,7 +35,7 @@
         (click)="profile.toggle($event)"
         shape="circle"
         class="cursor-pointer"
-        label="P"
+        [label]="sessionService.getSession()?.user?.firstName?.substring(0,1)"
       ></p-avatar>
       <p-toggleswitch class="lg:inline-flex hidden" [(ngModel)]="checked">
         <ng-template #handle let-checked="checked">

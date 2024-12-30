@@ -13,7 +13,7 @@ export const routes: Routes = [
   {
     path: 'profile',
     component: ProfileComponent,
-    canActivate: [notLoggedAuthGuard],
+    canActivate: [loggedAuthGuard],
   },
   {
     path: 'login',

@@ -29,10 +29,12 @@ import {
   isPasswordFieldPristine,
   passwordMatchValidator,
 } from '../../utils/password-utils';
+import { DatePickerModule } from 'primeng/datepicker';
 
 @Component({
   selector: 'app-register',
   imports: [
+    DatePickerModule,
     DividerModule,
     PasswordModule,
     FormsModule,
@@ -55,9 +57,11 @@ export class RegisterComponent {
   constructor(
     private readonly apiService: ApiService,
     private readonly router: Router
-  ) {}
+  ) {
+    this.maxDate = new Date();
+  }
   loading = false;
-
+  maxDate: Date;
   form: FormGroup = new FormGroup(
     {
       firstName: new FormControl<string>('', [
@@ -67,6 +71,9 @@ export class RegisterComponent {
       lastName: new FormControl<string>('', [
         Validators.required,
         Validators.minLength(2),
+      ]),
+      birthDate: new FormControl<Date | undefined>(undefined, [
+        Validators.required,
       ]),
       email: new FormControl<string>('', [
         Validators.required,

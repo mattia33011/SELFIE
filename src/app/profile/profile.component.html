@@ -1,1 +1,33 @@
-<p>profile works!</p>
+<div class="mx-auto mt-3">
+  <div class="flex flex-col gap-4 w-full items-center justify-center">
+    <p-avatar
+      [style]="{ width: '8rem', height: '8rem', 'font-size': '5rem' }"
+      label="P"
+      shape="circle"
+    />
+    <div class="gap-3 flex flex-col">
+      @for (item of fields; track $index) {
+      <p-inputgroup>
+        <p-inputgroup-addon>
+          <i [class]="item.icon"></i>
+        </p-inputgroup-addon>
+        <input
+          [id]="item.field"
+          type="text"
+          pInputText
+          readonly
+          [value]="item.value"
+        />
+      </p-inputgroup>
+      }
+      <p-inputgroup>
+        <p-inputgroup-addon> <i class="pi pi-lock"></i> </p-inputgroup-addon>
+        <input readonly pInputText type="password" value="************" />
+      </p-inputgroup>
+      <button routerLink="/reset-password" pButton styleClass="w-full">
+        {{'profile.editPassword' | translate}}
+        <i class="pi pi-pencil"></i>
+      </button>
+    </div>
+  </div>
+</div>

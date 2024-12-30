@@ -18,6 +18,7 @@ import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { SessionService } from '../service/session.service';
 import { Password } from 'primeng/password';
+import { onMessageSubject } from '../service/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -31,16 +32,14 @@ import { Password } from 'primeng/password';
     TranslatePipe,
     Card,
     RouterModule,
-    Toast
   ],
-  providers: [MessageService],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
   standalone: true,
 })
 export class LoginComponent {
 
-  constructor(private readonly router: Router, private readonly apiService: ApiService, private readonly messageService: MessageService, private readonly translateService: TranslateService, private readonly sessionService: SessionService) { }
+  constructor(private readonly router: Router, private readonly apiService: ApiService, private readonly translateService: TranslateService, private readonly sessionService: SessionService) { }
 
   form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -65,8 +64,8 @@ export class LoginComponent {
         this.router.navigate(['/home'])
       },
       error: (err) => {
-        console.log(err);
-        this.messageService.add({ severity: 'error', summary: this.translateService.instant('http.error'), detail: this.translateService.instant('user') + ' ' + this.translateService.instant(`http.${err.status}`) });
+        console.error(err);
+        onMessageSubject.next({ severity: 'error', summary: this.translateService.instant('http.error'), detail: this.translateService.instant('user') + ' ' + this.translateService.instant(`http.${err.status}`) });
         this.loading = false
       },
       complete: () => {

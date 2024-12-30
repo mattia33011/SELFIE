@@ -4,7 +4,8 @@
     <app-navbar />
   </nav>
   }
-  <section class="grow my-16 container grow mx-auto">
+  <section class="grow {{sessionService.isLogged() ? 'my-24' : 'my-4'}} container grow mx-auto">
+    <p-toast [breakpoints]="{ '920px': { width: '100%', right: '0', left: '0' } }" />
     <router-outlet />
   </section>
   @if (sessionService.isLogged()) {

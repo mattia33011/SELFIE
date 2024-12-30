@@ -18,11 +18,17 @@ import {
   isPasswordFieldPristine,
   passwordMatchValidator,
 } from '../../../utils/password-utils';
+import { Session, SessionService } from '../../service/session.service';
+import { RouterModule } from '@angular/router';
+import { Location } from '@angular/common';
+import { MessageService } from 'primeng/api';
+import { onMessageSubject } from '../../service/toast.service';
 
 @Component({
   selector: 'app-reset-password',
   imports: [
     CardModule,
+    RouterModule,
     ReactiveFormsModule,
     ButtonModule,
     TranslatePipe,
@@ -36,11 +42,19 @@ import {
 export class ResetPasswordComponent {
   loading = false;
   form: FormGroup;
+  session?: Session;
 
-  constructor() {
+  constructor(
+    private readonly sessionService: SessionService,
+    private readonly location: Location,
+  ) {
+    this.session = sessionService.getSession();
     this.form = new FormGroup(
       {
-        email: new FormControl('', [Validators.required, Validators.email]),
+        email: new FormControl(this.session?.user.email ?? '', [
+          Validators.required,
+          Validators.email,
+        ]),
         oldPassword: new FormControl('', [
           Validators.required,
           Validators.pattern(passwordRegex),
@@ -56,6 +70,15 @@ export class ResetPasswordComponent {
       },
       this.passwordMatchValidator
     );
+  }
+
+  submit() {
+    onMessageSubject.next({
+      severity: 'success',
+      summary: 'reset.success',
+      detail: 'reset.passwordSetted',
+    });
+    this.location.back()
   }
 
   passwordMatchValidator(form: any): any {

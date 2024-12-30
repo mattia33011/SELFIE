@@ -9,6 +9,7 @@
     "registerHere": "Registrati qui"
   },
   "register": {
+    "email": "Email",
     "welcome": "Benvenuto su",
     "redirectLogin": "Hai già un account",
     "signIn": "Accedi",
@@ -23,9 +24,12 @@
     "atLeastOneNumber": "Almeno un numero",
     "atLeast8Chars": "Almeno 8 caratteri",
     "signUp": "Registrati",
-    "gdpr": "Ho letto, compreso e accettato i termini e condizioni per gli effetti degli art. 13 e 23 del D.Lgs. n. 196/2003, con la sottoscrizione del presente modulo, il proprio consenso al trattamento dei dati personali forniti a seguito della segnalazione inoltrata."
+    "birthDate": "Data di nascita",
+    "gdpr": "Ho letto, compreso e accettato i termini e condizioni per gli effetti degli art. 13 e 23 del D.Lgs. n. 196/2003, con la sottoscrizione del presente modulo, il proprio consenso al trattamento dei dati personali forniti a seguito della segnalazione inoltrata.",
+    "enterPassword": "Scrivi una password"
   },
   "reset": {
+    "changePassword": "Vuoi cambiare la password ?",
     "confirmButton": "Cambia password",
     "newPassword": "Nuova password",
     "confirmNewPassword": "Conferma nuova password",
@@ -33,6 +37,9 @@
     "title": "Hai dimenticato la password ?",
     "backLogin": "Vuoi tornare al login ?",
     "clickHere": "Clicca qui"
+  },
+  "profile": {
+    "editPassword": "Cambia password"
   },
   "nav": {
     "profile": "Profilo",

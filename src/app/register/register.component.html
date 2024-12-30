@@ -11,7 +11,7 @@
           </span>
           <a
             routerLink="/login"
-            class="font-medium ml-2 underline cursor-pointer"
+            class="font-medium ml-2 underline cursor-pointer hover:!text-primary"
           >
             {{ "register.signIn" | translate }}!
           </a>
@@ -49,6 +49,24 @@
               [placeholder]="'register.lastName' | translate"
               pInputText
               class="w-full"
+            />
+          </p-inputgroup>
+
+          <label for="birthDate" class="block text-900 font-medium mb-2">
+            {{ "register.birthDate" | translate }}
+          </label>
+          <p-inputgroup styleClass="mb-3">
+            <p-inputgroup-addon>
+              <i class="pi pi-calendar"></i>
+            </p-inputgroup-addon>
+            <p-date-picker
+              [maxDate]="maxDate"
+              formControlName="birthDate"
+              id="birthDate"
+              [placeholder]="maxDate.toLocaleDateString()"
+              class="!w-full"
+              styleClass="!w-full"
+              fluid="true"
             />
           </p-inputgroup>
 
@@ -96,21 +114,75 @@
             placeholder="Password"
             mediumRegex="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9])(?=.{8,})"
             strongRegex="^(?=(.*[a-z]){2,})(?=(.*[A-Z]){2,})(?=(.*[0-9]){2,})(?=(.*[^a-zA-Z0-9]){2,})(?=.{12,})(?!.*(1234|password|qwerty|abc)).*"
-            styleClass="mb-3"
+            styleClass="mb-3 w-full"
+            class="w-full"
+            [promptLabel]="'\n'"
             fluid="true"
             [toggleMask]="true"
           >
             <ng-template #header>
-              <div class="font-semibold text-xm mb-4">{{'register.pickPassword' | translate}}</div>
+              <div class="font-semibold text-xm mb-4">
+                {{ "register.pickPassword" | translate }}
+              </div>
             </ng-template>
             <ng-template #footer>
               <p-divider />
               <ul class="pl-2 ml-2 my-0 leading-normal">
-                <li [class]="getPasswordErrors('lowercase') ? '!text-primary-500' : isPasswordFieldPristine() ? '' : '!text-rose-500'">{{'register.atLeastOneLowerCase' | translate}}</li>
-                <li [class]="getPasswordErrors('uppercase') ? '!text-primary-500' : isPasswordFieldPristine() ? '' : '!text-rose-500'">{{'register.atLeastOneUpperCase' | translate}}</li>
-                <li [class]="getPasswordErrors('numeric') ? '!text-primary-500' : isPasswordFieldPristine() ? '' :  '!text-rose-500'">{{'register.atLeastOneNumber' | translate}}</li>
-                <li [class]="getPasswordErrors('special') ? '!text-primary-500' : isPasswordFieldPristine() ? '' : '!text-rose-500'">{{'register.atLeastOneSpecial' | translate}} ({{'@'}}.!,-)</li>
-                <li [class]="getPasswordErrors('minimum') ? '!text-primary-500' : isPasswordFieldPristine() ? '' : '!text-rose-500'">{{'register.atLeast8Chars' | translate}}</li>
+                <li
+                  [class]="
+                    getPasswordErrors('lowercase')
+                      ? '!text-primary-500'
+                      : isPasswordFieldPristine()
+                      ? ''
+                      : '!text-rose-500'
+                  "
+                >
+                  {{ "register.atLeastOneLowerCase" | translate }}
+                </li>
+                <li
+                  [class]="
+                    getPasswordErrors('uppercase')
+                      ? '!text-primary-500'
+                      : isPasswordFieldPristine()
+                      ? ''
+                      : '!text-rose-500'
+                  "
+                >
+                  {{ "register.atLeastOneUpperCase" | translate }}
+                </li>
+                <li
+                  [class]="
+                    getPasswordErrors('numeric')
+                      ? '!text-primary-500'
+                      : isPasswordFieldPristine()
+                      ? ''
+                      : '!text-rose-500'
+                  "
+                >
+                  {{ "register.atLeastOneNumber" | translate }}
+                </li>
+                <li
+                  [class]="
+                    getPasswordErrors('special')
+                      ? '!text-primary-500'
+                      : isPasswordFieldPristine()
+                      ? ''
+                      : '!text-rose-500'
+                  "
+                >
+                  {{ "register.atLeastOneSpecial" | translate }} ({{ "@" }}.!,-)
+                </li>
+                <li
+                  [class]="
+                    getPasswordErrors('minimum')
+                      ? '!text-primary-500'
+                      : isPasswordFieldPristine()
+                      ? ''
+                      : '!text-rose-500'
+                  "
+                >
+                  {{ "register.atLeast8Chars" | translate }}
+                </li>
               </ul>
             </ng-template>
           </p-password>

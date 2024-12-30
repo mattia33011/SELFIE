@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { PopoverModule } from 'primeng/popover';
 import { ListboxModule } from 'primeng/listbox';
 import { SessionService } from '../service/session.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -22,6 +22,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     ListboxModule,
     PopoverModule,
     Menubar,
+    RouterModule,
     InputTextModule,
     BadgeModule,
     CommonModule,

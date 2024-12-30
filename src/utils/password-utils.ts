@@ -1,10 +1,14 @@
-import { FormGroup } from "@angular/forms";
+import { FormControl, FormGroup } from "@angular/forms";
 
 export function passwordMatchValidator(form: FormGroup, firstControl: string, secondControl: string): any {
     return form.get(firstControl)?.value === form.get(secondControl)?.value
        ? null : {'mismatch': true};
   }
   
+export function maxDateValidator(control: FormControl, max: Date): any {
+  return control.value < max
+     ? null : {'outOfRange': true};
+}
   export function getPasswordErrors(form: FormGroup, controlName: string ,type: PasswordValidatorType){
     const value = form.get(controlName)!.value as string
     switch(type){

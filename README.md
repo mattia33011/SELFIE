@@ -36,30 +36,41 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
-## Running unit tests
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Project Details
 
-```bash
-ng test
-```
+The project is divided into components (located in the /src folder)
 
-## Running end-to-end tests
+### Authentication
 
-For end-to-end (e2e) testing, run:
+We use JWT technology (JSON web token) to manage the authentication of the entire application
 
-```bash
-ng e2e
-```
+There are also two types of routes:
+- the authenticated one (Profile page, Home ...)
+- the unauthenticated one (Login page, Registration ...)
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Assets
 
-## Additional Resources
+All assets are in the folder `/public`. We have configured Angular so that when we write an absolute path automatically is set to `/public` as base (for all things related to assets, for example: \<img src="/absolute/path" /> cercherà il file in `/public/absolut/path`)
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### I18N
 
+in `/public/i18n` we put the `[it || en].json` files with labels and their translations into the selected language. To load translations dynamically we use the library [ngx-translate](https://www.npmjs.com/package/@ngx-translate/core).
 
+### Palette
 
-## Fonti:
-tomato icon = https://www.flaticon.com/free-icons/tomato
-logo SELFIE = https://logo.com/logo-ideas
+- Primary color: `#ADC178`
+- Light theme main color: `#F0EAD2`
+- Dark theme main color: `#6C584C`
+
+### NgPrime Theme
+
+The NgPrime theme we are using has been defined based on an existing one (Aura), we have defined it in `/public/selfie-theme.ts`
+
+## Sources:
+
+- Tomato icon : https://www.flaticon.com/free-icons/tomato
+- Logo SELFIE : https://logo.com/logo-ideas
+- Style libraries: 
+   - [PrimeNG](https://primeng.org/)
+   - [TailWind CSS](https://tailwindcss.com/docs/guides/angular)

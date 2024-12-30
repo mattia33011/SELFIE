@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from './api.service';
-import { LoginForm } from '../../types/register';
 
 @Injectable({
   providedIn: 'root',

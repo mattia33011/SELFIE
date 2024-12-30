@@ -14,8 +14,6 @@ import {
 } from '@angular/forms';
 import { LoginForm } from '../../types/register';
 import { ApiService } from '../service/api.service';
-import { MessageService } from 'primeng/api';
-import { Toast } from 'primeng/toast';
 import { SessionService } from '../service/session.service';
 import { Password } from 'primeng/password';
 import { onMessageSubject } from '../service/toast.service';

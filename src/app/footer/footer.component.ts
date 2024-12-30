@@ -15,6 +15,19 @@ export class FooterComponent {
   constructor(private readonly translateService: TranslateService) {
     this.items = [
       {
+        type: 'tomato',
+        label: translateService.instant('footer.Tomato') + ' timer',
+        img: 'tomato.png',
+        icon: "pi pi-stopwatch",
+        route: '/timer',
+      },
+      
+      {
+        type: 'event',
+        icon: 'pi pi-plus',
+        route: '/timer',
+      },
+      {
         type: 'note',
         label: 'Note',
         icon: 'pi pi-pen-to-square',
@@ -29,18 +42,11 @@ export class FooterComponent {
           },
         ],
       },
-      {
-        type: 'event',
-        icon: 'pi pi-plus',
-        route: '/timer',
-      },
-      {
-        type: 'tomato',
-        label: translateService.instant('footer.Tomato') + ' timer',
-        img: 'tomato.png',
-        icon: "pi pi-stopwatch",
-        route: '/timer',
-      },
     ];
   }
+
+  noteItems: {id: string, icon: string, callback: () => any}[] = [
+    {id: 'add', icon: 'pi pi-plus', callback: () => undefined},
+    {id: 'schedule', icon: 'pi pi-calendar', callback: () => undefined},
+  ]
 }

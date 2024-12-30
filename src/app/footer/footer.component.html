@@ -11,7 +11,7 @@
             }
             @case ('event') {
                 <div class="relative">
-                    <p-speed-dial [(visible)]="isSpeedDialVisible" [style]="{ position: 'absolute', left: 'calc(50% - 1.3rem)', bottom: 'calc(50% - 1.5rem)' }" [model]="items" direction="up">
+                    <p-speed-dial [(visible)]="isSpeedDialVisible" [style]="{ position: 'absolute', left: 'calc(50% - 1.3rem)', bottom: 'calc(50% - 1.5rem)' }" [model]="noteItems" direction="up">
                         <ng-template #item let-item let-toggleCallback="toggleCallback">
                             <button [class]="isSpeedDialVisible ? '!border-2 !border-primary-200' : '!hidden'" pButton rounded="true" [icon]="item.icon"></button>
                         </ng-template>

@@ -34,7 +34,10 @@
   },
 
   "profile": {
-    "editPassword": "Edit password"
+    "editPassword": "Edit password",
+    "preferences": "Preferences",
+    "passwordSettings": "Reset password",
+    "userDetails": "User details"
   },
   "verify": {
     "title": "Thank you for your registration!",
@@ -44,6 +47,8 @@
   },
 
   "reset": {
+    "passwordSetted": "The password has been setted correctly",
+    "error": "There was an error during the request",
     "changePassword": "Would you change your password ?",
     "cofirmButton": "Reset password",
     "newPassword": "New password",
@@ -53,8 +58,14 @@
     "backLogin": "Would you go back to the login ?",
     "clickHere": "Click here"
   },
+  "dark": "Dark",
+  "light": "Light",
+  "it": "Italian",
+  "en": "English",
   "http": {
+    "success": "Success",
     "error": "Error",
+    "0": "Connection refused",
     "404": "Not found"
   }
 }

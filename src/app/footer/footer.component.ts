@@ -11,7 +11,8 @@ import { SpeedDialModule } from 'primeng/speeddial';
 })
 export class FooterComponent {
   items: any[];
-  constructor(private translateService: TranslateService) {
+  isSpeedDialVisible = false
+  constructor(private readonly translateService: TranslateService) {
     this.items = [
       {
         type: 'note',

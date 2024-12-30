@@ -38,8 +38,12 @@ import { onMessageSubject } from '../service/toast.service';
   standalone: true,
 })
 export class LoginComponent {
-
-  constructor(private readonly router: Router, private readonly apiService: ApiService, private readonly translateService: TranslateService, private readonly sessionService: SessionService) { }
+  constructor(
+    private readonly router: Router,
+    private readonly apiService: ApiService,
+    private readonly translateService: TranslateService,
+    private readonly sessionService: SessionService
+  ) {}
 
   form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -47,31 +51,47 @@ export class LoginComponent {
     rememberMe: new FormControl<boolean | null>(null),
   });
 
-  loading = false
+  loading = false;
 
   submit() {
     if (this.form.invalid) return;
-    this.loading = true
+    this.loading = true;
     const loginForm: LoginForm = {
       email: this.form.get('email')!.value!,
-      password: this.form.get('password')!.value!, 
-      rememberMe: this.form.get('rememberMe')!.value 
-    }
+      password: this.form.get('password')!.value!,
+      rememberMe: this.form.get('rememberMe')!.value,
+    };
 
     this.apiService.login(loginForm).subscribe({
       next: (res) => {
-        this.sessionService.setToken(res)
-        this.router.navigate(['/home'])
+        this.sessionService.setToken(res);
+        this.router.navigate(['/home']);
       },
       error: (err) => {
         console.error(err);
-        onMessageSubject.next({ severity: 'error', summary: this.translateService.instant('http.error'), detail: this.translateService.instant('user') + ' ' + this.translateService.instant(`http.${err.status}`) });
-        this.loading = false
+        onMessageSubject.next({
+          severity: 'error',
+          summary: this.translateService.instant('http.error'),
+          detail: this.resolveHttpError(err.status),
+        });
+        this.loading = false;
       },
       complete: () => {
-        this.loading = false       
-      }
-    })
-    
+        this.loading = false;
+      },
+    });
+  }
+
+  resolveHttpError(status: number): string {
+    switch (status) {
+      case 404:
+        return (
+          this.translateService.instant('user') +
+          ' ' +
+          this.translateService.instant(`http.${status}`)
+        );
+      default:
+        return this.translateService.instant(`http.${status}`)
+    }
   }
 }

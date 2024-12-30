@@ -7,8 +7,8 @@ import {
 } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { passwordRegex } from '../../../types/register';
-import { TranslatePipe } from '@ngx-translate/core';
+import { ResetPasswordForm, passwordRegex } from '../../../types/register';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { DividerModule } from 'primeng/divider';
@@ -23,6 +23,7 @@ import { RouterModule } from '@angular/router';
 import { Location } from '@angular/common';
 import { MessageService } from 'primeng/api';
 import { onMessageSubject } from '../../service/toast.service';
+import { ApiService } from '../../service/api.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -46,7 +47,9 @@ export class ResetPasswordComponent {
 
   constructor(
     private readonly sessionService: SessionService,
-    private readonly location: Location,
+    private readonly translateService: TranslateService,
+    private readonly apiService: ApiService,
+    private readonly location: Location
   ) {
     this.session = sessionService.getSession();
     this.form = new FormGroup(
@@ -73,12 +76,40 @@ export class ResetPasswordComponent {
   }
 
   submit() {
-    onMessageSubject.next({
-      severity: 'success',
-      summary: 'reset.success',
-      detail: 'reset.passwordSetted',
+    if (this.form.invalid) return;
+    this.loading = true;
+    const form: ResetPasswordForm = {
+      email: this.form.get('email')!.value,
+      oldPassword: this.form.get('oldPassword')!.value,
+      newPassword: this.form.get('newPassword')!.value,
+    };
+
+    this.apiService.resetPassword(form).subscribe({
+      next: (res) => {
+        onMessageSubject.next({
+          severity: 'success',
+          summary: this.translateService.instant('http.success'),
+          detail: this.translateService.instant('reset.passwordSetted'),
+        });
+        this.loading = false;
+        this.location.back();
+      },
+      error: (err) => {
+        onMessageSubject.next({
+          severity: 'error',
+          summary: this.translateService.instant('http.error'),
+          detail: this.translateService.instant(this.resolveHttpError(err.status))
+        })
+        this.loading = false;
+      },
     });
-    this.location.back()
+  }
+
+  resolveHttpError(status: number): string{
+    // TODO other status
+      switch(status){
+        default: return 'reset.error'
+      }
   }
 
   passwordMatchValidator(form: any): any {

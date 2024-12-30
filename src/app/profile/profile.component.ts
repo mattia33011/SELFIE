@@ -8,15 +8,20 @@ import {
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { ButtonModule } from 'primeng/button';
 import { RouterModule } from '@angular/router';
-
+import { CardModule } from 'primeng/card';
+import { SelectModule } from 'primeng/select';
+import { FormsModule } from '@angular/forms';
+import { ThemeService } from '../service/theme.service';
 @Component({
   selector: 'app-profile',
   imports: [
+    FormsModule,
+    SelectModule,
     RouterModule,
     AvatarModule,
     ButtonModule,
@@ -25,27 +30,57 @@ import { RouterModule } from '@angular/router';
     InputTextModule,
     InputGroupAddonModule,
     InputGroupModule,
-    TranslatePipe
+    TranslatePipe,
+    CardModule,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
 })
 export class ProfileComponent {
-  constructor(protected readonly sessionService: SessionService) {
+  constructor(
+    protected readonly sessionService: SessionService,
+    protected readonly translateService: TranslateService,
+    private readonly themeService: ThemeService
+  ) {
     this.fields = Object.entries(this.sessionService.getSession()!.user).map(
       ([key, val]) => {
-        console.log(val, val instanceof Date)
+        console.log(val, val instanceof Date);
         return {
           field: key,
-          value: (val instanceof Date) ? val.toLocaleDateString() : val,
+          value: val instanceof Date ? val.toLocaleDateString() : val,
           icon: retrieveIconFromUserField(key as keyof User),
         };
       }
     );
     this.user = this.sessionService.getSession()!.user!;
+    this.selectedLang = this.languages.find(
+      (it) => it.lang == this.translateService.currentLang
+    );
+    this.selectedTheme = themeService.isDarkMode() ? 'dark' : 'light' 
   }
 
+  selectedLang?: { lang: string; flag: string };
+  languages = [
+    { lang: 'it', flag: '🇮🇹' },
+    { lang: 'en', flag: '🇬🇧' },
+  ];
   user: User;
+  fields: { field: string; value: any; icon: string }[];
+  themes = [
+    { value: 'dark', icon: 'pi-moon pi' },
+    { value: 'light', icon: 'pi-sun pi' },
+  ];
+  selectedTheme: 'dark' | 'light'
 
-  fields: {field: string, value: any; icon: string }[];
+  changeLang(lang: string) {
+    localStorage.setItem('lang', lang);
+    this.translateService.use(lang);
+  }
+
+  setTheme(event: { value: string }) {
+    this.themeService.setDarkMode(event.value == 'dark');
+  }
+  signOut(){
+    this.sessionService.signOut()
+  }
 }

@@ -149,33 +149,14 @@
       "streamingInterval": 0
     },
     {
-      "uuid": "3fbb5d4d-746f-4be7-9ea4-b7fe35d79373",
-      "type": "crud",
+      "uuid": "ce90f6ba-14e6-46e9-ab7b-f1679788f33f",
+      "type": "http",
       "documentation": "",
-      "method": "",
+      "method": "patch",
       "endpoint": "reset-password",
       "responses": [
         {
-          "uuid": "8d9b14ad-9619-4586-99ee-5a059a77a5c8",
-          "body": "{}",
-          "latency": 0,
-          "statusCode": 200,
-          "label": "",
-          "headers": [],
-          "bodyType": "DATABUCKET",
-          "filePath": "",
-          "databucketID": "",
-          "sendFileAsBody": false,
-          "rules": [],
-          "rulesOperator": "OR",
-          "disableTemplating": false,
-          "fallbackTo404": false,
-          "default": true,
-          "crudKey": "id",
-          "callbacks": []
-        },
-        {
-          "uuid": "814b3d0e-356b-4bfc-963f-98397910457c",
+          "uuid": "739f218d-7682-4181-a539-ebecbcbf5674",
           "body": "",
           "latency": 0,
           "statusCode": 200,
@@ -189,7 +170,7 @@
           "rulesOperator": "OR",
           "disableTemplating": false,
           "fallbackTo404": false,
-          "default": false,
+          "default": true,
           "crudKey": "id",
           "callbacks": []
         }
@@ -210,7 +191,7 @@
     },
     {
       "type": "route",
-      "uuid": "3fbb5d4d-746f-4be7-9ea4-b7fe35d79373"
+      "uuid": "ce90f6ba-14e6-46e9-ab7b-f1679788f33f"
     }
   ],
   "proxyMode": false,

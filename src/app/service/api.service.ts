@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { LoginForm, RegisterForm } from '../../types/register';
+import { LoginForm, RegisterForm, ResetPasswordForm } from '../../types/register';
 import { Session } from './session.service';
 
 @Injectable({
@@ -18,5 +18,8 @@ export class ApiService {
   
   register(form: RegisterForm){
     return this.http.post(`${this.baseUrl}/register`, form)
+  }
+  resetPassword(form: ResetPasswordForm){
+    return this.http.patch(`${this.baseUrl}/reset-password`, form)
   }
 }

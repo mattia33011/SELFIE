@@ -29,6 +29,8 @@
     "enterPassword": "Scrivi una password"
   },
   "reset": {
+    "passwordSetted": "La password è stata cambiata correttamente",
+    "error": "C'è stato un errore durante la richiesta",
     "changePassword": "Vuoi cambiare la password ?",
     "confirmButton": "Cambia password",
     "newPassword": "Nuova password",
@@ -39,7 +41,10 @@
     "clickHere": "Clicca qui"
   },
   "profile": {
-    "editPassword": "Cambia password"
+    "editPassword": "Cambia password",
+    "preferences": "Preferenze",
+    "passwordSettings": "Reimposta password",
+    "userDetails": "Dettagli utente"
   },
   "nav": {
     "profile": "Profilo",
@@ -51,8 +56,14 @@
     "instructions": "Per poter utilizzare il tuo account devi confermarlo attraverso l'email che ti abbiamo inviato",
     "redirectBtn": "Clicca qui se hai già confermato il tuo account"
   },
+  "dark": "Scuro",
+  "light": "Chiaro",
+  "it": "Italiano",
+  "en": "Inglese",
   "http": {
+    "success": "Successo",
     "error": "Errore",
+    "0": "Connessione rifiutata",
     "404": "Non trovato"
   }
 }

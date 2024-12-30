@@ -11,7 +11,10 @@
             }
             @case ('event') {
                 <div class="relative">
-                    <p-speed-dial [style]="{ position: 'absolute', left: 'calc(50% - 1.3rem)', bottom: 'calc(50% - 1.5rem)' }" [model]="items" direction="up">
+                    <p-speed-dial [(visible)]="isSpeedDialVisible" [style]="{ position: 'absolute', left: 'calc(50% - 1.3rem)', bottom: 'calc(50% - 1.5rem)' }" [model]="items" direction="up">
+                        <ng-template #item let-item let-toggleCallback="toggleCallback">
+                            <button [class]="isSpeedDialVisible ? '!border-2 !border-primary-200' : '!hidden'" pButton rounded="true" [icon]="item.icon"></button>
+                        </ng-template>
                     </p-speed-dial>
                 </div>
                     
@@ -19,7 +22,7 @@
             @case ('tomato') {
                 <p-speed-dial direction="up">
                     <ng-template #button let-toggleCallback="toggleCallback">
-                        <button pButton [icon]="item.icon"  [rounded]="true" (click)="toggleCallback($event)" ></button>
+                        <button pButton [icon]="item.icon" [rounded]="true" (click)="toggleCallback($event)" ></button>
                     </ng-template>
                 </p-speed-dial>
             }

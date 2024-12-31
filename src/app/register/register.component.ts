@@ -72,6 +72,10 @@ export class RegisterComponent {
         Validators.required,
         Validators.minLength(2),
       ]),
+      username: new FormControl<string>('', [
+        Validators.required,
+        Validators.minLength(4),
+      ]),
       birthDate: new FormControl<Date | undefined>(undefined, [
         Validators.required,
       ]),
@@ -113,6 +117,7 @@ export class RegisterComponent {
     this.loading = true;
     const registerForm: RegisterForm = {
       email: this.form.get('email')!.value.replaceAll(' ', ''),
+      username: this.form.get('username')!.value.replaceAll(' ', ''),
       firstName: this.form.get('firstName')!.value.replaceAll(' ', ''),
       lastName: this.form.get('lastName')!.value.replaceAll(' ', ''),
       password: this.form.get('password')!.value.replaceAll(' ', ''),

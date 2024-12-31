@@ -12,12 +12,12 @@ export class SessionService {
   }
 
   setToken(session: Session, rememberMe?: boolean) {
-    if (rememberMe)
-      localStorage.setItem('session', JSON.stringify(session))
+    if (rememberMe) localStorage.setItem('session', JSON.stringify(session));
     sessionStorage.setItem('session', JSON.stringify(session));
   }
   getSession(): Session | undefined {
-    const sessionStr = sessionStorage.getItem('session') ?? localStorage.getItem('session');
+    const sessionStr =
+      sessionStorage.getItem('session') ?? localStorage.getItem('session');
     if (sessionStr) {
       const session = JSON.parse(sessionStr) as Session;
       return {
@@ -43,6 +43,7 @@ export type Session = {
 
 export type User = {
   email: string;
+  username: string;
   firstName: string;
   lastName: string;
   birthDate: Date;
@@ -55,8 +56,10 @@ export const retrieveIconFromUserField = (key: keyof User) => {
     case 'birthDate':
       return 'pi pi-calendar';
     case 'firstName':
-      return 'pi pi-user';
+      return 'pi pi-address-book';
     case 'lastName':
+      return 'pi pi-users';
+    case 'username':
       return 'pi pi-user';
   }
 };

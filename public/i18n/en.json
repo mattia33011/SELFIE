@@ -45,7 +45,10 @@
     "instructions": "To use your account you must confirm it through the email we sent you",
     "redirectBtn": "Click here if you already confirmed your account"
   },
-
+  "footer": {
+    "tomato": "Tomato timer",
+    "event": "Events"
+  },
   "reset": {
     "passwordSetted": "The password has been setted correctly",
     "error": "There was an error during the request",

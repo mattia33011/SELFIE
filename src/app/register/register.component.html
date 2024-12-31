@@ -23,7 +23,7 @@
           </label>
           <p-inputgroup styleClass="mb-3">
             <p-inputgroup-addon>
-              <i class="pi pi-user"></i>
+              <i class="pi pi-address-book"></i>
             </p-inputgroup-addon>
             <input
               formControlName="firstName"
@@ -40,13 +40,30 @@
           </label>
           <p-inputgroup styleClass="mb-3">
             <p-inputgroup-addon>
-              <i class="pi pi-user"></i>
+              <i class="pi pi-users"></i>
             </p-inputgroup-addon>
             <input
               formControlName="lastName"
               id="lastname"
               type="text"
               [placeholder]="'register.lastName' | translate"
+              pInputText
+              class="w-full"
+            />
+          </p-inputgroup>
+
+          <label for="username" class="block text-900 font-medium mb-2">
+            Username
+          </label>
+          <p-inputgroup styleClass="mb-3">
+            <p-inputgroup-addon>
+              <i class="pi pi-user"></i>
+            </p-inputgroup-addon>
+            <input
+              formControlName="username"
+              id="username"
+              type="text"
+              placeholder="Username"
               pInputText
               class="w-full"
             />
@@ -61,6 +78,7 @@
             </p-inputgroup-addon>
             <p-date-picker
               [maxDate]="maxDate"
+              dateFormat="dd/mm/yy"
               formControlName="birthDate"
               id="birthDate"
               [placeholder]="maxDate.toLocaleDateString()"

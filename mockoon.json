@@ -56,7 +56,7 @@
         },
         {
           "uuid": "a8152250-6732-474a-ab9c-14017bb77be2",
-          "body": "{\n  \"user\":{\n    \"email\":  \"{{body \"email\"}}\",\n    \"firstName\": \"Mattia\",\n    \"lastName\": \"Iaria\",\n    \"birthDate\": \"2024-12-29T09:27:18.870Z\"\n    \n  },\n  \"token\": \"abc\"\n}",
+          "body": "{\n  \"user\":{\n    \"email\":  \"{{body \"email\"}}\",\n    \"username\": \"Mattwz\",\n    \"firstName\": \"Mattia\",\n    \"lastName\": \"Iaria\",\n    \"birthDate\": \"2024-12-29T09:27:18.870Z\"\n    \n  },\n  \"token\": \"abc\"\n}",
           "latency": 0,
           "statusCode": 200,
           "label": "",

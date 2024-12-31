@@ -8,6 +8,10 @@
     "signIn": "Accedi",
     "registerHere": "Registrati qui"
   },
+  "footer": {
+    "tomato": "Timer Pomodoro",
+    "event": "Eventi"
+  },
   "register": {
     "email": "Email",
     "welcome": "Benvenuto su",

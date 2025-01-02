@@ -68,7 +68,22 @@
               class="w-full"
             />
           </p-inputgroup>
-
+          <label for="email" class="block text-900 font-medium mb-2">
+            Email
+          </label>
+          <p-inputgroup styleClass="mb-3">
+            <p-inputgroup-addon>
+              <i class="pi pi-at"></i>
+            </p-inputgroup-addon>
+            <input
+              formControlName="email"
+              id="email"
+              type="text"
+              placeholder="Email"
+              pInputText
+              class="w-full"
+            />
+          </p-inputgroup>
           <label for="birthDate" class="block text-900 font-medium mb-2">
             {{ "register.birthDate" | translate }}
           </label>
@@ -88,23 +103,6 @@
             />
           </p-inputgroup>
 
-          <label for="email" class="block text-900 font-medium mb-2">
-            Email
-          </label>
-          <p-inputgroup styleClass="mb-3">
-            <p-inputgroup-addon>
-              <i class="pi pi-at"></i>
-            </p-inputgroup-addon>
-            <input
-              formControlName="email"
-              id="email"
-              type="text"
-              placeholder="Email"
-              pInputText
-              class="w-full"
-            />
-          </p-inputgroup>
-
           <label for="phoneNumber" class="block text-900 font-medium mb-2">
             {{ "register.phoneNumber" | translate }}
           </label>
@@ -121,6 +119,7 @@
               pInputText
             />
           </p-inputgroup>
+          <p-divider />
 
           <label for="password" class="block text-900 font-medium mb-2">
             Password
@@ -138,74 +137,68 @@
             [mediumLabel]="'\n'"
             [strongLabel]="'\n'"
             fluid="true"
+            feedback="false"
             [toggleMask]="true"
-          >
-            <ng-template #header>
-              <div class="font-semibold text-xm mb-4">
-                {{ "register.pickPassword" | translate }}
-              </div>
-            </ng-template>
-            <ng-template #footer>
-              <p-divider />
-              <ul class="pl-2 ml-2 my-0 leading-normal">
-                <li
-                  [class]="
-                    getPasswordErrors('lowercase')
-                      ? '!text-primary-500'
-                      : isPasswordFieldPristine()
-                      ? ''
-                      : '!text-rose-500'
-                  "
-                >
-                  {{ "register.atLeastOneLowerCase" | translate }}
-                </li>
-                <li
-                  [class]="
-                    getPasswordErrors('uppercase')
-                      ? '!text-primary-500'
-                      : isPasswordFieldPristine()
-                      ? ''
-                      : '!text-rose-500'
-                  "
-                >
-                  {{ "register.atLeastOneUpperCase" | translate }}
-                </li>
-                <li
-                  [class]="
-                    getPasswordErrors('numeric')
-                      ? '!text-primary-500'
-                      : isPasswordFieldPristine()
-                      ? ''
-                      : '!text-rose-500'
-                  "
-                >
-                  {{ "register.atLeastOneNumber" | translate }}
-                </li>
-                <li
-                  [class]="
-                    getPasswordErrors('special')
-                      ? '!text-primary-500'
-                      : isPasswordFieldPristine()
-                      ? ''
-                      : '!text-rose-500'
-                  "
-                >
-                  {{ "register.atLeastOneSpecial" | translate }} ({{ "@" }}.!,-)
-                </li>
-                <li
-                  [class]="
-                    getPasswordErrors('minimum')
-                      ? '!text-primary-500'
-                      : isPasswordFieldPristine()
-                      ? ''
-                      : '!text-rose-500'
-                  "
-                >
-                  {{ "register.atLeast8Chars" | translate }}
-                </li>
-              </ul>
-            </ng-template>
-          </p-password>
+          />
+          <div class="mb-2">
+            <ul class="pl-2 ml-2 my-0 leading-normal list-disc">
+              <li
+                [class]="
+                  getPasswordErrors('lowercase')
+                    ? '!text-primary-500'
+                    : isPasswordFieldPristine()
+                    ? ''
+                    : '!text-rose-500'
+                "
+              >
+                {{ "register.atLeastOneLowerCase" | translate }}
+              </li>
+              <li
+                [class]="
+                  getPasswordErrors('uppercase')
+                    ? '!text-primary-500'
+                    : isPasswordFieldPristine()
+                    ? ''
+                    : '!text-rose-500'
+                "
+              >
+                {{ "register.atLeastOneUpperCase" | translate }}
+              </li>
+              <li
+                [class]="
+                  getPasswordErrors('numeric')
+                    ? '!text-primary-500'
+                    : isPasswordFieldPristine()
+                    ? ''
+                    : '!text-rose-500'
+                "
+              >
+                {{ "register.atLeastOneNumber" | translate }}
+              </li>
+              <li
+                [class]="
+                  getPasswordErrors('special')
+                    ? '!text-primary-500'
+                    : isPasswordFieldPristine()
+                    ? ''
+                    : '!text-rose-500'
+                "
+              >
+                {{ "register.atLeastOneSpecial" | translate }} ({{ "@" }}.!,-)
+              </li>
+              <li
+                [class]="
+                  getPasswordErrors('minimum')
+                    ? '!text-primary-500'
+                    : isPasswordFieldPristine()
+                    ? ''
+                    : '!text-rose-500'
+                "
+              >
+                {{ "register.atLeast8Chars" | translate }}
+              </li>
+            </ul>
+          </div>
 
           <label for="password" class="block text-900 font-medium mb-2">
             {{ "register.confirmPassword" | translate }}

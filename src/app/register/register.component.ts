@@ -120,6 +120,7 @@ export class RegisterComponent {
       username: this.form.get('username')!.value.replaceAll(' ', ''),
       firstName: this.form.get('firstName')!.value.replaceAll(' ', ''),
       lastName: this.form.get('lastName')!.value.replaceAll(' ', ''),
+      birthDate: this.form.get('birthDate')!.value,
       password: this.form.get('password')!.value.replaceAll(' ', ''),
       phoneNumber: this.form.get('phoneNumber')!.value.replaceAll(' ', ''),
     };
@@ -135,5 +136,8 @@ export class RegisterComponent {
         this.router.navigate(['verify']);
       },
     });
+  }
+  get password(){
+    return this.form.get('password')!
   }
 }

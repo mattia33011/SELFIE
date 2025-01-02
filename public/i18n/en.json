@@ -6,7 +6,8 @@
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot password",
     "signIn": "Sign In",
-    "registerHere": "Register here"
+    "registerHere": "Register here",
+    "emailOrUsername": "Email or Username"
   },
   "register": {
     "email": "Email",

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { Session, User } from '../../types/session';
 
 @Injectable({
   providedIn: 'root',
@@ -36,18 +37,7 @@ export class SessionService {
   }
 }
 
-export type Session = {
-  token: string;
-  user: User;
-};
 
-export type User = {
-  email: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  birthDate: Date;
-};
 
 export const retrieveIconFromUserField = (key: keyof User) => {
   switch (key) {
@@ -61,5 +51,7 @@ export const retrieveIconFromUserField = (key: keyof User) => {
       return 'pi pi-users';
     case 'username':
       return 'pi pi-user';
+    case "phoneNumber":
+      return 'pi pi-phone'
   }
 };

@@ -3,18 +3,19 @@ export type RegisterForm = {
     lastName: string,
     email: string,
     username: string,
+    birthDate: Date,
     phoneNumber: string,
     password: string
 }
 
 export type LoginForm = {
-    email: string,
+    userID: string,
     password: string,
     rememberMe: boolean | null
 }
 
 export type ResetPasswordForm = {
-    email: string,
+    userID: string,
     oldPassword: string,
     newPassword: string
 }

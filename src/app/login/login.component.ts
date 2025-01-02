@@ -44,7 +44,7 @@ export class LoginComponent {
   ) {}
 
   form = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
+    userID: new FormControl('', [Validators.required]),
     password: new FormControl('', Validators.required),
     rememberMe: new FormControl<boolean | null>(null),
   });
@@ -55,7 +55,7 @@ export class LoginComponent {
     if (this.form.invalid) return;
     this.loading = true;
     const loginForm: LoginForm = {
-      email: this.form.get('email')!.value!,
+      userID: this.form.get('userID')!.value!,
       password: this.form.get('password')!.value!,
       rememberMe: this.form.get('rememberMe')!.value,
     };

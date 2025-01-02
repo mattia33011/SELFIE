@@ -18,12 +18,13 @@ import {
   isPasswordFieldPristine,
   passwordMatchValidator,
 } from '../../../utils/password-utils';
-import { Session, SessionService } from '../../service/session.service';
+import { SessionService } from '../../service/session.service';
 import { RouterModule } from '@angular/router';
 import { Location } from '@angular/common';
 import { MessageService } from 'primeng/api';
 import { onMessageSubject } from '../../service/toast.service';
 import { ApiService } from '../../service/api.service';
+import { Session } from '../../../types/session';
 
 @Component({
   selector: 'app-reset-password',
@@ -54,9 +55,8 @@ export class ResetPasswordComponent {
     this.session = sessionService.getSession();
     this.form = new FormGroup(
       {
-        email: new FormControl(this.session?.user.email ?? '', [
+        userID: new FormControl(this.session?.user.email ?? '', [
           Validators.required,
-          Validators.email,
         ]),
         oldPassword: new FormControl('', [
           Validators.required,
@@ -79,7 +79,7 @@ export class ResetPasswordComponent {
     if (this.form.invalid) return;
     this.loading = true;
     const form: ResetPasswordForm = {
-      email: this.form.get('email')!.value,
+      userID: this.form.get('userID')!.value,
       oldPassword: this.form.get('oldPassword')!.value,
       newPassword: this.form.get('newPassword')!.value,
     };
@@ -98,18 +98,21 @@ export class ResetPasswordComponent {
         onMessageSubject.next({
           severity: 'error',
           summary: this.translateService.instant('http.error'),
-          detail: this.translateService.instant(this.resolveHttpError(err.status))
-        })
+          detail: this.translateService.instant(
+            this.resolveHttpError(err.status)
+          ),
+        });
         this.loading = false;
       },
     });
   }
 
-  resolveHttpError(status: number): string{
+  resolveHttpError(status: number): string {
     // TODO other status
-      switch(status){
-        default: return 'reset.error'
-      }
+    switch (status) {
+      default:
+        return 'reset.error';
+    }
   }
 
   passwordMatchValidator(form: any): any {

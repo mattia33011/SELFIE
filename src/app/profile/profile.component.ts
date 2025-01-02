@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { AvatarModule } from 'primeng/avatar';
 import {
   SessionService,
-  User,
   retrieveIconFromUserField,
 } from '../service/session.service';
 import { InputTextModule } from 'primeng/inputtext';
@@ -17,6 +16,7 @@ import { CardModule } from 'primeng/card';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { ThemeService } from '../service/theme.service';
+import { User } from '../../types/session';
 @Component({
   selector: 'app-profile',
   imports: [

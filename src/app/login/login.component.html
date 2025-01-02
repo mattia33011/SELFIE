@@ -18,14 +18,14 @@
         </div>
 
         <div class="px-5">
-          <label for="email1" class="block text-900 font-medium mb-2">
-            Email
+          <label for="userID" class="block text-900 font-medium mb-2">
+            {{'login.emailOrUsername' | translate}}
           </label>
           <input
-            formControlName="email"
-            id="email1"
+            formControlName="userID"
+            id="userID"
             type="text"
-            placeholder="Email"
+            [placeholder]="'login.emailOrUsername' | translate"
             pInputText
             class="w-full mb-3"
           />

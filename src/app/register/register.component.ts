@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Checkbox } from 'primeng/checkbox';
@@ -30,6 +30,7 @@ import {
   passwordMatchValidator,
 } from '../../utils/password-utils';
 import { DatePickerModule } from 'primeng/datepicker';
+import { onMessageSubject } from '../service/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -56,7 +57,8 @@ import { DatePickerModule } from 'primeng/datepicker';
 export class RegisterComponent {
   constructor(
     private readonly apiService: ApiService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly translateService: TranslateService
   ) {
     this.maxDate = new Date();
   }
@@ -130,6 +132,15 @@ export class RegisterComponent {
         this.loading = true;
       },
       error: (err) => {
+        console.log(err);
+        const errDetail: string = err.error?.code ?? err.error?.status ?? 'genericError'
+        const errContext = err.error?.context ?? ''
+
+        onMessageSubject.next({ 
+          severity: 'error',
+          summary: this.translateService.instant(`http.error`),
+          detail: this.translateService.instant(`http.${errDetail}`) + this.translateService.instant(`register.${errContext}`),
+        });
         this.loading = false;
       },
       complete: () => {
@@ -137,7 +148,7 @@ export class RegisterComponent {
       },
     });
   }
-  get password(){
-    return this.form.get('password')!
+  get password() {
+    return this.form.get('password')!;
   }
 }

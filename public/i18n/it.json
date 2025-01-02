@@ -22,6 +22,7 @@
     "firstName": "Nome",
     "lastName": "Cognome",
     "phoneNumber": "Numero di telefono",
+    "username": "Username",
     "confirmPassword": "Conferma password",
     "pickPassword": "Scegli una password",
     "atLeastOneLowerCase": "Almeno un carattere minuscolo",
@@ -69,7 +70,11 @@
   "http": {
     "success": "Successo",
     "error": "Errore",
+    "genericError": "Si è verificato un errore",
     "0": "Connessione rifiutata",
-    "404": "Non trovato"
+    "404": "Non trovato",
+    "400": "Form non valido",
+    "RE_001": "Form registrazione non valido",
+    "RE_002": "Utente già esistente, campo non valido: "
   }
 }

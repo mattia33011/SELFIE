@@ -69,7 +69,11 @@
   "http": {
     "success": "Success",
     "error": "Error",
+    "genericError": "Ops, There was an error",
     "0": "Connection refused",
-    "404": "Not found"
+    "404": "Not found",
+    "400": "Bad request",
+    "RE_001": "Register form is not valid",
+    "RE_002": "User already exists, invalid field: "
   }
 }

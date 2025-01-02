@@ -6,6 +6,7 @@ import { loggedAuthGuard, notLoggedAuthGuard } from './guard/auth.guard';
 import { VerifyAccountComponent } from './register/verify-account/verify-account.component';
 import { ResetPasswordComponent } from './login/reset-password/reset-password.component';
 import { ProfileComponent } from './profile/profile.component';
+import { ActivateAccountComponent } from './register/activate-account/activate-account.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -33,5 +34,9 @@ export const routes: Routes = [
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
+  },
+  {
+    path: 'activate',
+    component: ActivateAccountComponent,
   },
 ];

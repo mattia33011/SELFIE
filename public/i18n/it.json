@@ -47,6 +47,10 @@
     "backLogin": "Vuoi tornare al login ?",
     "clickHere": "Clicca qui"
   },
+  "activate":{
+    "user": "Utente attivato",
+    "no": "C'è stato un problema nell'attivazione dell'utente"
+  },
   "profile": {
     "editPassword": "Cambia password",
     "preferences": "Preferenze",

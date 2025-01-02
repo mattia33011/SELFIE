@@ -33,7 +33,10 @@
     "profile": "Profile",
     "signOut": "Sign out"
   },
-
+  "activate": {
+    "user": "User activated",
+    "no": "There was a problem activated the user"
+  },
   "profile": {
     "editPassword": "Edit password",
     "preferences": "Preferences",

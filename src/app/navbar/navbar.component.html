@@ -2,12 +2,14 @@
   <ng-template #start>
     <div class="flex flex-row gap-4 items-center">
       <a routerLink="/home">
-        <p-image
-          class=" cursor-pointer"
-          src="selfie-logo-{{
+        <img
+          class="cursor-pointer"
+          ngSrc="selfie-logo-{{
             themeService.isDarkMode() ? 'light' : 'dark'
           }}.png"
           width="150"
+          height="57.3"
+          alt="SELFIE"
         />
       </a>
 
@@ -35,7 +37,12 @@
         (click)="profile.toggle($event)"
         shape="circle"
         class="cursor-pointer"
-        [label]="sessionService.getSession()?.user?.firstName?.substring(0,1)"
+        [image]="sessionService.profilePictureUrl"
+        [label]="
+          sessionService.profilePictureUrl
+            ? undefined
+            : sessionService.getSession()?.user?.firstName?.substring(0, 1)
+        "
       ></p-avatar>
       <p-toggleswitch class="lg:inline-flex hidden" [(ngModel)]="checked">
         <ng-template #handle let-checked="checked">

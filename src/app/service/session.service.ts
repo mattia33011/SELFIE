@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Session, User } from '../../types/session';
+import { ApiService } from './api.service';
+import { ReplaySubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SessionService {
-  constructor(private readonly router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private readonly apiService: ApiService
+  ) {}
 
   isLogged() {
     return this.getSession() != null;
@@ -29,15 +34,27 @@ export class SessionService {
 
     return undefined;
   }
-
+  profilePictureUrl?: string
+  loadProfilePicture() {
+    const user = this.getSession();
+    if (user)
+      this.apiService.getProfilePicture(user).subscribe({
+        next: (res) => {
+          this.profilePictureUrl = res
+          profilePictureSubject.next(res)
+        },
+        error: (err) => {
+          profilePictureSubject.next(undefined)
+        }
+      });
+  }
   signOut() {
+    this.profilePictureUrl = undefined
     localStorage.removeItem('session');
     sessionStorage.removeItem('session');
     this.router.navigate(['/login']);
   }
 }
-
-
 
 export const retrieveIconFromUserField = (key: keyof User) => {
   switch (key) {
@@ -51,7 +68,9 @@ export const retrieveIconFromUserField = (key: keyof User) => {
       return 'pi pi-users';
     case 'username':
       return 'pi pi-user';
-    case "phoneNumber":
-      return 'pi pi-phone'
+    case 'phoneNumber':
+      return 'pi pi-phone';
   }
 };
+
+export const profilePictureSubject = new ReplaySubject<string | undefined>(10)

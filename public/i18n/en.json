@@ -38,10 +38,22 @@
     "no": "There was a problem activated the user"
   },
   "profile": {
+    "delete": "Delete account",
+    "uploadSuccess": "Profile picture uploaded successfully",
+    "uploadFailed": "There was an error uploading your profile picture",
+    "fileTooBig": "The file is too big (Max 2MB)",
+    "selectProfilePicture": "Select profile picture",
     "editPassword": "Edit password",
     "preferences": "Preferences",
     "passwordSettings": "Reset password",
-    "userDetails": "User details"
+    "userDetails": "User details",
+    "deleteDialog": {
+      "noDelete": "Don't delete",
+      "delete": "Delete account",
+      "wouldDelete": "Would you delete your account ?",
+      "areYouSure": "Are you sure ?",
+      "error": "There was an error during the request, try later"
+    }
   },
   "verify": {
     "title": "Thank you for your registration!",
@@ -70,6 +82,7 @@
   "it": "Italian",
   "en": "English",
   "http": {
+    "warning": "Warning",
     "success": "Success",
     "error": "Error",
     "genericError": "Ops, There was an error",

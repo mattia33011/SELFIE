@@ -52,7 +52,7 @@
     "no": "C'è stato un problema nell'attivazione dell'utente"
   },
   "profile": {
-    "delete": "Delete account",
+    "delete": "Elimina profilo",
     "uploadSuccess": "Immagine profilo caricata correttamente",
     "uploadFailed": "C'è stato un errore nel caricamento dell'immagine",
     "fileTooBig": "Il file è troppo grande (Max 2MB)",

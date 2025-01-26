@@ -9,6 +9,11 @@
     "registerHere": "Register here",
     "emailOrUsername": "Email or Username"
   },
+  "home":{
+    "deadlines": "Deadlines",
+    "today": "Today",
+    "noTodayEvents": "No events recorded today"
+  },
   "register": {
     "email": "Email",
     "welcome": "Welcome to",

@@ -1,0 +1,8 @@
+
+
+::ng-deep .p-panel-content{
+        padding: 0 !important;
+    }
+ ::ng-deep .p-panel.p-component{
+    height: 100%;
+ }

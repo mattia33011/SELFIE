@@ -1,4 +1,24 @@
 
-<div class="">
-    Ciao {{sessionService.getSession()?.user?.email}}
+<div class="mx-3 flex flex-col gap-3">
+
+
+    <div class="flex flex-row columns-2 gap-2">
+        <div class="w-1/2">
+            <app-event-list [title]="'home.today' | translate" [loading]="loading" [emptyLabel]="'home.noTodayEvents' | translate" [events]="todayEvents" />
+        </div>
+        <div class="w-1/2">
+            <app-event-list [title]="'home.deadlines' | translate" [loading]="loading" [emptyLabel]="'home.noEvents' | translate" [events]="deadlineEvents" dateFormat="date" />
+        </div>
+
+    </div>
+
+    <p-panel class="w-full">
+        <ng-template #content>
+            <div class="h-[30dvh]">
+
+            </div>
+        </ng-template>
+        
+    </p-panel>
+
 </div>

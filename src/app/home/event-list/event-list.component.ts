@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Events } from '../../../types/events';
+import { Event, Events, isEvent, Note, Notes } from '../../../types/events';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -14,13 +14,26 @@ import { DatePipe } from '@angular/common';
   styleUrl: './event-list.component.css'
 })
 export class EventListComponent {
-  @Input() events!: Events
+  @Input() content!: Events | Notes
   @Input() loading?: boolean
   @Input() title!: string
   @Input() emptyLabel: string = 'home.noEvents'
   @Input() dateFormat: "time" | "date" = 'time'
+  protected _content:Content[] = []
+  ngOnInit(){
+    this._content = this.content.map(this.castContent)
 
-  convertTimeToString(date: Date){
-    return date.toLocaleTimeString(undefined, {"timeStyle": "short"})
   }
+  castContent(e: Event | Note): Content{
+    return {
+      title: e.title,
+      color: e.color,
+      date: isEvent(e) ? e.expireDate : e.lastEdit,
+      subtitle: isEvent(e) ? e.description : e.content
+    }
+  }
+
+
 }
+
+type Content = {title: string, color?: "success" | "info" | "warn" | "danger" | "help", date: Date, subtitle?: string}

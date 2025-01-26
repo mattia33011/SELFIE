@@ -3,11 +3,11 @@
     <ng-template #header>
       <div class="flex flex-col gap-4 w-full pt-4 items-center justify-center">
         <p-avatar
-          [style]="{ width: '8rem', height: '8rem', 'font-size': '5rem' }"
-          [label]="imageUrl ? undefined : user?.firstName?.substring(0, 1)"
+          [style]="{ width: '8rem', height: '8rem', 'font-size': '5rem', 'object-fit': 'inherit', 'object-position': 'center' }"
+          [label]="imageUrl ? undefined : user.firstName.substring(0, 1)"
           shape="circle"
           [image]="imageUrl"
-          styleClass="cursor-pointer"
+          styleClass="cursor-pointer !object-cover "
           (click)="fileInput.click()"
           [pTooltip]="'profile.selectProfilePicture' | translate"
         />

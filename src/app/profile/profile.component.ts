@@ -98,6 +98,9 @@ export class ProfileComponent {
   ngOnInit() {
     this.imageUrl = this.sessionService.profilePictureUrl;
     profilePictureSubject.subscribe((path) => (this.imageUrl = path));
+    this.themeService.listen.subscribe(res => {
+      this.selectedTheme = res
+    })
   }
   onFileChange(event: any) {
     const file = event.target.files[0] as File | undefined;

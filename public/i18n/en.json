@@ -12,7 +12,10 @@
   "home":{
     "deadlines": "Deadlines",
     "today": "Today",
-    "noTodayEvents": "No events recorded today"
+    "noTodayEvents": "No events recorded today",
+    "notes": "Notes",
+    "noNotes": "No notes saved"
+
   },
   "register": {
     "email": "Email",

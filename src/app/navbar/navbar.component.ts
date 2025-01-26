@@ -66,6 +66,9 @@ export class NavbarComponent {
     this.items = [];
     this.checked = this.themeService.isDarkMode();
     this.sessionService.loadProfilePicture()
+    this.themeService.listen.subscribe(res => {
+      this._checked = res == 'dark' ? true : false
+    })
   }
   ngOnCheck() {
     this.checked = this.themeService.isDarkMode();

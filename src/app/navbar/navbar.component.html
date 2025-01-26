@@ -1,9 +1,9 @@
 <p-menubar styleClass="" [model]="items">
   <ng-template #start>
-    <div class="flex flex-row gap-4 items-center">
-      <a routerLink="/home">
+    <div class="flex flex-row gap-3 items-center">
+      <a  class="" routerLink="/home">
         <img
-          class="cursor-pointer"
+          class="cursor-pointer xm:w-full min-w-[90px]"
           ngSrc="selfie-logo-{{
             themeService.isDarkMode() ? 'light' : 'dark'
           }}.png"
@@ -39,6 +39,7 @@
         shape="circle"
         class="cursor-pointer"
         size="large"
+        styleClass="!object-cover"
         [image]="sessionService.profilePictureUrl"
         [label]="
           sessionService.profilePictureUrl

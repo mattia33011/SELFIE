@@ -17,7 +17,9 @@
   "home":{
     "deadlines": "Scadenze",
     "today": "Oggi",
-    "noTodayEvents": "Nessun evento registrato oggi"
+    "noTodayEvents": "Nessun evento registrato oggi",
+    "notes": "Note",
+    "noNotes": "Non hai nessuna nota salvata"
   },
   "register": {
     "email": "Email",

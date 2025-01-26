@@ -2,23 +2,22 @@
 <div class="mx-3 flex flex-col gap-3">
 
 
-    <div class="flex flex-row columns-2 gap-2">
-        <div class="w-1/2">
-            <app-event-list [title]="'home.today' | translate" [loading]="loading" [emptyLabel]="'home.noTodayEvents' | translate" [events]="todayEvents" />
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div class="w-full">
+            <app-event-list [title]="'home.today' | translate" [loading]="loading" [emptyLabel]="'home.noTodayEvents' | translate" [content]="todayEvents" />
         </div>
-        <div class="w-1/2">
-            <app-event-list [title]="'home.deadlines' | translate" [loading]="loading" [emptyLabel]="'home.noEvents' | translate" [events]="deadlineEvents" dateFormat="date" />
+        <div class="w-full">
+            <app-event-list [title]="'home.deadlines' | translate" [loading]="loading" [emptyLabel]="'home.noEvents' | translate" [content]="deadlineEvents" dateFormat="date" />
         </div>
-
+        <div class="col-span-2 md:col-span-1">
+            <app-event-list [title]="'home.notes' | translate" [loading]="loading" [emptyLabel]="'home.noNotes' | translate" [content]="notes" dateFormat="date" />
+        </div>
+    
     </div>
+    
 
-    <p-panel class="w-full">
-        <ng-template #content>
-            <div class="h-[30dvh]">
 
-            </div>
-        </ng-template>
-        
-    </p-panel>
+
+
 
 </div>

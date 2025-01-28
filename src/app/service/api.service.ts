@@ -7,6 +7,7 @@ import {
 } from '../../types/register';
 import { Session, User } from '../../types/session';
 import { map } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,7 @@ export class ApiService {
   
   
   constructor(private readonly http: HttpClient) {}
-  private readonly baseUrl = '/api';
+  private readonly baseUrl = environment.baseUrl;
   private resolveBearerToken = (token: string) => `Bearer ${token}`;
 
   getProfilePicture(session: Session) {

@@ -22,7 +22,9 @@
             @case ('tomato') {
                 <p-speed-dial direction="up">
                     <ng-template #button let-toggleCallback="toggleCallback">
-                        <button pButton [icon]="item.icon" [rounded]="true" (click)="toggleCallback($event)" ></button>
+                        <button routerLink="/pomodoro" pButton [icon]="item.icon" [rounded]="true" (click)="toggleCallback($event)" ></button>
+                        <a routerLink="/pomodoro">
+                        </a>
                     </ng-template>
                 </p-speed-dial>
             }

@@ -6,6 +6,8 @@ import { loggedAuthGuard, notLoggedAuthGuard } from './guard/auth.guard';
 import { VerifyAccountComponent } from './register/verify-account/verify-account.component';
 import { ResetPasswordComponent } from './login/reset-password/reset-password.component';
 import { ProfileComponent } from './profile/profile.component';
+import { PomodoroComponent } from './pomodoro/pomodoro.components';
+
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -33,5 +35,9 @@ export const routes: Routes = [
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
+  },
+  {
+    path: 'pomodoro',
+    component: PomodoroComponent,
   },
 ];

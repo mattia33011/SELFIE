@@ -10,7 +10,7 @@ export class ApiService {
 
   constructor(private readonly http: HttpClient) { }
 
-  private readonly baseUrl = 'http://192.168.1.10:3000'
+  private readonly baseUrl = 'http://localhost:3000'
 
   login(form: LoginForm){
     return this.http.post<Session>(`${this.baseUrl}/login`, form)

@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
+import { RouterLink, RouterModule } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { SpeedDialModule } from 'primeng/speeddial';
 
 @Component({
   selector: 'app-footer',
-  imports: [ButtonModule, SpeedDialModule],
+  imports: [ButtonModule, SpeedDialModule, RouterModule],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css',
 })

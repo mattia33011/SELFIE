@@ -1,6 +1,7 @@
 footer{
     position: fixed;
     bottom: 0;
+    z-index: 100;
     width: 100%;
 }
 
@@ -8,5 +9,6 @@ nav{
     position: fixed;
     background: var(--p-menubar-background);
     top: 0;
+    z-index: 100;
     width: 100%;
 }

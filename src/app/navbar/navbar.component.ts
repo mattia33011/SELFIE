@@ -3,7 +3,7 @@ import { MenuItem } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { Menubar } from 'primeng/menubar';
 import { BadgeModule } from 'primeng/badge';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ImageModule } from 'primeng/image';
 import { Avatar } from 'primeng/avatar';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
@@ -14,10 +14,12 @@ import { ListboxModule } from 'primeng/listbox';
 import { SessionService } from '../service/session.service';
 import { Router, RouterModule } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ApiService } from '../service/api.service';
 
 @Component({
   selector: 'app-navbar',
   imports: [
+    NgOptimizedImage,
     TranslatePipe,
     ListboxModule,
     PopoverModule,
@@ -63,6 +65,10 @@ export class NavbarComponent {
     ];
     this.items = [];
     this.checked = this.themeService.isDarkMode();
+    this.sessionService.loadProfilePicture()
+    this.themeService.listen.subscribe(res => {
+      this._checked = res == 'dark' ? true : false
+    })
   }
   ngOnCheck() {
     this.checked = this.themeService.isDarkMode();

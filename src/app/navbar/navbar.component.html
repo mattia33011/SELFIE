@@ -1,13 +1,16 @@
-<p-menubar [model]="items">
+<p-menubar styleClass="" [model]="items">
   <ng-template #start>
-    <div class="flex flex-row gap-4 items-center">
-      <a routerLink="/home">
-        <p-image
-          class=" cursor-pointer"
-          src="selfie-logo-{{
+    <div class="flex flex-row gap-3 items-center">
+      <a  class="" routerLink="/home">
+        <img
+          class="cursor-pointer xm:w-full min-w-[90px]"
+          ngSrc="selfie-logo-{{
             themeService.isDarkMode() ? 'light' : 'dark'
           }}.png"
           width="150"
+          height="57.3"
+          alt="SELFIE"
+          priority
         />
       </a>
 
@@ -35,7 +38,14 @@
         (click)="profile.toggle($event)"
         shape="circle"
         class="cursor-pointer"
-        [label]="sessionService.getSession()?.user?.firstName?.substring(0,1)"
+        size="large"
+        styleClass="!object-cover"
+        [image]="sessionService.profilePictureUrl"
+        [label]="
+          sessionService.profilePictureUrl
+            ? undefined
+            : sessionService.getSession()?.user?.firstName?.substring(0, 1)
+        "
       ></p-avatar>
       <p-toggleswitch class="lg:inline-flex hidden" [(ngModel)]="checked">
         <ng-template #handle let-checked="checked">

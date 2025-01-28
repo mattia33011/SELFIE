@@ -1,25 +1,29 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { Session, User } from '../../types/session';
 import { ApiService } from './api.service';
-import { LoginForm } from '../../types/register';
+import { ReplaySubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SessionService {
-  constructor(private readonly router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private readonly apiService: ApiService
+  ) {}
 
   isLogged() {
     return this.getSession() != null;
   }
 
   setToken(session: Session, rememberMe?: boolean) {
-    if (rememberMe)
-      localStorage.setItem('session', JSON.stringify(session))
+    if (rememberMe) localStorage.setItem('session', JSON.stringify(session));
     sessionStorage.setItem('session', JSON.stringify(session));
   }
   getSession(): Session | undefined {
-    const sessionStr = sessionStorage.getItem('session') ?? localStorage.getItem('session');
+    const sessionStr =
+      sessionStorage.getItem('session') ?? localStorage.getItem('session');
     if (sessionStr) {
       const session = JSON.parse(sessionStr) as Session;
       return {
@@ -30,25 +34,27 @@ export class SessionService {
 
     return undefined;
   }
-
+  profilePictureUrl?: string
+  loadProfilePicture() {
+    const user = this.getSession();
+    if (user)
+      this.apiService.getProfilePicture(user).subscribe({
+        next: (res) => {
+          this.profilePictureUrl = res
+          profilePictureSubject.next(res)
+        },
+        error: (err) => {
+          profilePictureSubject.next(undefined)
+        }
+      });
+  }
   signOut() {
+    this.profilePictureUrl = undefined
     localStorage.removeItem('session');
     sessionStorage.removeItem('session');
     this.router.navigate(['/login']);
   }
 }
-
-export type Session = {
-  token: string;
-  user: User;
-};
-
-export type User = {
-  email: string;
-  firstName: string;
-  lastName: string;
-  birthDate: Date;
-};
 
 export const retrieveIconFromUserField = (key: keyof User) => {
   switch (key) {
@@ -57,8 +63,14 @@ export const retrieveIconFromUserField = (key: keyof User) => {
     case 'birthDate':
       return 'pi pi-calendar';
     case 'firstName':
-      return 'pi pi-user';
+      return 'pi pi-address-book';
     case 'lastName':
+      return 'pi pi-users';
+    case 'username':
       return 'pi pi-user';
+    case 'phoneNumber':
+      return 'pi pi-phone';
   }
 };
+
+export const profilePictureSubject = new ReplaySubject<string | undefined>(10)

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Checkbox } from 'primeng/checkbox';
@@ -30,6 +30,7 @@ import {
   passwordMatchValidator,
 } from '../../utils/password-utils';
 import { DatePickerModule } from 'primeng/datepicker';
+import { onMessageSubject } from '../service/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -56,7 +57,8 @@ import { DatePickerModule } from 'primeng/datepicker';
 export class RegisterComponent {
   constructor(
     private readonly apiService: ApiService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly translateService: TranslateService
   ) {
     this.maxDate = new Date();
   }
@@ -71,6 +73,10 @@ export class RegisterComponent {
       lastName: new FormControl<string>('', [
         Validators.required,
         Validators.minLength(2),
+      ]),
+      username: new FormControl<string>('', [
+        Validators.required,
+        Validators.minLength(4),
       ]),
       birthDate: new FormControl<Date | undefined>(undefined, [
         Validators.required,
@@ -113,8 +119,10 @@ export class RegisterComponent {
     this.loading = true;
     const registerForm: RegisterForm = {
       email: this.form.get('email')!.value.replaceAll(' ', ''),
+      username: this.form.get('username')!.value.replaceAll(' ', ''),
       firstName: this.form.get('firstName')!.value.replaceAll(' ', ''),
       lastName: this.form.get('lastName')!.value.replaceAll(' ', ''),
+      birthDate: this.form.get('birthDate')!.value,
       password: this.form.get('password')!.value.replaceAll(' ', ''),
       phoneNumber: this.form.get('phoneNumber')!.value.replaceAll(' ', ''),
     };
@@ -124,11 +132,23 @@ export class RegisterComponent {
         this.loading = true;
       },
       error: (err) => {
+        console.log(err);
+        const errDetail: string = err.error?.code ?? err.error?.status ?? 'genericError'
+        const errContext = err.error?.context ?? ''
+
+        onMessageSubject.next({ 
+          severity: 'error',
+          summary: this.translateService.instant(`http.error`),
+          detail: this.translateService.instant(`http.${errDetail}`) + this.translateService.instant(`register.${errContext}`),
+        });
         this.loading = false;
       },
       complete: () => {
         this.router.navigate(['verify']);
       },
     });
+  }
+  get password() {
+    return this.form.get('password')!;
   }
 }

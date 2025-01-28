@@ -1,0 +1,38 @@
+::ng-deep #calendar > .p-panel-header{
+    padding: 0 !important;
+}
+
+
+  /* bottoni full calendar */
+::ng-deep .fc-button {
+    transition: background-color 0.3s ease;
+    background-color: var(--p-primary-500) !important;
+    border-color: var(--p-primary-600) !important;
+    box-shadow: none !important;
+}
+::ng-deep .fc-button:hover{
+    background-color: var(--p-primary-700) !important;
+}
+
+  /* Celle di giorni generici */
+  ::ng-deep .fc-daygrid-day {
+    transition: background-color 0.3s ease;
+    font-weight: 500;
+    cursor: pointer;
+  }
+    /* Hover sulle celle */
+    ::ng-deep .fc-daygrid-day:hover {
+        background-color: var(--p-surface-400);
+        color: var(--p-light-900);
+      }
+
+  /* Celle di giorni specifici */
+ ::ng-deep .fc-day-today {
+    background-color: var(--p-primary-500) !important;
+    color: var(--p-surface-900);
+  }
+  ::ng-deep .fc-day-today:hover {
+    background-color: var(--p-primary-700) !important;
+
+  }
+

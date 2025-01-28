@@ -6,7 +6,20 @@
     "rememberMe": "Ricordami",
     "forgotPassword": "Password dimenticata",
     "signIn": "Accedi",
-    "registerHere": "Registrati qui"
+    "registerHere": "Registrati qui",
+    "emailOrUsername": "Email o Username"
+  },
+
+  "footer": {
+    "tomato": "Timer Pomodoro",
+    "event": "Eventi"
+  },
+  "home":{
+    "deadlines": "Scadenze",
+    "today": "Oggi",
+    "noTodayEvents": "Nessun evento registrato oggi",
+    "notes": "Note",
+    "noNotes": "Non hai nessuna nota salvata"
   },
   "register": {
     "email": "Email",
@@ -16,6 +29,7 @@
     "firstName": "Nome",
     "lastName": "Cognome",
     "phoneNumber": "Numero di telefono",
+    "username": "Username",
     "confirmPassword": "Conferma password",
     "pickPassword": "Scegli una password",
     "atLeastOneLowerCase": "Almeno un carattere minuscolo",
@@ -40,11 +54,27 @@
     "backLogin": "Vuoi tornare al login ?",
     "clickHere": "Clicca qui"
   },
+  "activate":{
+    "user": "Utente attivato",
+    "no": "C'è stato un problema nell'attivazione dell'utente"
+  },
   "profile": {
+    "delete": "Elimina profilo",
+    "uploadSuccess": "Immagine profilo caricata correttamente",
+    "uploadFailed": "C'è stato un errore nel caricamento dell'immagine",
+    "fileTooBig": "Il file è troppo grande (Max 2MB)",
+    "selectProfilePicture": "Seleziona immagine profilo",
     "editPassword": "Cambia password",
     "preferences": "Preferenze",
     "passwordSettings": "Reimposta password",
-    "userDetails": "Dettagli utente"
+    "userDetails": "Dettagli utente",
+    "deleteDialog": {
+      "noDelete": "Non eliminare",
+      "delete": "Elimina profilo",
+      "wouldDelete": "Vuoi cancellare il tuo profilo ?",
+      "areYouSure": "Sei sicuro ?",
+      "error": "Si è verificato un errore, riprova più tardi"
+    }
   },
   "nav": {
     "profile": "Profilo",
@@ -61,9 +91,14 @@
   "it": "Italiano",
   "en": "Inglese",
   "http": {
+    "warning": "Attenzione",
     "success": "Successo",
     "error": "Errore",
+    "genericError": "Si è verificato un errore",
     "0": "Connessione rifiutata",
-    "404": "Non trovato"
+    "404": "Non trovato",
+    "400": "Form non valido",
+    "RE_001": "Form registrazione non valido",
+    "RE_002": "Utente già esistente, campo non valido: "
   }
 }

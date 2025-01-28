@@ -8,6 +8,7 @@ import { ResetPasswordComponent } from './login/reset-password/reset-password.co
 import { ProfileComponent } from './profile/profile.component';
 import { PomodoroComponent } from './pomodoro/pomodoro.components';
 
+import { ActivateAccountComponent } from './register/activate-account/activate-account.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -39,5 +40,9 @@ export const routes: Routes = [
   {
     path: 'pomodoro',
     component: PomodoroComponent,
+  },
+  {
+    path: 'activate',
+    component: ActivateAccountComponent,
   },
 ];

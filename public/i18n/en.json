@@ -6,7 +6,16 @@
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot password",
     "signIn": "Sign In",
-    "registerHere": "Register here"
+    "registerHere": "Register here",
+    "emailOrUsername": "Email or Username"
+  },
+  "home":{
+    "deadlines": "Deadlines",
+    "today": "Today",
+    "noTodayEvents": "No events recorded today",
+    "notes": "Notes",
+    "noNotes": "No notes saved"
+
   },
   "register": {
     "email": "Email",
@@ -32,12 +41,27 @@
     "profile": "Profile",
     "signOut": "Sign out"
   },
-
+  "activate": {
+    "user": "User activated",
+    "no": "There was a problem activated the user"
+  },
   "profile": {
+    "delete": "Delete account",
+    "uploadSuccess": "Profile picture uploaded successfully",
+    "uploadFailed": "There was an error uploading your profile picture",
+    "fileTooBig": "The file is too big (Max 2MB)",
+    "selectProfilePicture": "Select profile picture",
     "editPassword": "Edit password",
     "preferences": "Preferences",
     "passwordSettings": "Reset password",
-    "userDetails": "User details"
+    "userDetails": "User details",
+    "deleteDialog": {
+      "noDelete": "Don't delete",
+      "delete": "Delete account",
+      "wouldDelete": "Would you delete your account ?",
+      "areYouSure": "Are you sure ?",
+      "error": "There was an error during the request, try later"
+    }
   },
   "verify": {
     "title": "Thank you for your registration!",
@@ -45,7 +69,10 @@
     "instructions": "To use your account you must confirm it through the email we sent you",
     "redirectBtn": "Click here if you already confirmed your account"
   },
-
+  "footer": {
+    "tomato": "Tomato timer",
+    "event": "Events"
+  },
   "reset": {
     "passwordSetted": "The password has been setted correctly",
     "error": "There was an error during the request",
@@ -63,9 +90,14 @@
   "it": "Italian",
   "en": "English",
   "http": {
+    "warning": "Warning",
     "success": "Success",
     "error": "Error",
+    "genericError": "Ops, There was an error",
     "0": "Connection refused",
-    "404": "Not found"
+    "404": "Not found",
+    "400": "Bad request",
+    "RE_001": "Register form is not valid",
+    "RE_002": "User already exists, invalid field: "
   }
 }

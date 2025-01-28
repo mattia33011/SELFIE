@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -9,6 +9,8 @@ import { ThemeService } from '../service/theme.service';
 import { Toolbar } from 'primeng/toolbar';
 import { AvatarModule } from 'primeng/avatar';
 import { SplitterModule } from 'primeng/splitter';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Knob } from 'primeng/knob';
 
 @Component({
     selector: 'app-timer',
@@ -20,7 +22,9 @@ import { SplitterModule } from 'primeng/splitter';
         FormsModule,
         Toolbar,
         AvatarModule,
-        SplitterModule
+        SplitterModule,
+        ReactiveFormsModule,
+        Knob
     ],
     templateUrl: './pomodoro.components.html',
     styleUrl: './pomodoro.components.css',

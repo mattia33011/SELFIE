@@ -24,8 +24,9 @@
                             <p-button label="Short break" />
                             <p-button label="Long break"/>
                         </div>
+                        <p-knob formControlName={{remaningTime}}/>
                         <p-progress-bar [value]="(remaningTime/60)*100"></p-progress-bar>
-                        <p>{{remaningTime}}</p>
+                        <div class="mx-auto">{{remaningTime}}</div>
                     <p-button label="{{ startStop }}" (click)="clickButton()"/>
                     </div>
                     <div>

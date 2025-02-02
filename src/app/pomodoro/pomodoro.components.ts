@@ -6,11 +6,12 @@ import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
 import { ThemeService } from '../service/theme.service';
-import { Toolbar } from 'primeng/toolbar';
 import { AvatarModule } from 'primeng/avatar';
 import { SplitterModule } from 'primeng/splitter';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Knob } from 'primeng/knob';
+import { ButtonGroupModule } from 'primeng/buttongroup';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @Component({
     selector: 'app-timer',
@@ -20,10 +21,11 @@ import { Knob } from 'primeng/knob';
         CardModule,
         //TranslatePipe,
         FormsModule,
-        Toolbar,
         AvatarModule,
         SplitterModule,
         ReactiveFormsModule,
+        ButtonGroupModule,
+        SelectButtonModule,
         Knob
     ],
     templateUrl: './pomodoro.components.html',
@@ -32,20 +34,26 @@ import { Knob } from 'primeng/knob';
 })
 export class PomodoroComponent{
 
-    standardTime: number = 1200 // 25 minuti, tempo in secondi
-    remaningTime: number = this.standardTime; 
+    formGroup = new FormGroup({
+        timer: new FormControl(0, )
+    })
+    standardTime: number = 1500 // 25 minuti, tempo in secondi
     //numero standard e remaning time separati per permettere personalizzazione del timer
     interval?: number;
     isRunning: boolean = false;
 
     startStop: string = "START"; // valore iniziale
+    formattedTimer: string = "25:00";
 
+    stateOptions: any[] =[{label: "Pomodoro", value:"pomodoro"},{ label: 'Short Break', value: 'shortBreak' },{ label: 'Long Break', value: 'longBreak' }]
+    value: string = 'off';
 
     constructor(
         private readonly messageService: MessageService,
         private readonly translateService: TranslateService,
         private readonly themeService: ThemeService
     ) {
+        this.remaningTime=this.standardTime
         this.selectedLang = this.languages.find(
             (it) => it.lang == this.translateService.currentLang
           );
@@ -84,7 +92,8 @@ export class PomodoroComponent{
         }
         this.isRunning=true;
         this.interval=window.setInterval(() => {
-            this.remaningTime--; 
+            this.remaningTime--;
+            this.getTime()
 
             if(this.remaningTime<=0){
                 this.stopTimer();
@@ -95,6 +104,13 @@ export class PomodoroComponent{
             }
     }, 1000)
 
+    }
+
+    set remaningTime(value: number){
+        this.formGroup.get("timer")?.setValue(value);
+    }
+    get remaningTime(){
+        return this.formGroup.get("timer")!.value as number;
     }
 
     stopTimer(){    //stoppo il timer
@@ -112,5 +128,14 @@ export class PomodoroComponent{
 
     setCustomTime(seconds: number){
         this.remaningTime=seconds;
+    }
+
+    getTime(){
+        let minutes=Math.floor(this.remaningTime/60);
+        let seconds=this.remaningTime%60
+        // Formattazione del timer in MM:SS
+        const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+        const formattedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+        this.formattedTimer = `${formattedMinutes}:${formattedSeconds}`;
     }
 }

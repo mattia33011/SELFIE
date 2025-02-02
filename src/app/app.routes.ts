@@ -9,6 +9,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { PomodoroComponent } from './pomodoro/pomodoro.components';
 
 import { ActivateAccountComponent } from './register/activate-account/activate-account.component';
+import { NoteComponent } from './note/note.components';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -40,6 +41,10 @@ export const routes: Routes = [
   {
     path: 'pomodoro',
     component: PomodoroComponent,
+  },
+  {
+    path: 'note',
+    component: NoteComponent,
   },
   {
     path: 'activate',

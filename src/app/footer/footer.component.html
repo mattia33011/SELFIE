@@ -5,7 +5,9 @@
             @case ('note') {
                 <p-speed-dial direction="up">
                     <ng-template #button let-toggleCallback="toggleCallback">
-                        <button pButton [icon]="page.icon"  [rounded]="true" (click)="toggleCallback($event)" ></button>
+                        <button routerLink="/note" pButton [ariaLabel]="page.label | translate" [icon]="page.icon" [rounded]="true" (click)="toggleCallback($event)" ></button>
+                        <a routerLink="/note">
+                        </a>
                     </ng-template>
                 </p-speed-dial> 
             }

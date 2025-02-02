@@ -1,33 +1,25 @@
 
-<p-toolbar [style]="{ 'border-radius': '3rem', 'padding': '1rem 1rem 1rem 1.5rem' }">
-    <ng-template #start>
-        <div class="flex items-center gap-2">
-            <p-button icon="pi-home" />
-            <p-button icon="pi-cog" />
-        </div>
-    </ng-template>
-    <ng-template #end>
-        <div class="flex items-center gap-2">
-            <p-avatar icon='pi pi-user' [style]="{ width: '32px', height: '32px' }" />
-        </div>
-    </ng-template>
-</p-toolbar>
 
-<p-splitter [style]="{height: '300px'}" styleClass="mb-8">
-    <ng-template #panel>
+<p-card>
+    <ng-template #header>
         <div class="mx-5">
             <p-card>
                 <ng-template #title>
-                    <div class="flex flex-col items-center justify-center">
-                        <div class="p-buttonset">
-                            <p-button label="Pomodoro"/>
-                            <p-button label="Short break" />
-                            <p-button label="Long break"/>
-                        </div>
-                        <p-knob formControlName={{remaningTime}}/>
-                        <p-progress-bar [value]="(remaningTime/60)*100"></p-progress-bar>
-                        <div class="mx-auto">{{remaningTime}}</div>
-                    <p-button label="{{ startStop }}" (click)="clickButton()"/>
+                    <div class="flex flex-col items-center justify-center" [formGroup]="formGroup">
+                        <!--
+                        <p-buttongroup>
+                            <p-button label="Pomodoro" (click)="setCustomTime(1500)"/>
+                            <p-button label="Short break" (click)="setCustomTime(300)" />
+                            <p-button label="Long break" (click)="setCustomTime(900)"/>
+                        </p-buttongroup>
+                        -->
+                        <p-select-button
+                            [options]="stateOptions" 
+                            [(ngModel)]="value" 
+                            aria-labelledby="basic"
+                        ></p-select-button>
+                        <p-knob formControlName={{formattedTimer}} [readonly]="true" />
+                    <p-button label="{{ startStop }}" (click)="clickButton()"/> 
                     </div>
                     <div>
                     </div>
@@ -35,7 +27,7 @@
             </p-card>
         </div>
     </ng-template>
-    <ng-template #panel>
+    <ng-template >
         <!-- Le task vanno poi collegate all'account della persona -->
     </ng-template>
-</p-splitter>
+</p-card>

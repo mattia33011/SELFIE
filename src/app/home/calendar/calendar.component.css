@@ -1,38 +1,74 @@
 ::ng-deep #calendar > .p-panel-header{
-    padding: 0 !important;
+  padding: 0 !important;
 }
-
-
-  /* bottoni full calendar */
+/* bottoni full calendar */
+::ng-deep .fc-toolbar-chunk {
+margin: 0 5px !important;
+}
+::ng-deep .fc-button-group {
+margin-bottom: 5px;
+}
 ::ng-deep .fc-button {
-    transition: background-color 0.3s ease;
-    background-color: var(--p-primary-500) !important;
-    border-color: var(--p-primary-600) !important;
-    box-shadow: none !important;
+transition: background-color 0.3s ease;
+background-color: var(--p-primary-700) !important;
+border-color: var(--p-primary-600) !important;
+box-shadow: none !important;
+height: fit-content;
 }
 ::ng-deep .fc-button:hover{
-    background-color: var(--p-primary-700) !important;
+  background-color: var(--p-primary-500) !important;
 }
 
-  /* Celle di giorni generici */
-  ::ng-deep .fc-daygrid-day {
-    transition: background-color 0.3s ease;
-    font-weight: 500;
-    cursor: pointer;
-  }
-    /* Hover sulle celle */
-    ::ng-deep .fc-daygrid-day:hover {
-        background-color: var(--p-surface-400);
-        color: var(--p-light-900);
-      }
+/* Celle giorni */
+::ng-deep .fc-daygrid-day-number {
+font-size: 18px !important;
+font-weight: bold !important;
+}
+::ng-deep .fc-daygrid-day {
+transition: background-color 0.3s ease;
+font-weight: 500;
+cursor: pointer;
+}
+/* Hover sulle celle */
+::ng-deep .fc-daygrid-day:hover {
+background-color: var(--p-surface-400);
+color: var(--p-light-900);
+}
 
-  /* Celle di giorni specifici */
- ::ng-deep .fc-day-today {
-    background-color: var(--p-primary-500) !important;
-    color: var(--p-surface-900);
-  }
-  ::ng-deep .fc-day-today:hover {
-    background-color: var(--p-primary-700) !important;
+/* Celle di giorni specifici */
+::ng-deep .fc-day-today {
+background-color: var(--p-primary-700) !important;
+color: var(--p-surface-900);
+}
+::ng-deep .fc-day-today:hover {
+background-color: var(--p-primary-500) !important;
+}
 
-  }
+/* Eventi */
+::ng-deep .fc-event {
+height: fit-content !important;
+line-height: 15px !important;
+}
+
+/* Popover */
+::ng-deep .fc-popover-body .fc-event {
+height: fit-content !important;
+}
+::ng-deep .fc-popover {
+background-color: var(--p-primary-700) !important;
+color: var(--p-surface-900) !important;
+height: fit-content !important;
+}
+
+/* stile titolo del popover */
+::ng-deep .fc-popover-header {
+background: var(--p-primary-500) !important;
+color: var(--p-surface-900) !important;
+height: fit-content !important;
+}
+
+/* stile lista eventi popover */
+::ng-deep .fc-popover-body {
+background: var(--p-primary-500) !important;
+}
 

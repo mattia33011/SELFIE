@@ -26,6 +26,7 @@ import { InputTextModule } from 'primeng/inputtext';
 export class NoteComponent{
     text: string | undefined;
     value: string | undefined;
+    selectedNote: any = null;
 
     folders: any[] = [
         {
@@ -35,7 +36,8 @@ export class NoteComponent{
               { label: 'App Idea', content: 'Scrivi qui...', type: 'note' },
               { label: 'ToDo List', content: 'Task da completare...', type: 'note' }
             ],
-            type: 'folder'
+            type: 'folder',
+            parent: null
           },
           {
             label: 'Personale',
@@ -43,49 +45,49 @@ export class NoteComponent{
             children: [
               { label: 'Diario', content: 'Oggi è stata una bella giornata...', type: 'note' }
             ],
-            type: 'folder'
+            type: 'folder',
+            parent: null
           }
       ];
-
-      selectedNote: any = null;
 
       openNote(event: any){
         if (event.node.type === 'note') {
             this.selectedNote = event.node;
+            this.text=this.selectedNote.content;
           } else {
             this.selectedNote = null;
+            this.text='';
           }
       }
 
-      addFolder(){
-        const folderName=this.value;
-        if(folderName){
+      addFolder() {
+        if (this.value?.trim()) {
             this.folders.push({
-                label: folderName,
+                label: this.value,
                 expanded: true,
-                children:[],
-                type: 'folder'
+                children: [],
+                type: 'folder',
+                parent: this.selectedNote.parent
             });
-            this.value='';
+            this.value = '';
         }
-      }
+    }
 
       addNote(){
         if(!this.selectedNote || this.selectedNote.type !== 'folder'){
             alert("seleziona una cartella per aggiungere una nota");
             return;
         }
-        const noteName=this.value;
-        if(noteName){
-            this.selectedNote.children.push({
-                label: noteName,
-                content: '',
-                type: 'note'
-            });
-        }
-        this.value='';
-        }
-
+        if (this.value?.trim()) {
+          this.selectedNote.children.push({
+              label: this.value,
+              content: '',
+              type: 'note',
+              parent: this.selectedNote.parent
+          });
+          this.value = '';
+      }
+  }
         saveNote(){
             this.selectedNote.content=this.text;
         }

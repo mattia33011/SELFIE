@@ -19,11 +19,10 @@ export class EventListComponent {
   @Input() title!: string
   @Input() emptyLabel: string = 'home.noEvents'
   @Input() dateFormat: "time" | "date" = 'time'
-  protected _content:Content[] = []
-  ngOnInit(){
-    this._content = this.content.map(this.castContent)
-
+  get _content(): Content[] {
+    return this.content.map(this.castContent)
   }
+
   castContent(e: Event | Note): Content{
     return {
       title: e.title,

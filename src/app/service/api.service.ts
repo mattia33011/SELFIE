@@ -1,28 +1,31 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 import {
   LoginForm,
   RegisterForm,
   ResetPasswordForm,
 } from '../../types/register';
-import { Session, User } from '../../types/session';
-import { map } from 'rxjs';
-import { environment } from '../../environments/environment';
+import {Session, User} from '../../types/session';
+import {map} from 'rxjs';
+import {environment} from '../../environments/environment';
+import {Events, Notes} from '../../types/events';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  
-  
-  constructor(private readonly http: HttpClient) {}
+
+
+  constructor(private readonly http: HttpClient) {
+  }
+
   private readonly baseUrl = environment.baseUrl;
   private resolveBearerToken = (token: string) => `Bearer ${token}`;
 
   getProfilePicture(session: Session) {
     return this.http
       .get(`${this.baseUrl}/users/${session.user.username}/profile-picture`, {
-        headers: { authorization: this.resolveBearerToken(session.token) },
+        headers: {authorization: this.resolveBearerToken(session.token)},
         responseType: 'blob',
       })
       .pipe(map((res) => URL.createObjectURL(res)));
@@ -34,7 +37,7 @@ export class ApiService {
         `${this.baseUrl}/users/${session.user.username}/profile-picture`,
         formData,
         {
-          headers: { authorization: this.resolveBearerToken(session.token) },
+          headers: {authorization: this.resolveBearerToken(session.token)},
         }
       )
   }
@@ -45,7 +48,7 @@ export class ApiService {
 
   activate(token: string) {
     return this.http.get(`${this.baseUrl}/activate`, {
-      params: { token: token },
+      params: {token: token},
     });
   }
 
@@ -56,9 +59,26 @@ export class ApiService {
   resetPassword(form: ResetPasswordForm) {
     return this.http.patch(`${this.baseUrl}/reset-password`, form);
   }
+
   deleteAccount(session: Session) {
     return this.http.delete(`${this.baseUrl}/users/${session.user.username}`, {
-      headers: { authorization: this.resolveBearerToken(session.token) },
+      headers: {authorization: this.resolveBearerToken(session.token)},
+    });
+  }
+
+  getNotes(userID: string, token: string, dateFilter?: Date) {
+    const params = dateFilter ? {
+      dateFilter: dateFilter.toString()
+    } : undefined
+    return this.http.get<Notes>(`${this.baseUrl}/users/${userID}/notes`, {
+      headers: {authorization: this.resolveBearerToken(token)},
+      params: params,
+    });
+  }
+
+  getEvents(userID: string, token: string) {
+    return this.http.get<Events>(`${this.baseUrl}/users/${userID}/events`, {
+      headers: {authorization: this.resolveBearerToken(token)},
     });
   }
 }

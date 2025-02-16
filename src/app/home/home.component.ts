@@ -1,75 +1,87 @@
-import { Component } from '@angular/core';
-import { SessionService } from '../service/session.service';
-import { SkeletonModule } from 'primeng/skeleton';
-import { PanelModule } from 'primeng/panel';
-import { ButtonModule } from 'primeng/button';
-import { TranslatePipe } from '@ngx-translate/core';
-import { Events, Notes } from '../../types/events';
-import { EventListComponent } from "./event-list/event-list.component";
-import { DatePickerModule } from 'primeng/datepicker';
-import { CalendarComponent } from './calendar/calendar.component';
+import {ChangeDetectorRef, Component} from '@angular/core';
+import {SessionService} from '../service/session.service';
+import {SkeletonModule} from 'primeng/skeleton';
+import {PanelModule} from 'primeng/panel';
+import {ButtonModule} from 'primeng/button';
+import {TranslatePipe} from '@ngx-translate/core';
+import {Events, Notes} from '../../types/events';
+import {EventListComponent} from "./event-list/event-list.component";
+import {DatePickerModule} from 'primeng/datepicker';
+import {CalendarComponent} from './calendar/calendar.component';
+import {ApiService} from '../service/api.service';
+import {forkJoin, Observable} from 'rxjs';
+import {stringToDate} from '../../utils/timeConverter';
 
 @Component({
   selector: 'app-home',
-  imports: [PanelModule, SkeletonModule, ButtonModule, TranslatePipe, EventListComponent,CalendarComponent], // calendar
+  imports: [PanelModule, SkeletonModule, ButtonModule, TranslatePipe, EventListComponent, CalendarComponent], // calendar
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
 
 
-  constructor(protected readonly sessionService: SessionService) { }
+  constructor(protected readonly sessionService: SessionService, private readonly apiService: ApiService) {
+  }
+
+  ngOnInit() {
+    forkJoin([
+      this.apiService.getEvents(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!),
+      this.apiService.getNotes(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!)
+    ]).subscribe({
+      next: (response) => {
+        this.notes.push(...response[1].map(it => ({
+          ...it,
+          created: stringToDate(it.created.toString()),
+          lastEdit: stringToDate(it.lastEdit.toString())
+        })))
+        this.deadlineEvents.push(...response[0].map(it => ({...it, expireDate: stringToDate(it.expireDate.toString()) })))
+        this.todayEvents = this.deadlineEvents.filter(event => {
+          const format = (date: Date) => `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+          return format(event.expireDate) == format(new Date())
+        })
+      },
+      error: (error) => {
+        console.log(error)
+      },
+    })
+  }
 
   todayEvents: Events = [{
     title: 'Palestra',
     description: 'FitActive Creti',
     'expireDate': new Date()
   },
-  {
-    title: 'TW Laboratorio',
-    description: 'Laboratorio Ercolani Seminterrato',
-    expireDate: new Date(),
-    color: 'help'
-  },
-  {
-    title: 'Calcolo numerico',
-    description: 'Aula Ercolani 1',
-    'expireDate': new Date(),
-    color: 'danger'
-  },
-  {
-    title: 'Tiro con l\'arco',
-    'expireDate': new Date(),
-    color: 'info'
-  },
-  {
-    title: 'TW Laboratorio',
-    'expireDate': new Date(),
-    color: 'warn'
+    {
+      title: 'TW Laboratorio',
+      description: 'Laboratorio Ercolani Seminterrato',
+      expireDate: new Date(),
+      color: 'help'
+    },
+    {
+      title: 'Calcolo numerico',
+      description: 'Aula Ercolani 1',
+      'expireDate': new Date(),
+      color: 'danger'
+    },
+    {
+      title: 'Tiro con l\'arco',
+      'expireDate': new Date(),
+      color: 'info'
+    },
+    {
+      title: 'TW Laboratorio',
+      'expireDate': new Date(),
+      color: 'warn'
 
-  }
-]
+    }
+  ]
 
-deadlineEvents: Events = [
-  {
-    title: 'Esame TW',
-    description: 'Laboratorio Ercolani Seminterrato',
-    expireDate: new Date(),
-    color: 'help'
-  },
-  {
-    title: 'Esame Calcolo numerico',
-    description: 'Aula Ercolani 1',
-    'expireDate': new Date(),
-    color: 'danger'
-  }
-]
+  deadlineEvents: Events = []
 
-notes: Notes = [
-  {"title": "Appunti Analisi", lastEdit: new Date(), created: new Date(),  content: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.'}
-]
+  notes: Notes = []
 
-loading = false
+  loading = false
 
 
 }

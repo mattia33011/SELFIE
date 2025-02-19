@@ -28,7 +28,7 @@ export class CalendarComponent {
       timeGridDay: window.innerWidth < 768 ? '🕒' : 'Giorno', //in alternativa CascadeSelect con primeng
     },
     dayMaxEvents: 2, //max eventi poi viene un popover
-    contentHeight: 700, //Altezza celle
+    contentHeight: window.innerWidth < 768 ? 350 : 700, // Altezza calendario (se piccola va a 350 se grande 700)
     locale: ['it'],
     plugins: [dayGridPlugin, ListWeekPlugin, TimeGridPlugin],
     events: [

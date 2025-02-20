@@ -1,33 +1,48 @@
+<p-splitter [style]="{ height: '500px' }" styleClass="mb-8">
+    <ng-template #panel>
+        <div class="flex flex-col items-center justify-center" [formGroup]="formGroup">
+                            
+            <p-select-button
+                [options]="stateOptions" 
+                [(ngModel)]="value" 
+                aria-labelledby="basic"
+            ></p-select-button>
 
+            <!-- Manteniamo valueTemplate per il formato -->
+            <p-knob formControlName="timer" [readonly]="true" [max]="standardTime" [valueTemplate]="formattedTimer" />
 
-<p-card>
-    <ng-template #header>
-        <div class="mx-5">
-            <p-card>
-                <ng-template #title>
-                    <div class="flex flex-col items-center justify-center" [formGroup]="formGroup">
-                        <!--
-                        <p-buttongroup>
-                            <p-button label="Pomodoro" (click)="setCustomTime(1500)"/>
-                            <p-button label="Short break" (click)="setCustomTime(300)" />
-                            <p-button label="Long break" (click)="setCustomTime(900)"/>
-                        </p-buttongroup>
-                        -->
-                        <p-select-button
-                            [options]="stateOptions" 
-                            [(ngModel)]="value" 
-                            aria-labelledby="basic"
-                        ></p-select-button>
-                        <p-knob formControlName={{formattedTimer}} [readonly]="true" />
-                    <p-button label="{{ startStop }}" (click)="clickButton()"/> 
-                    </div>
-                    <div>
-                    </div>
+            <p-button label="{{ startStop }}" (click)="clickButton()"/> 
+        </div>                    
+    </ng-template>
+
+    <ng-template #panel>
+        <div  class="flex flex-col items-center" style="margin: 15px;">
+            <div class="task-input">
+                <input type="text" pInputText [(ngModel)]="newTaskName" placeholder="Task name" />
+                <p-button label="Add Task" (click)="addTask()"></p-button>
+            </div>
+
+            
+            <p-table [value]="tasks" dataKey="id" [reorderableColumns]="true" [tableStyle]="{ 'min-width': '50rem'}">
+                <ng-template #header>
+                    <tr>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
                 </ng-template>
-            </p-card>
+                <ng-template #body let-task let-index="rowIndex"> <!-- DA MODIFICARE LE COLONNE PER RENDERLE RIORDINABILI-->>
+                    <tr>
+                        <td>{{ task.name }}</td>
+                        <td>{{ task.completed ? 'Completed' : 'Pending' }}</td>
+                        <td>
+                            <p-button label="Complete" (click)="completeTask(index)" *ngIf="!task.completed"></p-button>
+                            <p-button label="Remove" (click)="removeTask(index)" severity="danger"></p-button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+
         </div>
     </ng-template>
-    <ng-template >
-        <!-- Le task vanno poi collegate all'account della persona -->
-    </ng-template>
-</p-card>
+</p-splitter>

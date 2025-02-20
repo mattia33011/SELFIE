@@ -8,7 +8,7 @@
         @if (loading) {
             <p-skeleton width="100%" height="4rem" />
             <p-skeleton width="100%" height="4rem" />
-            <p-skeleton width="100%" height="4rem" />   
+            <p-skeleton width="100%" height="4rem" />
         }
         @else {
             @for (event of _content; track $index ; let i = $index) {
@@ -25,9 +25,9 @@
                 <div class="text-sm">
                     {{emptyLabel | translate}}
                 </div>
-            }    
+            }
         }
-        
-        
+
+
     </div>
 </p-panel>

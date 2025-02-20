@@ -14,8 +14,8 @@
     "today": "Today",
     "noTodayEvents": "No events recorded today",
     "notes": "Notes",
-    "noNotes": "No notes saved"
-
+    "noNotes": "No notes saved",
+    "noEvents": "No events planned"
   },
   "register": {
     "email": "Email",

@@ -19,7 +19,8 @@
     "today": "Oggi",
     "noTodayEvents": "Nessun evento registrato oggi",
     "notes": "Note",
-    "noNotes": "Non hai nessuna nota salvata"
+    "noNotes": "Non hai nessuna nota salvata",
+    "noEvents": "Non hai nessun evento programmato"
   },
   "register": {
     "email": "Email",

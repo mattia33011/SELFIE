@@ -19,6 +19,7 @@ import { DividerModule } from 'primeng/divider';
 import { DialogModule } from 'primeng/dialog';
 import { timer } from 'rxjs';
 
+
 interface Task {
     id: number;
     name: string;
@@ -43,7 +44,7 @@ interface Task {
         InputNumberModule,
         TableModule,
         DividerModule,
-        DialogModule
+        DialogModule,
     ],
     templateUrl: './pomodoro.components.html',
     styleUrl: './pomodoro.components.css',
@@ -204,7 +205,7 @@ export class PomodoroComponent implements OnInit {
         this.shortBreakVisuale = this.shortBreak / 60;
         this.longBreakVisuale = this.longBreak / 60;
         this.visible = false;
-
+        this.updateKnobTime();
         this.setUpTimer();
     }
 

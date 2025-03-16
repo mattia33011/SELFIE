@@ -1,11 +1,11 @@
 <p-card header="Pomodoro">
-    <div class="w-full flex flex-wrap md:flex-nowrap items-center justify-center gap-3 py-5">
-        <div class="w-full md:w-5/12 flex flex-col items-center justify-center gap-3">
+    <div class="w-full flex flex-wrap md:flex-nowrap items-center justify-center gap-2 py-5">
+        <div class="w-full md:w-5/12 flex flex-col items-center justify-center gap-2">
             <div class="flex items-end gap-5 ml-auto md:ml-0 md:self-end">
                 <p-button (click)="showDialog()" icon="pi pi-cog"></p-button>
             </div>
             <p-dialog header="SETTINGS" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
-                <div class="flex flex-col items-center justify-center gap-3">
+                <div class="flex flex-col items-top justify-center gap-3">
                     <p>Timer (minutes)</p>
                     <div class="flex items-center gap-4 mb-4">
                         <label for="shortBreak" class="font-semibold w-24">Pomodoro</label>
@@ -29,6 +29,7 @@
                 </div>
             </p-dialog>
             <div class="flex flex-col items-center justify-center" [formGroup]="formGroup">
+                <!--TODO SOSTITUIRE CON ANIMAZIONE ALTERNANZA POMODORO E PAUSE!!!!!!!!!!!!!-->
                 <p-select-button
                     [options]="stateOptions" 
                     [(ngModel)]="value" 
@@ -50,29 +51,47 @@
                     <p-button label="Add Task" (click)="addTask()"></p-button>
                 </div>
 
-                <p-table [value]="tasks" dataKey="id" [reorderableColumns]="true" [tableStyle]="{ 'max-width': '40rem'}">
-                    <ng-template #header>
-                        <tr>
-                            <th>Name</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template #body let-task let-index="rowIndex">
-                        <tr>
-                            <td>
-                                <div style="max-width: 20rem; word-wrap: break-word;">
-                                    {{ task.name }}
-                                </div>
-                            </td>
-                            <td>{{ task.completed ? 'Completed' : 'Pending' }}</td>
-                            <td>
-                                <p-button label="Complete" (click)="completeTask(index)" *ngIf="!task.completed"></p-button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </div>
+                    <p-table [value]="tasks" dataKey="id" [tableStyle]="{ 'max-width': '40rem'}">
+                        <ng-template #header>
+                            <tr>
+                                <th style="width:3rem"></th>
+                                <th style="width: 15rem">Name</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template #body let-task let-index="rowIndex" let-editing="editing">
+                            <tr [pReorderableRow]="index">
+                                <td>
+                                    <span class="pi pi-bars" pReorderableRowHandle></span>
+                                </td>
+                                <td [pEditableColumn]="task.name" pEditableColumnField="name">
+                                    <p-cellEditor>
+                                        <ng-template #input>
+                                        <input
+                                        pInputText
+                                        type="text"
+                                        [(ngModel)]="task.name"
+                                        required />
+                                        </ng-template>
+                                        <ng-template #output>
+                                    <div style="max-width: 15rem; word-wrap: break-word;">
+                                        {{ task.name }}
+                                    </div>
+                                </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td>{{ task.completed ? 'Completed' : 'Pending' }}</td>
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                    <p-button label="Complete" (click)="completeTask(index)" *ngIf="!task.completed"></p-button>
+                                    <p-button icon="pi pi-trash" [style]="{ 'height': '2.6rem', 'width': '2.6rem', 'margin-left':'0.6rem'}" (click)="removeTask(index)"></p-button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
         </div>
     </div>
 </p-card>

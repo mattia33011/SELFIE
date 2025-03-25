@@ -2,16 +2,37 @@
 
     <ng-template #header>
         <div class="container">
-            <p-tree [value]="folders" selectionMode="single" [(selection)]="selectedNote" (onNodeSelect)="openNote($event)"></p-tree>
+            <p-tree 
+                [value]="files" 
+                selectionMode="single" 
+                styleClass="md:w-[30rem]" 
+                [filter]="true" 
+                filterPlaceholder="Lenient Filter" 
+                [(selection)]="selectedFiles" 
+                [draggableNodes]="true" 
+                [droppableNodes]="true" 
+                draggableScope="self" 
+                droppableScope="self" 
+                (onNodeSelect)="openNote($event)">
+                <ng-template let-node pTemplate="default">
+                    <span *ngIf="node.type === 'note'" class="note-label">
+                        <span class="color-dot" [ngStyle]="{'background-color': node.color}"></span>
+                        {{node.label}}
+                    </span>
+                    <span *ngIf="node.type === 'folder'">{{node.label}}</span>
+                </ng-template>
+            </p-tree>
+            
             <div class="flex flex-col items-center justify-center">
                 <input type="text" pInputText [(ngModel)]="value">    
-                <p-buttongroup>
+                <p-buttongroup [style]="{'margin': '1rem'}">
                     <p-button label="Nuova Cartella" (click)="addFolder()"></p-button>
                     <p-button label="Nuova Nota" (click)="addNote()"></p-button>
+                    <p-button icon="pi pi-trash" (click)="deleteNote()" [style]="{'height': '2.6rem'}"></p-button>
                 </p-buttongroup>
             </div>
         </div>
-        <div class="content" *nglf="selectedNote">
+        <div class="content" *ngIf="selectedNote">
             <h2>{{selectedNote.label}}</h2>
         </div>
     </ng-template>

@@ -10,7 +10,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CommonModule } from '@angular/common';
 import { Tree } from 'primeng/tree';
 
-//TEST
 @Component({
     selector: 'notes',
     imports: [
@@ -35,68 +34,93 @@ export class NoteComponent {
     value: string | undefined;
     selectedNote: any = null;
     selectedFiles!: TreeNode[];
-    files: {
-        "folders": [
-            {
-                "label": "Progetti",
-                "expanded": true,
-                "children": [
-                    {
-                        "label": "App Idea",
-                        "content": "Scrivi qui...",
-                        "type": "note",
-                        "color": "red"
-                    },
-                    {
-                        "label": "ToDo List",
-                        "content": "Task da completare...",
-                        "type": "note",
-                        "color": "blue"
-                    }
-                ],
-                "type": "folder",
-                "parent": null
-            },
-            {
-                "label": "Personale",
-                "expanded": true,
-                "children": [
-                    {
-                        "label": "Diario",
-                        "content": "Oggi è stata una bella giornata...",
-                        "type": "note",
-                        "color": "green"
-                    }
-                ],
-                "type": "folder",
-                "parent": null
-            }
-        ]
-    } | undefined;
+    files: any[] = [
+        {
+            label: 'Progetti',
+            expanded: true,
+            icon: 'pi pi-folder',
+            children: [
+              { label: 'App Idea', content: 'Scrivi qui...', type: 'note', icon: 'pi pi-clipboard' },
+              { label: 'ToDo List', content: 'Task da completare...', type: 'note', icon: 'pi pi-clipboard' }
+            ],
+            type: 'folder',
+            parent: null
+          },
+          {
+            label: 'Personale',
+            expanded: true,
+            icon: 'pi pi-folder',
+            children: [
+              { label: 'Diario', content: 'Oggi è stata una bella giornata...', type: 'note', icon: 'pi pi-clipboard' }
+            ],
+            type: 'folder',
+            parent: null
+          }
+      ];
 
     openNote(event: any) {
         if (event.node.type === 'note') {
             this.selectedNote = event.node;
             this.text = this.selectedNote.content;
         } else {
-            this.selectedNote = null;
+            this.selectedNote = event.node;
             this.text = '';
         }
     }
 
-    addFolder(){
-        return;
+
+
+    addFolder(parentNode: TreeNode | null = null) {
+        if (this.value == null) {
+            alert("Inserire un nome per la cartella");
+            return;
+        }
+        const newFolder = {
+            label: this.value,
+            expanded: true,
+            children: [],
+            type: 'folder',
+            icon: 'pi pi-folder',
+            parent: parentNode ?? undefined
+        };
+
+        if (parentNode) {
+            if (!parentNode.children) {
+                parentNode.children = [];
+            }
+            parentNode.children.push(newFolder);
+        } else {
+            this.files.push(newFolder);
+        }
     }
 
-    addNote(){
-        return;
+    addNote() {
+        if (this.value == null) {
+            alert("Inserire un nome per la nota");
+            return;
+        }
+        const newNote = {
+            label: this.value,
+            content: 'Scrivi qui...',
+            type: 'note',
+            icon: 'pi pi-clipboard',
+            parent: this.selectedNote ?? null
+        };
+        if (this.selectedNote && this.selectedNote.type === 'folder') {
+            if (!this.selectedNote.children) {
+                this.selectedNote.children = [];
+            }
+            this.selectedNote.children.push(newNote);
+        } else {
+            this.files.push(newNote);
+        }
     }
 
     saveNote() {
         if (this.selectedNote) {
             this.selectedNote.content = this.text;
         }
-            }
+    }
 
     deleteNote() {
         if (this.selectedNote) {
@@ -106,10 +130,14 @@ export class NoteComponent {
                 if (index !== -1) {
                     parent.children.splice(index, 1);
                 }
+            } else {
+                const index = this.files.indexOf(this.selectedNote);
+                if (index !== -1) {
+                    this.files.splice(index, 1);
+                }
             }
             this.selectedNote = null;
             this.text = '';
         }
     }
- 
 }

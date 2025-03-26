@@ -1,7 +1,6 @@
 <p-card>
-
-    <ng-template #header>
-        <div class="container">
+    <div class="flex items-center justify-center">
+        <div class="container" style="flex: 0 0 30rem; align-self: flex-start;">
             <p-tree 
                 [value]="files" 
                 selectionMode="single" 
@@ -14,7 +13,8 @@
                 draggableScope="self" 
                 droppableScope="self" 
                 (onNodeSelect)="openNote($event)">
-                <ng-template let-node pTemplate="default">
+
+            <ng-template let-node pTemplate="default">
                     <span *ngIf="node.type === 'note'" class="note-label">
                         <span class="color-dot" [ngStyle]="{'background-color': node.color}"></span>
                         {{node.label}}
@@ -31,13 +31,13 @@
                     <p-button icon="pi pi-trash" (click)="deleteNote()" [style]="{'height': '2.6rem'}"></p-button>
                 </p-buttongroup>
             </div>
-        </div>
-        <div class="content" *ngIf="selectedNote">
-            <h2>{{selectedNote.label}}</h2>
-        </div>
-    </ng-template>
-    <ng-template #footer>
-        <p-editor [(ngModel)]="text" [style]="{ height: '320px' }" />
+        
+
+    </div>
+    <div class="container">
+        <p-editor [(ngModel)]="text" [style]="{ height: '50vh' }" *ngIf="selectedNote?.type !== 'folder'" [readonly]="false"></p-editor>
+        <p-editor [ngModel]="'Hai selezionato una cartella!'" [style]="{ height: '50vh' }" *ngIf="selectedNote?.type === 'folder'" [readonly]="true"></p-editor>
         <p-button label="Salva" (click)="saveNote()"></p-button>
-    </ng-template>
+    </div>
+    </div>
 </p-card>

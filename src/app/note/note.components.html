@@ -14,13 +14,7 @@
                 droppableScope="self" 
                 (onNodeSelect)="openNote($event)">
 
-            <ng-template let-node pTemplate="default">
-                    <span *ngIf="node.type === 'note'" class="note-label">
-                        <span class="color-dot" [ngStyle]="{'background-color': node.color}"></span>
-                        {{node.label}}
-                    </span>
-                    <span *ngIf="node.type === 'folder'">{{node.label}}</span>
-                </ng-template>
+            
             </p-tree>
             
             <div class="flex flex-col items-center justify-center">

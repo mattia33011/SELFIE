@@ -1,6 +1,6 @@
 import { EditorModule } from 'primeng/editor'; // npm install quill
 import { Card, CardModule } from 'primeng/card';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MessageService, TreeNode, TreeDragDropService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { TreeModule } from 'primeng/tree';
@@ -27,9 +27,10 @@ import { Tree } from 'primeng/tree';
     ],
     templateUrl: './note.components.html',
     styleUrls: ['./note.components.css'],
-    providers: [MessageService, TreeDragDropService]
+    providers: [MessageService, TreeDragDropService],
 })
 export class NoteComponent {
+    @ViewChild(Tree) tree: Tree | undefined;   
     text: string | undefined;
     value: string | undefined;
     selectedNote: any = null;
@@ -40,24 +41,35 @@ export class NoteComponent {
             expanded: true,
             icon: 'pi pi-folder',
             children: [
-              { label: 'App Idea', content: 'Scrivi qui...', type: 'note', icon: 'pi pi-clipboard' },
-              { label: 'ToDo List', content: 'Task da completare...', type: 'note', icon: 'pi pi-clipboard' }
+              { label: 'App Idea', content: 'Scrivi qui...', type: 'note', icon: 'pi pi-clipboard', droppableNode: false },
+              { label: 'ToDo List', content: 'Task da completare...', type: 'note', icon: 'pi pi-clipboard', droppableNode: false }
             ],
             type: 'folder',
-            parent: null
+            parent: null,
+            droppableNode: true
           },
           {
             label: 'Personale',
             expanded: true,
             icon: 'pi pi-folder',
             children: [
-              { label: 'Diario', content: 'Oggi è stata una bella giornata...', type: 'note', icon: 'pi pi-clipboard' }
+              { label: 'Diario', content: 'Oggi è stata una bella giornata...', type: 'note', icon: 'pi pi-clipboard', droppableNode: false }
             ],
             type: 'folder',
-            parent: null
+            parent: null,
+            droppableNode: true
           }
       ];
 
+    constructor(private messageService: MessageService) {
+        Tree.prototype.allowDrop = (dragNode: any, dropNode: any, dragNodeScope: any): boolean => {
+            return this._overrideAllowDrop(dragNode, dropNode, dragNodeScope);
+        };
+    }
+
+    private _overrideAllowDrop(dragNode: any, dropNode: any, dragNodeScope: any): boolean {
+        return dropNode.type === 'folder'; // Example: Only allow dropping on folders
+    }
     openNote(event: any) {
         if (event.node.type === 'note') {
             this.selectedNote = event.node;
@@ -67,6 +79,7 @@ export class NoteComponent {
             this.text = '';
         }
     }
+
 
 
 
@@ -81,7 +94,8 @@ export class NoteComponent {
             children: [],
             type: 'folder',
             icon: 'pi pi-folder',
-            parent: parentNode ?? undefined
+            parent: parentNode ?? undefined,
+            droppableNode: true
         };
 
         if (parentNode) {
@@ -104,7 +118,8 @@ export class NoteComponent {
             content: 'Scrivi qui...',
             type: 'note',
             icon: 'pi pi-clipboard',
-            parent: this.selectedNote ?? null
+            parent: this.selectedNote ?? null,
+            droppableNode: false
         };
         if (this.selectedNote && this.selectedNote.type === 'folder') {
             if (!this.selectedNote.children) {

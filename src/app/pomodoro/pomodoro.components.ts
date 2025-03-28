@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -86,6 +86,13 @@ export class PomodoroComponent implements OnInit {
     formGroup = new FormGroup({
         timer: new FormControl(this.pomodoro) // Inizializza con 25 minuti
     });
+
+    screenWidth: number = window.innerWidth;
+    
+    @HostListener('window:resize', ['$event'])
+    onResize(event: Event): void {
+        this.screenWidth = (event.target as Window).innerWidth;
+    }
 
     constructor(
         private readonly messageService: MessageService,

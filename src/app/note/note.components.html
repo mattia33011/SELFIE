@@ -1,5 +1,5 @@
 <p-card>
-    <div class="flex items-center justify-center">
+    <div class="flex items-center justify-center" [ngClass]="{'flex-col': screenWidth < 1023, 'flex-row': screenWidth >= 1024}">
         <div class="container" style="flex: 0 0 30rem; align-self: flex-start;">
             <p-tree 
                 [value]="files" 
@@ -34,4 +34,5 @@
         <p-button label="Salva" (click)="saveNote()"></p-button>
     </div>
     </div>
+
 </p-card>

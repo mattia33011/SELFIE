@@ -1,5 +1,5 @@
 <p-card header="Pomodoro">
-    <div class="w-full flex flex-wrap md:flex-nowrap items-center justify-center gap-2 py-51">
+    <div class="w-full flex flex-wrap md:flex-nowrap items-center justify-center gap-2 py-51" [ngClass]="{'flex-col': screenWidth < 1089, 'flex-row': screenWidth >= 1090}">
         <div class="w-full md:w-5/12 flex flex-col items-center justify-center gap-2">
             <div class="flex items-end gap-5 ml-auto md:ml-0 md:self-end">
                 <p-button (click)="showDialog()" icon="pi pi-cog"></p-button>

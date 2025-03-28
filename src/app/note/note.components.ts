@@ -1,6 +1,6 @@
 import { EditorModule } from 'primeng/editor'; // npm install quill
 import { Card, CardModule } from 'primeng/card';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { MessageService, TreeNode, TreeDragDropService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { TreeModule } from 'primeng/tree';
@@ -60,11 +60,17 @@ export class NoteComponent {
             droppableNode: true
           }
       ];
+    screenWidth: number = window.innerWidth;
+
+    @HostListener('window:resize', ['$event'])
+    onResize(event: Event): void {
+        this.screenWidth = (event.target as Window).innerWidth;
+    }
 
     constructor(private messageService: MessageService) {
         Tree.prototype.allowDrop = (dragNode: any, dropNode: any, dragNodeScope: any): boolean => {
             return this._overrideAllowDrop(dragNode, dropNode, dragNodeScope);
-        };
+        }; 
     }
 
     private _overrideAllowDrop(dragNode: any, dropNode: any, dragNodeScope: any): boolean {

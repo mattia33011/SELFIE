@@ -101,5 +101,27 @@
     "400": "Form non valido",
     "RE_001": "Form registrazione non valido",
     "RE_002": "Utente già esistente, campo non valido: "
+  },
+  "pomodoro": {
+    "settings": "Timer (minuti)",
+    "shortBreak": "Pausa corta",
+    "longBreak": "Pausa lunga",
+    "intervals": "Pausa lunga tra le sessioni",
+    "otherOptions": "Altre opzioni",
+    "save": "Salva",
+    "resetTimer": "Ripristina timer",
+    "taskName": "Nome attività",
+    "addTask": "Aggiungi attività",
+    "nameTask": "Nome",
+    "statusTask": "Stato",
+    "actionsTask": "Azioni",
+    "pendingTask": "In attesa",
+    "completeTask": "Completa",
+    "completedTask": "Completata"
+  },
+  "note":{
+    "newFolder": "Nuova cartella",
+    "newNote": "Nuova nota",
+    "folderSelected": "Hai selezionato una cartella!"
   }
 }

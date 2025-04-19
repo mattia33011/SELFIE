@@ -1,4 +1,4 @@
-<p-card header="Pomodoro">
+<p-card>
     <div class="w-full flex flex-wrap md:flex-nowrap items-center justify-center gap-2 py-51" [ngClass]="{'flex-col': screenWidth < 1089, 'flex-row': screenWidth >= 1090}">
         <div class="w-full md:w-5/12 flex flex-col items-center justify-center gap-2">
             <div class="flex items-end gap-5 ml-auto md:ml-0 md:self-end">
@@ -6,26 +6,26 @@
             </div>
             <p-dialog header="SETTINGS" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
                 <div class="flex flex-col items-top justify-center gap-3">
-                    <p>Timer (minutes)</p>
+                    <p>{{"pomodoro.settings" | translate }}</p>
                     <div class="flex items-center gap-4 mb-4">
                         <label for="shortBreak" class="font-semibold w-24">Pomodoro</label>
                         <p-inputNumber id="pomodoro" [(ngModel)]="pomodoroVisuale" [min]="1" [max]="120"></p-inputNumber>
                     </div>
                     <div class="flex items-center gap-4 mb-4">
-                        <label for="shortBreak" class="font-semibold w-24">Short Break</label>
+                        <label for="shortBreak" class="font-semibold w-24">{{"pomodoro.shortBreak" | translate }}</label>
                         <p-inputNumber id="longBreak" [(ngModel)]="shortBreakVisuale" [min]="1" [max]="20"></p-inputNumber>
                     </div>
                     <div class="flex items-center gap-4 mb-4">
-                        <label for="longBreak" class="font-semibold w-24">Long Break</label>
+                        <label for="longBreak" class="font-semibold w-24">{{"pomodoro.longBreak" | translate }}</label>
                         <p-inputNumber id="longBreak" [(ngModel)]="longBreakVisuale" [min]="1" [max]="40"></p-inputNumber>
                     </div>
-                    <p>other</p>
+                    <p>{{"pomodoro.otherOptions" | translate }}</p>
                     <div class="flex items-center gap-4 mb-4">
-                        <label for="longBreakInterval" class="font-semibold w-24">Long Break Interval</label>
+                        <label for="longBreakInterval" class="font-semibold w-24">{{"pomodoro.intervals" | translate }}</label>
                         <p-inputNumber id="longBreakInterval" [(ngModel)]="longBreakInterval" [min]="1"></p-inputNumber>
                     </div>
-                    <p-button label="Save" (click)="saveSettings()"></p-button>
-                    <p-button label="Reset Timer" (click)="resetTimer()"></p-button>
+                    <p-button label="{{'pomodoro.save' | translate }}" (click)="saveSettings()"></p-button>
+                    <p-button label="{{'pomodoro.resetTimer' | translate }}" (click)="resetTimer()"></p-button>
                 </div>
             </p-dialog>
             <div class="flex flex-col items-center justify-center" [formGroup]="formGroup">
@@ -35,6 +35,7 @@
                     [(ngModel)]="value" 
                     aria-labelledby="basic"
                 ></p-select-button>
+                
 
                 <!-- Manteniamo valueTemplate per il formato -->
                 <p-knob formControlName="timer" [readonly]="true" [max]="knobTIME" [valueTemplate]="formattedTimer" />
@@ -47,17 +48,17 @@
         <div class="w-full md:w-5/12 flex flex-col items-center justify-start gap-3 pt-3 md:pt-0 md:pl-3">
             <div class="flex flex-col items-start justify-center gap-3">
                 <div class="task-input">
-                    <input type="text" pInputText [(ngModel)]="newTaskName" placeholder="Task name" />
-                    <p-button label="Add Task" (click)="addTask()"></p-button>
+                    <input type="text" pInputText [(ngModel)]="newTaskName" placeholder="{{'pomodoro.taskName' | translate }}" />
+                    <p-button label="{{'pomodoro.addTask' | translate }}" (click)="addTask()"></p-button>
                 </div>
 
                     <p-table [value]="tasks" dataKey="id" [tableStyle]="{ 'max-width': '40rem'}">
                         <ng-template #header>
                             <tr>
                                 <th style="width:3rem"></th>
-                                <th style="width: 15rem">Name</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th style="width: 15rem">{{"pomodoro.nameTask" | translate }}</th>
+                                <th>{{"pomodoro.statusTask" | translate }}</th>
+                                <th>{{"pomodoro.actionsTask" | translate }}</th>
                             </tr>
                         </ng-template>
                         <ng-template #body let-task let-index="rowIndex" let-editing="editing">
@@ -81,10 +82,10 @@
                                 </ng-template>
                                     </p-cellEditor>
                                 </td>
-                                <td>{{ task.completed ? 'Completed' : 'Pending' }}</td>
+                                <td>{{ task.completed ? ("pomodoro.completedTask" | translate) : ("pomodoro.pendingTask" | translate) }}</td>
                                 <td>
                                     <div class="flex items-center gap-2">
-                                    <p-button label="Complete" (click)="completeTask(index)" *ngIf="!task.completed"></p-button>
+                                    <p-button label="{{'pomodoro.completeTask' | translate }}" (click)="completeTask(index)" *ngIf="!task.completed"></p-button>
                                     <p-button icon="pi pi-trash" [style]="{ 'height': '2.6rem', 'width': '2.6rem', 'margin-left':'0.6rem'}" (click)="removeTask(index)"></p-button>
                                     </div>
                                 </td>

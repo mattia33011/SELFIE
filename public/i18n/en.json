@@ -99,5 +99,28 @@
     "400": "Bad request",
     "RE_001": "Register form is not valid",
     "RE_002": "User already exists, invalid field: "
+  },
+  "pomodoro": {
+    "settings": "Timer (minutes)",
+    "shortBreak": "Short break",
+    "longBreak": "Long break",
+    "intervals": "Long break intervals",
+    "otherOptions": "Other options",
+    "save": "Save",
+    "resetTimer": "Reset timer",
+    "startTimer": "START",
+    "taskName": "Task name",
+    "addTask": "Add task",
+    "nameTask": "Name",
+    "statusTask": "Status",
+    "actionsTask": "Actions",
+    "pendingTask": "Pending",
+    "completeTask": "Complete",
+    "completedTask": "Completed"
+  },
+  "note":{
+    "newFolder": "New Folder",
+    "newNote": "New Note",
+    "folderSelected": "You have selected a folder!"
   }
 }

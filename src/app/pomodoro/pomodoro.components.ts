@@ -32,7 +32,7 @@ interface Task {
         ProgressBarModule,
         ButtonModule,
         CardModule,
-        //TranslatePipe,
+        TranslatePipe,
         FormsModule,
         AvatarModule,
         ReactiveFormsModule,
@@ -139,7 +139,7 @@ export class PomodoroComponent implements OnInit {
     clickButton() {
         if (this.isRunning) {
             this.stopTimer();
-            this.startStop = 'START';
+            this.startStop ='START';
         } else {
             this.startTimer();
             this.startStop = 'STOP';
@@ -255,4 +255,5 @@ export class PomodoroComponent implements OnInit {
     completeTask(index: number) {
         this.tasks[index].completed = true;
     }
+    
 }

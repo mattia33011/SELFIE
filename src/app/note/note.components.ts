@@ -9,6 +9,7 @@ import { ButtonGroupModule } from 'primeng/buttongroup';
 import { InputTextModule } from 'primeng/inputtext';
 import { CommonModule } from '@angular/common';
 import { Tree } from 'primeng/tree';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'notes',
@@ -23,11 +24,12 @@ import { Tree } from 'primeng/tree';
         ButtonGroupModule,
         InputTextModule,
         CommonModule,
-        Tree
+        Tree,
+        TranslatePipe,
     ],
     templateUrl: './note.components.html',
     styleUrls: ['./note.components.css'],
-    providers: [MessageService, TreeDragDropService],
+    providers: [MessageService, TreeDragDropService, TranslateService],
 })
 export class NoteComponent {
     @ViewChild(Tree) tree: Tree | undefined;   

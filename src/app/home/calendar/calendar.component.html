@@ -1,14 +1,87 @@
-<p-panel id="calendar" class="w-full">
-    <ng-template #header>
-        <div class="md:px-4 md:pb-3 w-full">
-            <full-calendar  [options]="calendarOptions" class="h-full">
-                <ng-template #eventContent let-arg>
-                    <span class="w-full !text-left px-2 !text-nowrap">
-                        <h3 class="font-semibold  text-xl truncate">{{arg.title}} </h3>
-                        <p class="truncate">{{'Laboratorio ercolani'}}</p>
-                    </span>
-                  </ng-template>
-            </full-calendar>
-        </div>
+<full-calendar #fullcalendar [options]="calendarOptions" class="h-full">
+    <ng-template #eventContent let-arg>
+        <span class="w-full !text-left px-2 !text-nowrap">
+            <h4 class="font-semibold  text-xl truncate">{{arg.event.title}} </h4>
+            <p class="truncate">{{ arg.event.extendedProps.luogo}}</p>
+        </span>
     </ng-template>
-</p-panel>
+</full-calendar>
+
+<p-dialog header="Nuovo evento" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+    <div class="popup" *ngIf="visible"> <!--MIGLIORA VISIBILITà DEL POPUP-->
+        <div class="flex-col items-left">
+            <label for="eventName">Nome Evento:</label>
+            <input id="eventName" [(ngModel)]="eventName" type="text" />
+        </div>
+        <div class="flex-col items-left">
+            <label for="theDate">Data:</label>
+            <input id="theDate" [(ngModel)]="theDate" type="date" />
+        </div>
+        <div class="flex-col items-left">
+            <label for="eventTime">Inizio:</label>
+            <input id="eventTime" [(ngModel)]="eventTime" type="time" />
+        </div>
+        <div class="flex-col items-left">
+            <label for="endDate">Data fine:</label>
+            <input id="endDate" [(ngModel)]="eventEndDate" type="date" />
+        </div>
+        
+        <div class="flex-col items-left">
+            <label for="endTime">Tempo fine:</label>
+            <input id="endTime" [(ngModel)]="eventEndTime" type="time" />
+        </div>
+
+        <div class="flex-col items-left">
+            <label for="eventLocation">Luogo:</label>
+            <input id="eventLocation" [(ngModel)]="eventLocation" type="text" />
+        </div>
+        
+        <div class="flex-col items-left">
+            <label for="eventColor">Colore:</label>
+            <input id="eventColor" [(ngModel)]="eventColor" type="color" />
+        </div>
+        
+        
+        <!-- Per la ripetizione -->
+        <div class="flex-col items-left">
+            <label for="repeatType">Ripeti:</label>
+            <select id="repeatType" [(ngModel)]="repeatType" (change)="onRepeatTypeChange()">
+            <option value="">Nessuna</option>
+            <option value="daily">Ogni giorno</option>
+            <option value="weekly">Ogni settimana</option>
+            <option value="biweekly">Ogni 2 settimane</option>
+            <option value="monthly">Ogni mese</option>
+            <option value="yearly">Ogni anno</option>
+            <!--<option value="custom">Personalizzato</option> -->
+            </select>
+        </div>
+        
+    <!-- Se settimanale o bi-settimanale: mostra i giorni della settimana -->
+    <div *ngIf="repeatType === 'weekly' || repeatType === 'biweekly'" class="giorni-ripetizione">
+        <label *ngFor="let day of weekDays" style="margin-right: 10px;">
+        <input
+            type="checkbox"
+            [value]="day.value"
+            (change)="toggleWeekday($event)"
+            [checked]="repeatWeekDays.includes(day.value)"
+        />
+        {{ day.label }}
+        </label>
+    </div>
+    
+    <!-- Data fine ripetizione -->
+    <div *ngIf="repeatType && repeatType !== 'custom'" class="flex-col items-left">
+        <label for="repeatUntil">Ripeti fino a:</label>
+        <input id="repeatUntil" [(ngModel)]="repeatUntil" type="date" />
+    </div>
+    
+    <!-- 
+    <div *ngIf="repeatType === 'custom'" class="flex-col items-left">
+    </div> -->
+    </div>  
+        <div class="flex-col items-left">
+            <p-button label="Aggiungi" (click)="addEvent()"></p-button>
+            <p-button label="Annulla" (click)="visible = false"></p-button>
+        </div>
+    
+</p-dialog>

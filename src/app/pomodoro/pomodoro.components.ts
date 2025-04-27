@@ -51,17 +51,14 @@ interface Task {
     providers: [MessageService],
 })
 export class PomodoroComponent implements OnInit {
+    //variabili per il timer
     standardTime: number = 60; // 25 minuti
     interval?: number;
     isRunning: boolean = false;
     startStop: string = "START";
 
-    stateOptions: any[] = [
-        { label: "Pomodoro", value: "pomodoro" },
-        { label: 'Short Break', value: 'shortBreak' },
-        { label: 'Long Break', value: 'longBreak' }
-    ];
-    value: string = 'pomodoro';
+
+    typeTimer: string = 'pomodoro';
     pomodoroTimes: number = 1;
     knobTIME: number = 25 * 60; // Inizializza con 25 minuti
     pause: boolean = false;
@@ -155,6 +152,7 @@ export class PomodoroComponent implements OnInit {
         this.stopTimer();
         this.startStop = 'START';
         this.pause=false;
+        this.updateKnobTime();
     }
 
     pauses(){
@@ -162,14 +160,17 @@ export class PomodoroComponent implements OnInit {
             if(this.pomodoroTimes % this.longBreakInterval == 0){
                 this.remaningTime = this.longBreak;
                 this.knobTIME = this.longBreak;
+                this.typeTimer='longBreak';
             } else {
                 this.remaningTime = this.shortBreak;
                 this.knobTIME = this.shortBreak;
+                this.typeTimer='shortBreak';
             }
             this.pomodoroTimes++;
         }else{
             this.remaningTime = this.pomodoro;
             this.knobTIME = this.pomodoro;
+            this.typeTimer='pomodoro';
         }
         this.startStop = 'START';
         this.pause=!this.pause;
@@ -217,11 +218,11 @@ export class PomodoroComponent implements OnInit {
     }
 
     updateKnobTime() {
-        if (this.value === 'pomodoro') {
+        if (this.typeTimer === 'pomodoro') {
             this.knobTIME = this.pomodoro;
-        } else if (this.value === 'shortBreak') {
+        } else if (this.typeTimer === 'shortBreak') {
             this.knobTIME = this.shortBreak;
-        } else if (this.value === 'longBreak') {
+        } else if (this.typeTimer === 'longBreak') {
             this.knobTIME = this.longBreak;
         }
     }

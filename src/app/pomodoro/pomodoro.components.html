@@ -2,7 +2,7 @@
     <div class="w-full flex flex-wrap md:flex-nowrap items-center justify-center gap-2 py-51" [ngClass]="{'flex-col': screenWidth < 1089, 'flex-row': screenWidth >= 1090}">
         <div class="w-full md:w-5/12 flex flex-col items-center justify-center gap-2">
             <div class="flex items-end gap-5 ml-auto md:ml-0 md:self-end">
-                <p-button (click)="showDialog()" icon="pi pi-cog"></p-button>
+                <p-button (click)="showDialog()" icon="pi pi-cog" ></p-button>
             </div>
             <p-dialog header="SETTINGS" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
                 <div class="flex flex-col items-top justify-center gap-3">
@@ -29,13 +29,27 @@
                 </div>
             </p-dialog>
             <div class="flex flex-col items-center justify-center" [formGroup]="formGroup">
-                <!--TODO SOSTITUIRE CON ANIMAZIONE ALTERNANZA POMODORO E PAUSE!!!!!!!!!!!!!-->
-                <p-select-button
-                    [options]="stateOptions" 
-                    [(ngModel)]="value" 
-                    aria-labelledby="basic"
-                ></p-select-button>
-                
+
+                <div class="animated-text" style="margin-bottom: 1rem;">
+                    <p *ngIf="typeTimer === 'pomodoro'" 
+                       [@fadeInOut] 
+                       class="tracking-in-expand" 
+                       >
+                        Pomodoro
+                    </p>
+                    <p *ngIf="typeTimer === 'shortBreak'" 
+                       [@fadeInOut] 
+                       class="tracking-in-expand whitespace-nowrap" 
+                       >
+                        {{ 'pomodoro.shortBreak' | translate }}
+                    </p>
+                    <p *ngIf="typeTimer === 'longBreak'" 
+                       [@fadeInOut] 
+                       class="tracking-in-expand whitespace-nowrap" 
+                       >
+                        {{ 'pomodoro.longBreak' | translate }}
+                    </p>
+                </div>
 
                 <!-- Manteniamo valueTemplate per il formato -->
                 <p-knob formControlName="timer" [readonly]="true" [max]="knobTIME" [valueTemplate]="formattedTimer" />
@@ -48,7 +62,7 @@
         <div class="w-full md:w-5/12 flex flex-col items-center justify-start gap-3 pt-3 md:pt-0 md:pl-3">
             <div class="flex flex-col items-start justify-center gap-3">
                 <div class="task-input">
-                    <input type="text" pInputText [(ngModel)]="newTaskName" placeholder="{{'pomodoro.taskName' | translate }}" />
+                    <input type="text" pInputText [(ngModel)]="newTaskName" placeholder="{{'pomodoro.taskName' | translate }}"/>
                     <p-button label="{{'pomodoro.addTask' | translate }}" (click)="addTask()"></p-button>
                 </div>
 

@@ -24,11 +24,19 @@ export class EventListComponent {
   }
 
   castContent(e: Event | Note): Content{
-    return {
-      title: e.title,
-      color: e.color,
-      date: isEvent(e) ? e.expireDate : e.lastEdit,
-      subtitle: isEvent(e) ? e.description : e.content
+    if (isEvent(e)){
+      return {
+        title: e.title,
+        color: e.color,
+        date: e.expireDate,
+        subtitle: e.description
+      }
+    } else {
+      return {
+        title: e.label,
+        date: e.lastEdit,
+        subtitle: e.content.length > 30 ? e.label.slice(0, 30) + '...' : e.content
+      }
     }
   }
 

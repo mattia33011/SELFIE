@@ -10,11 +10,15 @@ export type Event = {
 export type Notes = Note[]
 
 export type Note = {
-    title: string,
-    lastEdit: Date,
-    created: Date,
+    label: string, 
+    expanded: boolean,
     content: string,
-    color?: "success" | "info" | "warn" | "danger" | "help"
+    type: string,
+    icon: string,
+    children: Notes,
+    parent: Note,
+    droppableNode: boolean,
+    lastEdit: Date,
 }
 
 

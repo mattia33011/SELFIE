@@ -116,7 +116,11 @@
     "actionsTask": "Actions",
     "pendingTask": "Pending",
     "completeTask": "Complete",
-    "completedTask": "Completed"
+    "completedTask": "Completed",
+    "numbertaskCompleted": "Tasks completed",
+    "numberPomodoroCompleted": "Pomodoros completed",
+    "endSession": "End session",
+    "dateCompleted": "Date"
   },
   "note":{
     "newFolder": "New Folder",

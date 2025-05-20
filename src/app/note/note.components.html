@@ -30,7 +30,7 @@
     </div>
     <div class="container">
         <p-editor [(ngModel)]="text" [style]="{ height: '50vh' }" *ngIf="selectedNote?.type !== 'folder'" [readonly]="false"></p-editor>
-        <p-editor [ngModel]="'note.folderSelected' | translate" [style]="{ height: '50vh' }" *ngIf="selectedNote?.type === 'folder'" [readonly]="true"></p-editor>
+        <p-editor [ngModel]="'note.folderSelected' | translate" [style]="{ height: '50vh' }" *ngIf="selectedNote?.type === 'folder' " [readonly]="true"></p-editor>
 
         <p-button label="Salva" (click)="saveNote()"></p-button>
     </div>

@@ -58,6 +58,30 @@
                     <p-button [label]="startStop" [style]="{ height: '2.5rem' }" (click)="clickButton()" />
                     <p-button icon="pi pi-play" [style]="{ height: '2.5rem' }" (click)="skipTimer()"></p-button>
                 </div></div>
+            
+            <p-button label="{{'pomodoro.endSession' | translate}}" [style]="{ height: '2.5rem', marginTop: '3rem' }" (click)="endSession()"></p-button>
+            
+            <div class="flex items-center gap-2">
+                
+                <p-table [value]="pomodoroHistory" dataKey="id" [tableStyle]="{ 'max-width': '40rem'}">
+                    <ng-template #header>
+                        <tr>
+                            <th style="width: 10rem"> {{ 'pomodoro.numberPomodoroCompleted' | translate }}</th>
+                            <th style="width: 10rem"> {{ 'pomodoro.numbertaskCompleted' | translate }}</th>
+                            <th style="width: 10rem"> {{ 'pomodoro.dateCompleted' | translate }}</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-history let-rowIndex="rowIndex">
+                        <tr>
+                            <td>{{ history.pomodoroCompleted }}</td>
+                            <td>{{ history.completedTasks }}</td>
+                            <td>{{ history.dateCompleted}}</td>
+                            <p-button icon="pi pi-trash" [style]="{ 'height': '2.6rem', 'width': '2.6rem', 'margin-left':'0.6rem'}" (click)="removeSession(rowIndex)"></p-button>
+                        </tr>
+                    </ng-template>
+                    
+                </p-table>
+            </div>
         </div>
         <div class="w-full md:w-5/12 flex flex-col items-center justify-start gap-3 pt-3 md:pt-0 md:pl-3">
             <div class="flex flex-col items-start justify-center gap-3">

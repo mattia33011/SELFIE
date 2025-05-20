@@ -117,7 +117,11 @@
     "actionsTask": "Azioni",
     "pendingTask": "In attesa",
     "completeTask": "Completa",
-    "completedTask": "Completata"
+    "completedTask": "Completata",
+    "numbertaskCompleted": "Task completate",
+    "numberPomodoroCompleted": "Pomodoro completati",
+    "endSession": "Termina sessione",
+    "dateCompleted": "Data"
   },
   "note":{
     "newFolder": "Nuova cartella",

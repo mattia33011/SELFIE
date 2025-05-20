@@ -76,6 +76,31 @@ export class ApiService {
     });
   }
 
+  putNote(userID: string, note: Notes, token: string) {
+    return this.http.put(`${this.baseUrl}/users/${userID}/notes`, note, {
+      headers : {authorization: this.resolveBearerToken(token)},
+    });
+  }
+
+  pushNote(userID: string, note: Notes, token: string) {
+    return this.http.post(`${this.baseUrl}/users/${userID}/notes`, note, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+
+  getRecentNotes(userID: string, token: string) {
+    return this.http.get<Notes>(`${this.baseUrl}/users/${userID}/notes/recent`, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+
+  deleteNote(userID: string, note: Notes, token: string) {
+    return this.http.delete(`${this.baseUrl}/users/${userID}/notes/${note}`, {
+    headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+
+
   getEvents(userID: string, token: string) {
     return this.http.get<Events>(`${this.baseUrl}/users/${userID}/events`, {
       headers: {authorization: this.resolveBearerToken(token)},

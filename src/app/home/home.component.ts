@@ -19,7 +19,7 @@ import {stringToDate} from '../../utils/timeConverter';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-
+  recentNotes: Notes = []
 
   constructor(protected readonly sessionService: SessionService, private readonly apiService: ApiService) {
   }
@@ -27,12 +27,11 @@ export class HomeComponent {
   ngOnInit() {
     forkJoin([
       this.apiService.getEvents(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!),
-      this.apiService.getNotes(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!)
+      this.apiService.getRecentNotes(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!)
     ]).subscribe({
       next: (response) => {
-        this.notes.push(...response[1].map(it => ({
+        this.recentNotes.push(...response[1].map(it => ({
           ...it,
-          created: stringToDate(it.created.toString()),
           lastEdit: stringToDate(it.lastEdit.toString())
         })))
         this.deadlineEvents.push(...response[0].map(it => ({...it, expireDate: stringToDate(it.expireDate.toString()) })))
@@ -79,7 +78,7 @@ export class HomeComponent {
 
   deadlineEvents: Events = []
 
-  notes: Notes = []
+
 
   loading = false
 

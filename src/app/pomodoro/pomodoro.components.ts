@@ -65,7 +65,8 @@ export class PomodoroComponent implements OnInit {
 
     tasks: Task[] = [];
     newTaskName: string = '';
-    newTaskPomodoros: number = 1;
+    completedTasks: number = 0;
+
 
     //variabili per le impostazioni del timer
     pomodoro: number = 25 * 60;
@@ -85,6 +86,13 @@ export class PomodoroComponent implements OnInit {
     });
 
     screenWidth: number = window.innerWidth;
+
+    pomodoroHistory: { 
+        pomodoroCompleted: number; 
+        completedTasks: number 
+        dateCompleted: string;
+    }[] = [];
+
     
     @HostListener('window:resize', ['$event'])
     onResize(event: Event): void {
@@ -152,6 +160,7 @@ export class PomodoroComponent implements OnInit {
         this.stopTimer();
         this.startStop = 'START';
         this.pause=false;
+        this.typeTimer='pomodoro';
         this.updateKnobTime();
     }
 
@@ -245,7 +254,6 @@ export class PomodoroComponent implements OnInit {
                 completed: false
             });
             this.newTaskName = '';
-            this.newTaskPomodoros = 1;
         }
     }
 
@@ -255,6 +263,26 @@ export class PomodoroComponent implements OnInit {
 
     completeTask(index: number) {
         this.tasks[index].completed = true;
+        this.completedTasks++;
     }
-    
+
+    endSession(){
+        if (this.pomodoroTimes==0){
+            return;
+        }
+        const now = new Date();
+        const dateCompleted = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        this.pomodoroHistory.push({
+            pomodoroCompleted: this.pomodoroTimes, 
+            completedTasks: this.completedTasks,
+            dateCompleted: dateCompleted
+        });
+        this.pomodoroTimes = 0;
+        this.completedTasks = 0;
+        this.setUpTimer();
+    }
+
+    removeSession(index: number){
+        this.pomodoroHistory.splice(index, 1);
+    }
 }

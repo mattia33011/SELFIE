@@ -22,7 +22,7 @@
                     <p>{{"pomodoro.otherOptions" | translate }}</p>
                     <div class="flex items-center gap-4 mb-4">
                         <label for="longBreakInterval" class="font-semibold w-24">{{"pomodoro.intervals" | translate }}</label>
-                        <p-inputNumber id="longBreakInterval" [(ngModel)]="longBreakInterval" [min]="1"></p-inputNumber>
+                        <p-inputNumber id="longBreakInterval" [(ngModel)]="pomodoro.longBreakInterval" [min]="1"></p-inputNumber>
                     </div>
                     <p-button label="{{'pomodoro.save' | translate }}" (click)="saveSettings()"></p-button>
                     <p-button label="{{'pomodoro.resetTimer' | translate }}" (click)="resetTimer()"></p-button>
@@ -31,19 +31,19 @@
             <div class="flex flex-col items-center justify-center" [formGroup]="formGroup">
 
                 <div class="animated-text" style="margin-bottom: 1rem;">
-                    <p *ngIf="typeTimer === 'pomodoro'" 
+                    <p *ngIf="pomodoro.pomodoroType === 'pomodoro'" 
                        [@fadeInOut] 
                        class="tracking-in-expand" 
                        >
                         Pomodoro
                     </p>
-                    <p *ngIf="typeTimer === 'shortBreak'" 
+                    <p *ngIf="pomodoro.pomodoroType === 'shortBreak'" 
                        [@fadeInOut] 
                        class="tracking-in-expand whitespace-nowrap" 
                        >
                         {{ 'pomodoro.shortBreak' | translate }}
                     </p>
-                    <p *ngIf="typeTimer === 'longBreak'" 
+                    <p *ngIf="pomodoro.pomodoroType === 'longBreak'" 
                        [@fadeInOut] 
                        class="tracking-in-expand whitespace-nowrap" 
                        >
@@ -53,7 +53,7 @@
 
                 <!-- Manteniamo valueTemplate per il formato -->
                 <p-knob formControlName="timer" [readonly]="true" [max]="knobTIME" [valueTemplate]="formattedTimer" />
-                <p>#{{ pomodoroTimes }}</p>
+                <p>#{{ pomodoro.pomodoroNumber }}</p>
                 <div class="flex items-center gap-2">
                     <p-button [label]="startStop" [style]="{ height: '2.5rem' }" (click)="clickButton()" />
                     <p-button icon="pi pi-play" [style]="{ height: '2.5rem' }" (click)="skipTimer()"></p-button>

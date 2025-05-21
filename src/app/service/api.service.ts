@@ -100,6 +100,57 @@ export class ApiService {
     });
   }
 
+  //api per le sessioni e pomodoro
+
+  getStudySessions(userID: string, token: string) {
+    return this.http.get(`${this.baseUrl}/users/${userID}/pomodoro/oldSessions`, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+  pushStudySessions(userID: string, pomodoroHistory: any, token: string) {
+    return this.http.post(`${this.baseUrl}/users/${userID}/pomodoro/oldSessions`, pomodoroHistory, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+
+  deleteStudySession(userID: string, pomodoroHistory: any, token: string, indexSession: number) {
+    return this.http.delete(`${this.baseUrl}/users/${userID}/pomodoro/oldStudySession/${indexSession}`, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+
+  //api per le task
+  getTasks(userID: string, token: string) {
+    return this.http.get(`${this.baseUrl}/users/${userID}/tasks`, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+  putTask(userID: string, task: any, token: string) {
+    return this.http.put(`${this.baseUrl}/users/${userID}/tasks`, task, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+  pushTask(userID: string, task: any, token: string) {
+    return this.http.post(`${this.baseUrl}/users/${userID}/tasks`, task, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+  deleteTask(userID: string, token: string, taskid: number) {
+    return this.http.delete(`${this.baseUrl}/users/${userID}/tasks/${taskid}`, {  
+      headers : {authorization: this.resolveBearerToken(token)},
+    });
+  }
+
+  getPomodoro(userID: string, token: string) {
+    return this.http.get(`${this.baseUrl}/users/${userID}/pomodoro`, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+  putPomodoro(userID: string, pomodoro: any, token: string) {
+    return this.http.put(`${this.baseUrl}/users/${userID}/pomodoro`, pomodoro, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
 
   getEvents(userID: string, token: string) {
     return this.http.get<Events>(`${this.baseUrl}/users/${userID}/events`, {

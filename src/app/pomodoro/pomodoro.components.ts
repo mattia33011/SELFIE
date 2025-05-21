@@ -18,13 +18,12 @@ import { TableModule } from 'primeng/table';
 import { DividerModule } from 'primeng/divider';
 import { DialogModule } from 'primeng/dialog';
 import { timer } from 'rxjs';
+import {Task, Pomodoro} from '../../types/pomodoro';
+import {SessionService} from '../service/session.service';
+import {forkJoin, Observable} from 'rxjs';
+import {ApiService} from '../service/api.service';
+import {stringToDate} from '../../utils/timeConverter';
 
-
-interface Task {
-    id: number;
-    name: string;
-    completed: boolean;
-}
 
 @Component({
     selector: 'app-timer',
@@ -48,7 +47,7 @@ interface Task {
     ],
     templateUrl: './pomodoro.components.html',
     styleUrl: './pomodoro.components.css',
-    providers: [MessageService],
+    providers: [MessageService, ApiService],
 })
 export class PomodoroComponent implements OnInit {
     //variabili per il timer
@@ -58,8 +57,6 @@ export class PomodoroComponent implements OnInit {
     startStop: string = "START";
 
 
-    typeTimer: string = 'pomodoro';
-    pomodoroTimes: number = 1;
     knobTIME: number = 25 * 60; // Inizializza con 25 minuti
     pause: boolean = false;
 
@@ -68,21 +65,27 @@ export class PomodoroComponent implements OnInit {
     completedTasks: number = 0;
 
 
+
     //variabili per le impostazioni del timer
-    pomodoro: number = 25 * 60;
-    shortBreak: number = 5 * 60;
-    longBreak: number = 15 * 60;
-    longBreakInterval: number = 4;
+    pomodoro: Pomodoro={
+        pomodoroNumber: 1,
+        pomodoroType: 'pomodoro',
+        pomodoroDuration: 25 * 60,
+        shortBreak: 5 * 60,
+        longBreak: 15 * 60,
+        longBreakInterval: 4
+    }
+    
 
     //variabili visualizzazione finestra di dialogo
-    pomodoroVisuale: number = this.pomodoro / 60;
-    shortBreakVisuale: number = this.shortBreak / 60;
-    longBreakVisuale: number = this.longBreak / 60;
+    pomodoroVisuale: number = this.pomodoro.pomodoroDuration / 60;
+    shortBreakVisuale: number = this.pomodoro.shortBreak / 60;
+    longBreakVisuale: number = this.pomodoro.longBreak / 60;
 
     visible: boolean = false; //variabile per la visibilità della finestra di dialogo
 
     formGroup = new FormGroup({
-        timer: new FormControl(this.pomodoro) // Inizializza con 25 minuti
+        timer: new FormControl(this.pomodoro.pomodoroDuration) // Inizializza con 25 minuti
     });
 
     screenWidth: number = window.innerWidth;
@@ -102,14 +105,61 @@ export class PomodoroComponent implements OnInit {
     constructor(
         private readonly messageService: MessageService,
         private readonly translateService: TranslateService,
-        private readonly themeService: ThemeService
+        private readonly themeService: ThemeService,
+         private readonly apiService: ApiService, 
+         protected readonly sessionService: SessionService
     ) {
-        this.remaningTime = this.pomodoro;
+        this.remaningTime = this.pomodoro.pomodoroDuration;
     }
 
     ngOnInit() {
         this.formGroup.patchValue({
-            timer: this.pomodoro
+            timer: this.pomodoro.pomodoroDuration
+        });
+
+        forkJoin([
+            
+            this.apiService.getTasks(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!),
+            this.apiService.getPomodoro(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!),
+            this.apiService.getStudySessions(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!)
+            ]).subscribe({
+            next: (response) => {
+                if (response[0]) {
+                    this.tasks.push(...(response[0] as any[]).map(it => ({
+                        ...it,
+                        
+                    })));
+                }else if (response[1]) {
+                    this.pomodoro = response[1] as Pomodoro;
+                    this.pomodoroVisuale = this.pomodoro.pomodoroDuration / 60;
+                    this.shortBreakVisuale = this.pomodoro.shortBreak / 60;
+                    this.longBreakVisuale = this.pomodoro.longBreak / 60;
+                    this.formGroup.patchValue({
+                        timer: this.pomodoro.pomodoroDuration
+                    });
+                    this.updateKnobTime();
+                }else if (response[2]) {
+                    this.pomodoroHistory = response[2] as {
+                        pomodoroCompleted: number; 
+                        completedTasks: number 
+                        dateCompleted: string;
+                    }[];
+                }
+            },
+            error: (error) => {
+                console.log(error)
+            },
+            })
+    }
+
+    chiamataPomodoro(){
+        this.apiService.putPomodoro(this.sessionService.getSession()!.user.username!, this.pomodoro, this.sessionService.getSession()!.token!).subscribe({
+            next: (response) => {
+                console.log(response);
+            },
+            error: (error) => {
+                console.log(error);
+            },
         });
     }
 
@@ -118,19 +168,21 @@ export class PomodoroComponent implements OnInit {
     }
 
     saveSettings() {
-        this.pomodoro = (this.pomodoroVisuale ?? 0) * 60;
-        this.shortBreak = (this.shortBreakVisuale ?? 0) * 60;
-        this.longBreak = (this.longBreakVisuale ?? 0) * 60;
-        this.longBreakInterval = this.longBreakInterval ?? 0;
+        this.pomodoro.pomodoroDuration = (this.pomodoroVisuale ?? 0) * 60;
+        this.pomodoro.shortBreak = (this.shortBreakVisuale ?? 0) * 60;
+        this.pomodoro.longBreak = (this.longBreakVisuale ?? 0) * 60;
+        this.pomodoro.longBreakInterval = this.pomodoro.longBreakInterval ?? 0;
         this.visible = false;
 
         // Aggiorna il FormGroup con i nuovi valori
         this.formGroup.patchValue({
-            timer: this.pomodoro
+            timer: this.pomodoro.pomodoroDuration
         });
 
         this.updateKnobTime();
         this.setUpTimer();
+        this.chiamataPomodoro();
+
     }
 
     set remaningTime(value: number) {
@@ -156,33 +208,35 @@ export class PomodoroComponent implements OnInit {
     }
 
     setUpTimer() {
-        this.remaningTime = this.pomodoro;
+        this.remaningTime = this.pomodoro.pomodoroDuration;
         this.stopTimer();
         this.startStop = 'START';
         this.pause=false;
-        this.typeTimer='pomodoro';
+        this.pomodoro.pomodoroType='pomodoro';
         this.updateKnobTime();
+        this.chiamataPomodoro();
     }
 
     pauses(){
         if(!this.pause){
-            if(this.pomodoroTimes % this.longBreakInterval == 0){
-                this.remaningTime = this.longBreak;
-                this.knobTIME = this.longBreak;
-                this.typeTimer='longBreak';
+            if(this.pomodoro.pomodoroNumber % this.pomodoro.longBreakInterval == 0){
+                this.remaningTime = this.pomodoro.longBreak;
+                this.knobTIME = this.pomodoro.longBreak;
+                this.pomodoro.pomodoroType='longBreak';
             } else {
-                this.remaningTime = this.shortBreak;
-                this.knobTIME = this.shortBreak;
-                this.typeTimer='shortBreak';
+                this.remaningTime = this.pomodoro.shortBreak;
+                this.knobTIME = this.pomodoro.shortBreak;
+                this.pomodoro.pomodoroType='shortBreak';
             }
-            this.pomodoroTimes++;
+            this.pomodoro.pomodoroNumber++;
         }else{
-            this.remaningTime = this.pomodoro;
-            this.knobTIME = this.pomodoro;
-            this.typeTimer='pomodoro';
+            this.remaningTime = this.pomodoro.pomodoroDuration;
+            this.knobTIME = this.pomodoro.pomodoroDuration;
+            this.pomodoro.pomodoroType='pomodoro';
         }
         this.startStop = 'START';
         this.pause=!this.pause;
+        this.chiamataPomodoro();
         
     }
 
@@ -195,9 +249,7 @@ export class PomodoroComponent implements OnInit {
             if (this.remaningTime <= 0) {
                 this.pauses();
                 this.stopTimer();
-                this.messageService.add({
-                    // TODO: Aggiungere messaggio al server
-                });
+                
             }
         }, 1000);
     }
@@ -212,33 +264,32 @@ export class PomodoroComponent implements OnInit {
 
     resetTimer() {
         this.stopTimer();
-        this.pomodoro = 25 * 60;
-        this.shortBreak = 5 * 60;
-        this.longBreak = 15 * 60;
-        this.longBreakInterval = 4;
+        this.pomodoro.pomodoroDuration = 25 * 60;
+        this.pomodoro.shortBreak = 5 * 60;
+        this.pomodoro.longBreak = 15 * 60;
+        this.pomodoro.longBreakInterval = 4;
 
         //aggiorno la visualizzazione
-        this.pomodoroVisuale = this.pomodoro / 60;
-        this.shortBreakVisuale = this.shortBreak / 60;
-        this.longBreakVisuale = this.longBreak / 60;
+        this.pomodoroVisuale = this.pomodoro.pomodoroDuration / 60;
+        this.shortBreakVisuale = this.pomodoro.shortBreak / 60;
+        this.longBreakVisuale = this.pomodoro.longBreak / 60;
         this.visible = false;
         this.updateKnobTime();
         this.setUpTimer();
+        this.chiamataPomodoro();
     }
 
     updateKnobTime() {
-        if (this.typeTimer === 'pomodoro') {
-            this.knobTIME = this.pomodoro;
-        } else if (this.typeTimer === 'shortBreak') {
-            this.knobTIME = this.shortBreak;
-        } else if (this.typeTimer === 'longBreak') {
-            this.knobTIME = this.longBreak;
+        if (this.pomodoro.pomodoroType === 'pomodoro') {
+            this.knobTIME = this.pomodoro.pomodoroDuration;
+        } else if (this.pomodoro.pomodoroType === 'shortBreak') {
+            this.knobTIME = this.pomodoro.shortBreak;
+        } else if (this.pomodoro.pomodoroType === 'longBreak') {
+            this.knobTIME = this.pomodoro.longBreak;
         }
     }
 
-    setCustomTime(seconds: number) {
-        this.remaningTime = seconds;
-    }
+
 
     get formattedTimer(): string {
         let minutes = Math.floor(this.remaningTime / 60);
@@ -255,34 +306,74 @@ export class PomodoroComponent implements OnInit {
             });
             this.newTaskName = '';
         }
+        this.apiService.pushTask(this.sessionService.getSession()!.user.username!, this.tasks, this.sessionService.getSession()!.token!).subscribe({
+            next: (response) => {
+                console.log(response);
+            },
+            error: (error) => { 
+                console.log(error);
+            },
+        });
     }
 
     removeTask(index: number) {
         this.tasks.splice(index, 1);
+        this.apiService.deleteTask(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!, index).subscribe({
+            next: (response) => {
+                console.log(response);
+            },
+            error: (error) => { 
+                console.log(error);
+            },
+        });
     }
 
     completeTask(index: number) {
         this.tasks[index].completed = true;
         this.completedTasks++;
+        this.apiService.putTask(this.sessionService.getSession()!.user.username!, this.tasks, this.sessionService.getSession()!.token!).subscribe({
+            next: (response) => {   
+                console.log(response);
+            },
+            error: (error) => { 
+                console.log(error);
+            },
+        });
     }
 
     endSession(){
-        if (this.pomodoroTimes==0){
+        if (this.pomodoro.pomodoroNumber==0){
             return;
         }
         const now = new Date();
         const dateCompleted = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         this.pomodoroHistory.push({
-            pomodoroCompleted: this.pomodoroTimes, 
+            pomodoroCompleted: this.pomodoro.pomodoroNumber, 
             completedTasks: this.completedTasks,
             dateCompleted: dateCompleted
         });
-        this.pomodoroTimes = 0;
+        this.pomodoro.pomodoroNumber = 1;
         this.completedTasks = 0;
         this.setUpTimer();
+        this.apiService.pushStudySessions(this.sessionService.getSession()!.user.username!, this.pomodoroHistory, this.sessionService.getSession()!.token!).subscribe({
+            next: (response) => {
+                console.log(response);
+            },
+            error: (error) => { 
+                console.log(error);
+            },
+        });
     }
 
     removeSession(index: number){
         this.pomodoroHistory.splice(index, 1);
+        this.apiService.deleteStudySession(this.sessionService.getSession()!.user.username!, this.pomodoroHistory, this.sessionService.getSession()!.token!, index).subscribe({
+            next: (response) => {
+                console.log(response);
+            },
+            error: (error) => { 
+                console.log(error);
+            },
+        });
     }
 }

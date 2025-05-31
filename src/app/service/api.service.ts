@@ -9,6 +9,7 @@ import {Session, User} from '../../types/session';
 import {map} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Events, Notes} from '../../types/events';
+import { Task, TaskDTO } from '../../types/pomodoro';
 
 @Injectable({
   providedIn: 'root',
@@ -121,22 +122,35 @@ export class ApiService {
 
   //api per le task
   getTasks(userID: string, token: string) {
-    return this.http.get(`${this.baseUrl}/users/${userID}/tasks`, {
+    return this.http.get<TaskDTO[]>(`${this.baseUrl}/users/${userID}/pomodoro/tasks`, {
       headers: {authorization: this.resolveBearerToken(token)},
     });
   }
-  putTask(userID: string, task: any, token: string) {
-    return this.http.put(`${this.baseUrl}/users/${userID}/tasks`, task, {
+  putTask(userID: string, tasks: Task[], token: string) {
+
+    const mappedTask = tasks.map(task => ({
+      taskName: task.name,
+      taskStatus: task.completed ? "completed": "pending",
+      taskCompleted: task.completed
+    }))
+
+    return this.http.put(`${this.baseUrl}/users/${userID}/pomodoro/tasks`, mappedTask, {
       headers: {authorization: this.resolveBearerToken(token)},
     });
   }
-  pushTask(userID: string, task: any, token: string) {
-    return this.http.post(`${this.baseUrl}/users/${userID}/tasks`, task, {
+  pushTask(userID: string, tasks: any, token: string) {
+    const mappedTask = tasks.map((task: any) => ({
+      taskName: task.name,
+      taskStatus: task.completed ? "completed": "pending",
+      taskCompleted: task.completed
+    }))
+
+    return this.http.post(`${this.baseUrl}/users/${userID}/pomodoro/tasks`, mappedTask, {
       headers: {authorization: this.resolveBearerToken(token)},
     });
   }
-  deleteTask(userID: string, token: string, taskid: number) {
-    return this.http.delete(`${this.baseUrl}/users/${userID}/tasks/${taskid}`, {  
+  deleteTask(userID: string, token: string, taskid: string) {
+    return this.http.delete(`${this.baseUrl}/users/${userID}/pomodoro/tasks/${taskid}`, {  
       headers : {authorization: this.resolveBearerToken(token)},
     });
   }

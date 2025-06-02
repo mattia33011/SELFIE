@@ -15,14 +15,14 @@
 
 /* Celle giorni */
 ::ng-deep .fc-daygrid-day-number {
-  font-size: 18px !important;
+  font-size: 1.125rem !important;
   font-weight: bold !important;
 }
 ::ng-deep .fc-daygrid-day {
   transition: background-color 0.3s ease;
   font-weight: 500;
   cursor: pointer;
-  height: 50px;
+  height: 3.125rem;
 }
 /* Hover sulle celle */
 ::ng-deep .fc-daygrid-day:hover {
@@ -41,8 +41,8 @@ background-color: var(--p-primary-500) !important;
 
 /* Eventi */
 ::ng-deep .fc-event {
-line-height: 15px !important;
-line-break: 0px;
+line-height: 0.938rem !important;
+line-break: 0rem;
 }
 
 /* Popover */
@@ -66,40 +66,49 @@ height: fit-content !important;
 ::ng-deep .fc-popover-body {
 background: var(--p-primary-500) !important;
 }
-
-@media (max-width: 768px) {
+::ng-deep .form-group { /*aggiungi*/
+  padding: 0.5rem !important;
+}
+@media (max-width: 48rem) {
   ::ng-deep .fc { /*il calendario ha meno padding nella box*/
-    padding: 0px !important;
-    margin: 0px !important;
+    padding: 0rem !important;
+    margin: 0rem !important;
   }
   /*toolbar*/
   ::ng-deep .fc-header-toolbar {
-    margin: 4px !important;
+    margin: 0.25rem !important;
   }
   /* giorni*/
   ::ng-deep .fc-daygrid-day {
-    height: 17px !important;
+    height: 1.063rem !important;
   }
   ::ng-deep .fc-daygrid-day-number {
-    font-size: 12px !important;
+    font-size: 0.75rem !important;
     font-weight: bold !important;
   }
   ::ng-deep .fc-event {
-    line-height: 10px !important;
-    font-size: 12px !important;
-    line-break: 0px !important;
+    font-size: 0.4rem !important;
+    line-height: 0.9rem !important;
+    padding: 0.1rem 0.2rem !important;
+    margin: 0.1rem 0 !important;
+    min-height: unset !important;
+    max-height: 1.5rem !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
   }
+
   ::ng-deep .fc-toolbar-chunk {
-    margin: 0 15px !important;
+    margin: 0 0.938rem !important;
   }
   ::ng-deep .fc-button-group {
-    margin-bottom: 5px;
+    margin-bottom: 0.313rem;
    }
   ::ng-deep .fc-toolbar button {
-    font-size: 15px !important;
+    font-size: 0.938rem !important;
   }
   ::ng-deep .fc-toolbar-title {
-    font-size: 25px !important;
+    font-size: 1.563rem !important;
   }
   
 }

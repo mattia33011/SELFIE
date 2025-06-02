@@ -7,53 +7,61 @@
     </ng-template>
 </full-calendar>
 
-<p-dialog header="Nuovo evento" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
-    <div class="popup" *ngIf="visible"> <!--MIGLIORA VISIBILITà DEL POPUP-->
-        <div class="flex-col items-left">
-            <label for="eventName">Nome Evento:</label>
-            <input id="eventName" [(ngModel)]="eventName" type="text" />
-        </div>
-        <div class="flex-col items-left">
-            <label for="theDate">Data:</label>
-            <input id="theDate" [(ngModel)]="theDate" type="date" />
-        </div>
-        <div class="flex-col items-left">
-            <label for="eventTime">Inizio:</label>
-            <input id="eventTime" [(ngModel)]="eventTime" type="time" />
-        </div>
-        <div class="flex-col items-left">
-            <label for="endDate">Data fine:</label>
-            <input id="endDate" [(ngModel)]="eventEndDate" type="date" />
+<p-dialog header="Evento" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' , height: '50rem' }" (onHide)="resetForm()">
+    <div class="popup" *ngIf="visible"> <!--dai indicazioni a form-group su css-->
+        <div class="form-group">
+            <p-floatlabel variant="in">
+                <input pInputText id="in_label" [(ngModel)]="eventName" pSize="small" autocomplete="off" />
+                <label for="in_label">{{ 'event.name' | translate }}</label>
+            </p-floatlabel>
         </div>
         
-        <div class="flex-col items-left">
-            <label for="endTime">Tempo fine:</label>
-            <input id="endTime" [(ngModel)]="eventEndTime" type="time" />
+        <div class="form-group">
+            <p-iftalabel>
+                <p-datepicker [(ngModel)]="theDate" inputId="date" showIcon iconDisplay="input" />
+                <label for="date">{{ 'event.theDate' | translate }}</label>
+            </p-iftalabel>
+        </div>
+        <div class="form-group">
+            <p-iftalabel>
+                <p-datepicker [(ngModel)]="eventEndDate" inputId="end_date" showIcon iconDisplay="input" />
+                <label for="end_date">{{ 'event.enddate' | translate }}</label>
+            </p-iftalabel>
+        </div>
+        <div class="form-group">
+            <p-iftalabel>
+                <p-datepicker inputId="eventTime" [(ngModel)]="eventTime" [timeOnly]="true" [stepMinute]="15" />
+                <label for="eventTime">{{"event.start" | translate }}</label>
+            </p-iftalabel>
+        </div>
+        <div class="form-group">
+            <p-iftalabel>
+                <p-datepicker inputId="endTime" [(ngModel)]="eventEndTime" [timeOnly]="true" [stepMinute]="15" />
+                <label for="eventEndTime">{{"event.endtime" | translate }}</label>
+            </p-iftalabel>
         </div>
 
-        <div class="flex-col items-left">
-            <label for="eventLocation">Luogo:</label>
-            <input id="eventLocation" [(ngModel)]="eventLocation" type="text" />
+        <div class="form-group">
+            <p-iftalabel>
+                <label for="eventLocation">{{"event.location" | translate }}</label>
+                <input type="eventLocation" pInputText [(ngModel)]="eventLocation" />
+            </p-iftalabel>
         </div>
-        
-        <div class="flex-col items-left">
-            <label for="eventColor">Colore:</label>
-            <input id="eventColor" [(ngModel)]="eventColor" type="color" />
+
+        <div class="form-group">
+                <label for="eventColor">{{"event.color" | translate }}</label>
+                <div>
+                    <p-colorpicker [(ngModel)]="eventColor" />
+                </div>
         </div>
-        
-        
+
+
         <!-- Per la ripetizione -->
         <div class="flex-col items-left">
-            <label for="repeatType">Ripeti:</label>
-            <select id="repeatType" [(ngModel)]="repeatType" (change)="onRepeatTypeChange()">
-            <option value="">Nessuna</option>
-            <option value="daily">Ogni giorno</option>
-            <option value="weekly">Ogni settimana</option>
-            <option value="biweekly">Ogni 2 settimane</option>
-            <option value="monthly">Ogni mese</option>
-            <option value="yearly">Ogni anno</option>
-            <!--<option value="custom">Personalizzato</option> -->
-            </select>
+            <p-floatlabel class="w-full md:w-56" variant="in">
+                <p-dropdown  [(ngModel)]="repeatType"  [options]="repeatOptions"  optionLabel="label" placeholder="{{'event.none' | translate }}"></p-dropdown>
+                <label for="repeatType">{{ "event.repeat" | translate }}</label>
+            </p-floatlabel>
         </div>
         
     <!-- Se settimanale o bi-settimanale: mostra i giorni della settimana -->
@@ -71,7 +79,7 @@
     
     <!-- Data fine ripetizione -->
     <div *ngIf="repeatType && repeatType !== 'custom'" class="flex-col items-left">
-        <label for="repeatUntil">Ripeti fino a:</label>
+        <label for="repeatUntil">{{ 'event.repeatUntil' | translate }}</label>
         <input id="repeatUntil" [(ngModel)]="repeatUntil" type="date" />
     </div>
     
@@ -79,9 +87,10 @@
     <div *ngIf="repeatType === 'custom'" class="flex-col items-left">
     </div> -->
     </div>  
-        <div class="flex-col items-left">
-            <p-button label="Aggiungi" (click)="addEvent()"></p-button>
-            <p-button label="Annulla" (click)="visible = false"></p-button>
-        </div>
+    <div class="form-group">
+        <p-button *ngIf="!selectedEvent" label="{{ 'event.add' | translate }}" (click)="addEvent()"></p-button>
+        <p-button *ngIf="selectedEvent" label="{{ 'event.update' | translate }}" (click)="updateEvent()"></p-button>
+        <p-button *ngIf="selectedEvent" label="{{ 'event.delete' | translate }}" class="p-button-danger" (click)="deleteEvent()"></p-button>
+    </div>
     
 </p-dialog>

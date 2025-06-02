@@ -126,5 +126,27 @@
     "newFolder": "New Folder",
     "newNote": "New Note",
     "folderSelected": "You have selected a folder!"
+  },
+  "event": {
+    "name": "Name of the event",
+    "theDate": "Date",
+    "start": "Start time",
+    "enddate": "End date",
+    "endtime": "End time",
+    "location": "Location",
+    "color": "Color",
+    "deleteEvent": "Delete event",
+    "repeat": "Repeat event",
+    "repeatUntil": "Repeat until",
+    "selectRepeat": "Select repeat",
+    "none": "None",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "biweekly": "Every 2 weeks",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "add": "Add event",
+    "update": "Update event",
+    "delete": "Delete event"
   }
 }

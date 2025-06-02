@@ -127,5 +127,27 @@
     "newFolder": "Nuova cartella",
     "newNote": "Nuova nota",
     "folderSelected": "Hai selezionato una cartella!"
+  },
+  "event": {
+    "name": "Nome evento",
+    "theDate": "Data evento",
+    "start": "Ora evento",
+    "enddate": "Data fine",
+    "endtime": "Ora fine",
+    "location": "Luogo",
+    "color": "Colore",
+    "deleteEvent": "Elimina evento",
+    "repeat": "Ripeti evento",
+    "repeatUntil": "Ripeti fino a",
+    "selectRepeat": "Ripeti evento",
+    "none": "Nessuna",
+    "daily": "Ogni giorno",
+    "weekly": "Ogni settimana",
+    "biweekly": "Ogni 2 settimane",
+    "monthly": "Ogni mese",
+    "yearly": "Ogni anno",
+    "add": "Aggiungi evento",
+    "update": "Aggiorna evento",
+    "delete": "Elimina evento"
   }
 }

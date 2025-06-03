@@ -19,6 +19,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { IftaLabelModule } from 'primeng/iftalabel'; 
+import { CheckboxModule} from 'primeng/checkbox'; // Importa il modulo Checkbox
 //import { RouterOutlet } from '@angular/router';
 
 // COMANDO npm install @fullcalendar/rrule rrule
@@ -32,7 +33,7 @@ import { IftaLabelModule } from 'primeng/iftalabel';
 @Component({
   selector: 'app-calendar',
   standalone: true, //standalone
-  imports: [FullCalendarModule, PanelModule, FormsModule, CommonModule, DialogModule, ButtonModule, DatePickerModule , TranslatePipe, DropdownModule , FloatLabelModule, ColorPickerModule, InputTextModule, IftaLabelModule], //standalone
+  imports: [FullCalendarModule, PanelModule, FormsModule, CommonModule, DialogModule, ButtonModule, DatePickerModule , TranslatePipe, DropdownModule , FloatLabelModule, ColorPickerModule, InputTextModule, IftaLabelModule, CheckboxModule], //standalone
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
@@ -49,6 +50,8 @@ export class CalendarComponent {
   eventColor: string = '#99ff63'; // colore evento
   eventLocation: string = ''; // luogo evento
   repeatWeekly: boolean = false;
+  isTask: boolean = false;
+  taskStatus: string = 'da_fare';
   visible: boolean = false;
   repeatType: string = ''; // 'none', 'daily', 'weekly', 'monthly', // 'custom'
   repeatInterval: number = 1; // ogni tot giorni/settimane/mesi
@@ -63,6 +66,7 @@ export class CalendarComponent {
     { label: 'Sabato', value: 'SA' },
     { label: 'Domenica', value: 'SU' },
   ];
+  taskStatuses :any[] = []
   repeatOptions:any[] = [];
   constructor(private translate: TranslateService) {}
   ngOnInit() {
@@ -82,6 +86,17 @@ export class CalendarComponent {
         { label: translations['event.monthly'], value: 'monthly' },
         { label: translations['event.yearly'], value: 'yearly' },
       ];
+      this.translate.get([
+      'taskStatus.da_fare',
+      'taskStatus.in_corso',
+      'taskStatus.completata'
+    ]).subscribe(translations => {
+      this.taskStatuses = [
+        { label: translations['taskStatus.da_fare'], value: 'da_fare' },
+        { label: translations['taskStatus.in_corso'], value: 'in_corso' },
+        { label: translations['taskStatus.completata'], value: 'completata' }
+      ];
+    });
   });
 
   }
@@ -126,94 +141,100 @@ export class CalendarComponent {
     //this.isEditMode = false; 
   }
 
-  addEvent() {
-    if (!this.eventName.trim()) {
-      alert("Inserisci un nome per l'evento!");
-      return;
-    }
-    if (!this.theDate) {
-      alert("Seleziona una data per l'evento!");
-      return;
-    }
-
-    const calendarApi = this.calendarComponent.getApi();
-
-    let startDateTime: Date;
-    if (!this.eventTime) {
-      // solo data, ore a 0
-      startDateTime = new Date(
-        this.theDate.getFullYear(),
-        this.theDate.getMonth(),
-        this.theDate.getDate(),
-        0, 0, 0, 0
-      );
-    } else {
-      startDateTime = new Date(
-        this.theDate.getFullYear(),
-        this.theDate.getMonth(),
-        this.theDate.getDate(),
-        this.eventTime.getHours(),
-        this.eventTime.getMinutes(),
-        0, 0
-      );
-    }
-
-    let newEvent: any = {
-      title: this.eventName,
-      color: this.eventColor,
-      extendedProps: { luogo: this.eventLocation },
-      allDay: !this.eventTime
-    };
-
-    if (this.repeatType && this.repeatType !== 'none') {
-      const freqMap: any = {
-        daily: 'DAILY',
-        weekly: 'WEEKLY',
-        biweekly: 'WEEKLY',
-        monthly: 'MONTHLY',
-        yearly: 'YEARLY'
-      };
-
-      newEvent.rrule = {
-        freq: freqMap[this.repeatType],
-        dtstart: startDateTime,
-        interval: this.repeatInterval || 1,
-        until: this.repeatUntil || undefined,
-        byweekday: this.repeatWeekDays.length ? this.repeatWeekDays : undefined
-      };
-
-      if (this.eventTime && this.eventEndTime) {
-        newEvent.duration = this.getDuration(this.eventTime, this.eventEndTime);
-      }
-    } else {
-      newEvent.start = startDateTime;
-
-      if (this.eventEndTime) {
-        // Se abbiamo un orario di fine, anche senza data, usiamo theDate
-        const endDateTime = new Date(
-          this.theDate.getFullYear(),
-          this.theDate.getMonth(),
-          this.theDate.getDate(),
-          this.eventEndTime.getHours(),
-          this.eventEndTime.getMinutes(),
-          0, 0
-        );
-        newEvent.end = endDateTime;
-      } else if (this.eventEndDate) {
-        // Se abbiamo solo una data di fine
-        newEvent.end = new Date(
-          this.eventEndDate.getFullYear(),
-          this.eventEndDate.getMonth(),
-          this.eventEndDate.getDate(),
-          0, 0, 0, 0
-        );
-      }
-    }
-
-    calendarApi.addEvent(newEvent);
-    this.resetForm();
+addEvent() {
+  if (!this.eventName.trim()) {
+    alert("Inserisci un nome per l'evento!");
+    return;
+  }
+  if (!this.theDate) {
+    alert("Seleziona una data per l'evento!");
+    return;
   }
 
+  const calendarApi = this.calendarComponent.getApi();
+
+  // Calcolo startDateTime con o senza orario
+  let startDateTime: Date;
+  if (!this.eventTime || this.isTask) {
+    // Se è attività o non c'è orario => data solo con ore 0
+    startDateTime = new Date(
+      this.theDate.getFullYear(),
+      this.theDate.getMonth(),
+      this.theDate.getDate(),
+      0, 0, 0, 0
+    );
+  } else {
+    startDateTime = new Date(
+      this.theDate.getFullYear(),
+      this.theDate.getMonth(),
+      this.theDate.getDate(),
+      this.eventTime.getHours(),
+      this.eventTime.getMinutes(),
+      0, 0
+    );
+  }
+
+  let newEvent: any = {
+    title: this.eventName,
+    color: this.eventColor,
+    extendedProps: { 
+      luogo: this.eventLocation,
+      tipo: this.isTask ? 'attività' : 'evento',
+      stato: this.taskStatus 
+    },
+    allDay: this.isTask || !this.eventTime  // allDay se attività o senza orario
+  };
+
+  if (!this.isTask && this.repeatType && this.repeatType !== 'none') {
+    // Se NON è attività e c'è ripetizione
+    const freqMap: any = {
+      daily: 'DAILY',
+      weekly: 'WEEKLY',
+      biweekly: 'WEEKLY',
+      monthly: 'MONTHLY',
+      yearly: 'YEARLY'
+    };
+
+    newEvent.rrule = {
+      freq: freqMap[this.repeatType],
+      dtstart: startDateTime,
+      interval: this.repeatInterval || 1,
+      until: this.repeatUntil || undefined,
+      byweekday: this.repeatWeekDays.length ? this.repeatWeekDays : undefined
+    };
+
+    if (this.eventTime && this.eventEndTime) {
+      newEvent.duration = this.getDuration(this.eventTime, this.eventEndTime);
+    }
+  } else {
+    // Eventi singoli o attività (senza rrule)
+    newEvent.start = startDateTime;
+
+    if (!this.isTask && this.eventEndTime) {
+      // Se evento (non attività) con orario di fine
+      const endDateTime = new Date(
+        this.theDate.getFullYear(),
+        this.theDate.getMonth(),
+        this.theDate.getDate(),
+        this.eventEndTime.getHours(),
+        this.eventEndTime.getMinutes(),
+        0, 0
+      );
+      newEvent.end = endDateTime;
+    } else if (!this.isTask && this.eventEndDate) {
+      // Se evento (non attività) con data di fine
+      newEvent.end = new Date(
+        this.eventEndDate.getFullYear(),
+        this.eventEndDate.getMonth(),
+        this.eventEndDate.getDate(),
+        0, 0, 0, 0
+      );
+    }
+  }
+
+  calendarApi.addEvent(newEvent);
+  this.resetForm();
+}
 
   handleEventClick(clickInfo: any) {
     const event = clickInfo.event;
@@ -274,12 +295,14 @@ updateEvent() {
   const calendarApi = this.calendarComponent.getApi();
   this.selectedEvent.remove();
 
-  const isAllDay = !this.eventTime || (this.eventTime.getHours() === 0 && this.eventTime.getMinutes() === 0);
-
   if (!this.theDate) {
     alert("Inserisci una data valida");
     return;
   }
+
+  // Se è attività, sempre allDay e start senza ora
+  const isAllDay = this.isTask || !this.eventTime;
+
   const startDate = this.theDate;
   let endDate: Date | null = this.eventEndDate;
 
@@ -291,11 +314,16 @@ updateEvent() {
   let newEvent: any = {
     title: this.eventName,
     color: this.eventColor,
-    extendedProps: { luogo: this.eventLocation },
+    extendedProps: { 
+      luogo: this.eventLocation,
+      tipo: this.isTask ? 'attività' : 'evento',
+      stato: this.taskStatus
+    },
     allDay: isAllDay
   };
 
-  if (this.repeatType && this.repeatType !== 'none') {
+  if (!this.isTask && this.repeatType && this.repeatType !== 'none') {
+    // Solo per eventi normali applichiamo rrule
     const freqMap: any = {
       daily: 'DAILY',
       weekly: 'WEEKLY',
@@ -337,8 +365,8 @@ updateEvent() {
       );
     }
 
-    // end
-    if (endDate) {
+    // end (solo per eventi normali)
+    if (!this.isTask && endDate) {
       if (!isAllDay && this.eventEndTime) {
         newEvent.end = new Date(
           endDate.getFullYear(),
@@ -429,9 +457,24 @@ getDuration(startTime: Date, endTime: Date): string {
     this.repeatWeekDays = []; // Reset dei giorni della settimana 
     this.selectedEvent = null;
     this.selectedEvent.eventname = '';
-  }
+    this.isTask = false;
+    this.taskStatus = 'da_fare';
 
+  }
+  onIsTaskChange() {
+  if (this.isTask) {
+    // Resetta i campi non rilevanti se è attività
+    this.eventTime = null;
+    this.eventEndTime = null;
+    this.eventLocation = '';  // opzionale, se vuoi
+    this.repeatType = '';
+    this.repeatUntil = null;
+    this.repeatWeekDays = [];
+  }
+}
 };
+
+
 /*
   isHoliday(date: Date): boolean {
     // Logica per compleanno

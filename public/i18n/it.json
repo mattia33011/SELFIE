@@ -148,6 +148,8 @@
     "yearly": "Ogni anno",
     "add": "Aggiungi evento",
     "update": "Aggiorna evento",
-    "delete": "Elimina evento"
+    "delete": "Elimina evento",
+    "isTask": "È un task?",
+    "task": "Task"
   }
 }

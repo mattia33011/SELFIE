@@ -147,6 +147,7 @@
     "yearly": "Yearly",
     "add": "Add event",
     "update": "Update event",
-    "delete": "Delete event"
+    "delete": "Delete event",
+    "task": "Task"
   }
 }

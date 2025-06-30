@@ -1,0 +1,184 @@
+<p-card>
+  <div class="flex flex-col gap-4">
+    <span class="text-5xl font-semibold">
+      {{ project.name }}
+    </span>
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-row justify-between">
+        <span class="text-2xl">{{ "activities" | translate }}</span>
+        <div class="flex flex-row justify-end">
+          <p-selectbutton
+            [options]="viewOptions"
+            [(ngModel)]="viewMode"
+            optionLabel="name"
+            optionValue="value"
+            aria-labelledby="basic"
+          />
+        </div>
+      </div>
+      @switch (viewMode) { @case ("list") {
+      <app-list
+        [tasks]="taskSignal()"
+        (addSubTaskAction)="handleTaskEmitters($event, 'add')"
+        (addTaskAction)="openDialog('addTask')"
+        (changeStatus)="handleTaskEmitters($event, 'status')"
+        (deleteAction)="handleTaskEmitters($event, 'delete')"
+        (inputAction)="handleTaskEmitters($event, 'input')"
+        (outputAction)="handleTaskEmitters($event, 'output')"
+      ></app-list>
+      } @case ("gantt") {
+      <app-gantt-chart [tasks]="tasks" [language]="lang"></app-gantt-chart>
+      } @case ('addTask') {
+      <div class="flex flex-col gap-3 justify-center">
+        <form class="flex flex-col gap-3" [formGroup]="taskFormGroup">
+          <div class="flex flex-col">
+            <label>{{ "enterID" | translate }}</label>
+            <input type="text" pInputText formControlName="id" />
+          </div>
+          <div class="flex flex-col">
+            <label>{{ "enterName" | translate }}</label>
+            <input type="text" pInputText formControlName="name" />
+          </div>
+          <div class="flex flex-col">
+            <label>{{ "enterInput" |translate }}</label>
+            <textarea
+              rows="5"
+              cols="30"
+              pTextarea
+              formControlName="input"
+            ></textarea>
+          </div>
+
+          <div class="flex flex-row gap-3">
+            <div class="flex-1 flex items-end">
+              <p-togglebutton
+                formControlName="isMilestone"
+                [onLabel]="'isMilestone'"
+                [offLabel]="'isMilestone' | translate"
+                [onIcon]="'pi pi-check'"
+                offIcon="pi pi-times"
+                styleClass="w-full flex-1"
+              />
+            </div>
+
+            <div class="flex-1">
+              <label>{{ "selectRange" | translate }}</label>
+              <p-datepicker
+                formControlName="range"
+                selectionMode="range"
+                [minDate]="today"
+                dateFormat="dd/mm/yy"
+                styleClass="w-full"
+              />
+            </div>
+          </div>
+          <div class="flex flex-row gap-3">
+            <div class="flex-1">
+              <label>{{ "isLinkedTask" | translate }}</label>
+              <p-listbox
+                formControlName="linkedTask"
+                showToggleAll="false"
+                [options]="project.tasks"
+                optionLabel="name"
+                optionValue="id"
+                [multiple]="true"
+                [checkbox]="true"
+                styleClass="w-full"
+              />
+            </div>
+            <div class="flex-1">
+              <label>{{ "assignee" | translate }}</label>
+              <p-listbox
+                formControlName="authors"
+                showToggleAll="false"
+                [options]="members"
+                [multiple]="true"
+                [checkbox]="true"
+                styleClass="w-full"
+              />
+            </div>
+          </div>
+        </form>
+        <div class="flex flex-row gap-3 justify-end">
+          <p-button [loading]="confirmLoading" [disabled]="taskFormGroup.invalid" (click)="addTask()">{{
+            "confirmBtn" | translate
+          }}</p-button>
+          <p-button [disabled]="confirmLoading" severity="danger" (click)="taskFormGroup.reset()">Reset</p-button>
+        </div>
+      </div>
+      } }
+    </div>
+    <div class="flex flex-col gap-3">
+      <span class="text-2xl">
+        {{ "membersManager" | translate }}
+      </span>
+      <app-profile-chip
+        label="Leader:"
+        [name]="project.author"
+        [imageUrl]="getProfilePicture(project.author)"
+      />
+      <span>{{ "members" | translate }}:</span>
+      <div class="flex flex-col md:flex-row gap-3">
+        @for (member of project.members; track $index) {
+        <app-profile-chip
+          (click)="openDeletePopup(member, $event)"
+          class="cursor-pointer"
+          [name]="member"
+          [imageUrl]="getProfilePicture(member)"
+        />
+        }
+      </div>
+      <div id="actions" class="flex flex-row justify-end">
+        <p-button (click)="openDialog('addMember')"
+          >{{ "addMember" | translate }} <i class="pi pi-plus"></i
+        ></p-button>
+      </div>
+    </div>
+  </div>
+</p-card>
+
+<p-confirmpopup />
+<p-dialog
+  #addMemberDialog
+  modal="true"
+  [(visible)]="addMemberVisible"
+  [header]="'addMember' | translate"
+>
+  <div class="flex flex-col gap-3 justify-center">
+    <p-inputgroup>
+      <p-inputgroup-addon>
+        <i class="pi pi-user"></i>
+      </p-inputgroup-addon>
+      <input
+        (keyup.enter)="searchNewMember(addMemberValue.value)"
+        pInputText
+        #addMemberValue
+        [placeholder]="'searchNewMember' | translate"
+      />
+      <p-inputgroup-addon>
+        <p-button
+          (click)="searchNewMember(addMemberValue.value)"
+          icon="pi pi-search"
+          severity="secondary"
+          variant="text"
+        />
+      </p-inputgroup-addon>
+    </p-inputgroup>
+    @if (userList.length > 0) {
+    <p-listbox
+      #listboxValue
+      [(ngModel)]="selectedMembers"
+      [options]="userList"
+      [multiple]="true"
+      [checkbox]="true"
+      class="w-full"
+    />
+    }
+    <div class="flex flex-row gap-3 justify-end">
+      <p-button (click)="addMembers()">{{ "confirmBtn" | translate }}</p-button>
+      <p-button severity="danger" (click)="closeDialog()">{{
+        "close" | translate
+      }}</p-button>
+    </div>
+  </div>
+</p-dialog>

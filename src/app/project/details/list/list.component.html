@@ -1,0 +1,70 @@
+<p-treetable
+  [value]="treeNodes"
+  [columns]="cols"
+  [paginator]="true"
+  [rows]="5"
+  [rowsPerPageOptions]="[5, 10, 25]"
+  [scrollable]="true"
+  [tableStyle]="{ 'min-width': '85rem' }"
+>
+  <ng-template #header let-columns>
+    <tr>
+      @for (col of columns; track $index) {
+      <th>
+        {{ col.header | translate }}
+      </th>
+      }
+    </tr>
+  </ng-template>
+  <ng-template #body let-rowNode let-rowData="rowData" let-columns="columns">
+    <tr [ttRow]="rowNode">
+      @for (col of columns; track $index) {
+      <td>
+        @switch (col.field) { @default {
+        {{ rowData[col.field] | translate }}
+        } @case ("status") {
+        <p-select
+          (onChange)="changeStatus.emit(t(rowData['id']))"
+          [(ngModel)]="rowData['status']"
+          [disabled]="isStatusDisabled(rowData['status'])"
+          [options]="statusOptions"
+        >
+          <ng-template let-item #selectedItem>
+            <div class="flex items-center gap-2">
+              <div>{{ item | translate }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-item #item>
+            <div class="flex items-center gap-2">
+              <div>{{ item | translate }}</div>
+            </div>
+          </ng-template>
+        </p-select>
+        } @case ("output") {
+        <p-button (click)="outputAction.emit(t(rowData['id']))" [rounded]="true"
+          ><i class="pi-arrow-circle-up pi"></i
+        ></p-button>
+        } @case ("input") {
+        <p-button (click)="inputAction.emit(t(rowData['id']))" [rounded]="true"
+          ><i class="pi-arrow-circle-down pi"></i
+        ></p-button>
+        } @case ("actions") {
+        <div class="flex flex-row gap-3">
+          <p-button (click)="addSubTaskAction.emit(t(rowData['id']))"
+            ><i class="pi pi-plus"></i
+          ></p-button>
+          <p-button (click)="deleteAction.emit(t(rowData['id']))"
+            ><i class="pi pi-trash"></i
+          ></p-button>
+        </div>
+        } }
+      </td>
+      }
+    </tr>
+  </ng-template>
+  <ng-template #paginatorleft>
+</ng-template>
+  <ng-template #paginatorright>
+    <p-button (click)="addTaskAction.emit()">{{"addTask" | translate }} <i class="pi pi-plus"></i></p-button>
+</ng-template>
+</p-treetable>

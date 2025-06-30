@@ -1,0 +1,7 @@
+    <div class="gantt-chart-container flex flex-col gap-4">
+        <div class="w-full flex flex-row justify-{{alignButtons}}">
+            <p-selectbutton [options]="viewOptions" (onOptionClick)="changeViewMode()" [(ngModel)]="viewMode" optionLabel="label" optionValue="value" aria-labelledby="basic" />
+        </div>
+
+        <svg id="ganttContainer"></svg>
+    </div>    

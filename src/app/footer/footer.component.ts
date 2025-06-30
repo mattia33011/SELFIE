@@ -1,22 +1,21 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterModule } from '@angular/router';
+import { Router, RouterLink, RouterModule } from '@angular/router';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { SpeedDialModule } from 'primeng/speeddial';
-
+import { TooltipModule } from 'primeng/tooltip';
 @Component({
   selector: 'app-footer',
-  imports: [ButtonModule, SpeedDialModule, RouterModule, TranslatePipe],
+  imports: [ButtonModule, SpeedDialModule, RouterModule, TooltipModule, TranslatePipe],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css',
 })
 export class FooterComponent {
-
-
-
+  noteItems: {id: string, icon: string, desc:string, callback: () => any}[]
   items: any[];
   isSpeedDialVisible = false
-  constructor(private readonly translateService: TranslateService) {
+
+  constructor(private readonly translateService: TranslateService, router: Router) {
     this.items = [
       { 
         type: 'tomato',
@@ -39,10 +38,12 @@ export class FooterComponent {
         route: '/notes'
       },
     ];
+
+    this.noteItems = [
+      {id: 'add', icon: 'pi pi-plus', desc: "add-event", callback: () => undefined},
+      {id: 'add-project', icon: 'pi pi-calendar-plus', desc: "add-project", callback: () => undefined},
+      {id: 'new-project', icon: 'pi pi-sitemap',desc: "project-view", callback: () => router.navigate(["project"])},
+    ]
   }
 
-  noteItems: {id: string, icon: string, callback: () => any}[] = [
-    {id: 'add', icon: 'pi pi-plus', callback: () => undefined},
-    {id: 'schedule', icon: 'pi pi-calendar', callback: () => undefined},
-  ]
 }

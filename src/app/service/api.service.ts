@@ -6,7 +6,7 @@ import {
   ResetPasswordForm,
 } from '../../types/register';
 import {Session, User} from '../../types/session';
-import {map} from 'rxjs';
+import {Observable, map} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Events, Notes} from '../../types/events';
 import { Task, TaskDTO } from '../../types/pomodoro';
@@ -26,6 +26,15 @@ export class ApiService {
   getProfilePicture(session: Session) {
     return this.http
       .get(`${this.baseUrl}/users/${session.user.username}/profile-picture`, {
+        headers: {authorization: this.resolveBearerToken(session.token)},
+        responseType: 'blob',
+      })
+      .pipe(map((res) => URL.createObjectURL(res)));
+  }
+
+  getOtherProfilePicture(userID: string, session: Session) {
+    return this.http
+      .get(`${this.baseUrl}/users/${userID}/profile-picture`, {
         headers: {authorization: this.resolveBearerToken(session.token)},
         responseType: 'blob',
       })

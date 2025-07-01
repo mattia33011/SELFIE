@@ -1,10 +1,15 @@
 <div id="content" class="col-span-12">
     <div id="header" class="flex flex-col md:flex-row justify-between py-3">
-        <span class="text-4xl font-semibold text-primary-900 dark:text-primary-0">
-            {{"projectTitle" | translate}}
-        </span>
-        <div id="actions" class="flex flex-row justify-end">
-            <p-button>{{"add-project" | translate}} </p-button>
+        <div class="flex flex-row justify-between">
+            <span class="text-4xl font-semibold text-primary-900 dark:text-primary-0">
+                {{"projectTitle" | translate}}
+            </span>
+            <span id="mobile" class="md:hidden">
+                <p-button icon="pi pi-plus" [text]="true" ></p-button>
+            </span>
+        </div>
+        <div id="actions" class="md:flex flex-row justify-end hidden ">
+            <p-button id="desktop" >{{"add-project" | translate}} </p-button>
         </div>
     </div>
     <app-data-view [data]="fakeProjects"></app-data-view>

@@ -4,7 +4,9 @@
       {{ project.name }}
     </span>
     <div class="flex flex-col gap-3">
-      <div class="flex flex-row justify-between">
+      <div
+        class="flex flex-col md:flex-row md:justify-between text-center gap-2"
+      >
         <span class="text-2xl">{{ "activities" | translate }}</span>
         <div class="flex flex-row justify-end">
           <p-selectbutton
@@ -20,7 +22,7 @@
       <app-list
         [tasks]="taskSignal()"
         (addSubTaskAction)="handleTaskEmitters($event, 'add')"
-        (addTaskAction)="openDialog('addTask')"
+        (addSubTaskAction)="openTaskDialog($event)"
         (changeStatus)="handleTaskEmitters($event, 'status')"
         (deleteAction)="handleTaskEmitters($event, 'delete')"
         (inputAction)="handleTaskEmitters($event, 'input')"
@@ -29,83 +31,13 @@
       } @case ("gantt") {
       <app-gantt-chart [tasks]="tasks" [language]="lang"></app-gantt-chart>
       } @case ('addTask') {
-      <div class="flex flex-col gap-3 justify-center">
-        <form class="flex flex-col gap-3" [formGroup]="taskFormGroup">
-          <div class="flex flex-col">
-            <label>{{ "enterID" | translate }}</label>
-            <input type="text" pInputText formControlName="id" />
-          </div>
-          <div class="flex flex-col">
-            <label>{{ "enterName" | translate }}</label>
-            <input type="text" pInputText formControlName="name" />
-          </div>
-          <div class="flex flex-col">
-            <label>{{ "enterInput" |translate }}</label>
-            <textarea
-              rows="5"
-              cols="30"
-              pTextarea
-              formControlName="input"
-            ></textarea>
-          </div>
-
-          <div class="flex flex-row gap-3">
-            <div class="flex-1 flex items-end">
-              <p-togglebutton
-                formControlName="isMilestone"
-                [onLabel]="'isMilestone'"
-                [offLabel]="'isMilestone' | translate"
-                [onIcon]="'pi pi-check'"
-                offIcon="pi pi-times"
-                styleClass="w-full flex-1"
-              />
-            </div>
-
-            <div class="flex-1">
-              <label>{{ "selectRange" | translate }}</label>
-              <p-datepicker
-                formControlName="range"
-                selectionMode="range"
-                [minDate]="today"
-                dateFormat="dd/mm/yy"
-                styleClass="w-full"
-              />
-            </div>
-          </div>
-          <div class="flex flex-row gap-3">
-            <div class="flex-1">
-              <label>{{ "isLinkedTask" | translate }}</label>
-              <p-listbox
-                formControlName="linkedTask"
-                showToggleAll="false"
-                [options]="project.tasks"
-                optionLabel="name"
-                optionValue="id"
-                [multiple]="true"
-                [checkbox]="true"
-                styleClass="w-full"
-              />
-            </div>
-            <div class="flex-1">
-              <label>{{ "assignee" | translate }}</label>
-              <p-listbox
-                formControlName="authors"
-                showToggleAll="false"
-                [options]="members"
-                [multiple]="true"
-                [checkbox]="true"
-                styleClass="w-full"
-              />
-            </div>
-          </div>
-        </form>
-        <div class="flex flex-row gap-3 justify-end">
-          <p-button [loading]="confirmLoading" [disabled]="taskFormGroup.invalid" (click)="addTask()">{{
-            "confirmBtn" | translate
-          }}</p-button>
-          <p-button [disabled]="confirmLoading" severity="danger" (click)="taskFormGroup.reset()">Reset</p-button>
-        </div>
-      </div>
+      <app-add-task
+        [taskFormGroup]="taskFormGroup"
+        [members]="members"
+        [tasks]="project.tasks"
+        (confirmAction)="addTask()"
+        [loading]="confirmLoading"
+      ></app-add-task>
       } }
     </div>
     <div class="flex flex-col gap-3">
@@ -121,7 +53,7 @@
       <div class="flex flex-col md:flex-row gap-3">
         @for (member of project.members; track $index) {
         <app-profile-chip
-          (click)="openDeletePopup(member, $event)"
+          (click)="openDeleteMemberPopup(member, $event)"
           class="cursor-pointer"
           [name]="member"
           [imageUrl]="getProfilePicture(member)"
@@ -138,6 +70,7 @@
 </p-card>
 
 <p-confirmpopup />
+<p-toast />
 <p-dialog
   #addMemberDialog
   modal="true"
@@ -181,4 +114,20 @@
       }}</p-button>
     </div>
   </div>
+</p-dialog>
+
+
+
+<p-dialog 
+modal="true"
+[(visible)]="addTaskDialog"
+[header]="'addTask' | translate"
+>
+  <app-add-task
+    [taskFormGroup]="taskFormGroup"
+    [members]="members"
+    [tasks]="project.tasks"
+    (confirmAction)="addTask()"
+    [loading]="confirmLoading"
+></app-add-task>
 </p-dialog>

@@ -189,6 +189,7 @@
   "enterName": "Inserisci il nome",
   "enterInput": "Inserisci l'input della task",
   "isMilestone": "È una milestone",
+  "isNotMilestone": "Non è una milestone",
   "selectRange": "Seleziona la data di inizio e di scadenza",
   "isLinkedTask": "Task collegate",
   "assignee": "Assegnatari"

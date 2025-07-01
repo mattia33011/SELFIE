@@ -187,7 +187,8 @@
   "enterID": "Enter the task id",
   "enterName": "Enter the task name",
   "enterInput": "Enter the task input",
-  "isMilestone": "Is it a milestone",
+  "isMilestone": "It is a milestone",
+  "isNotMilestone": "It is not a milestone",
   "selectRange": "Select the starting date and the expiration date",
   "isLinkedTask": "Linked Task",
   "assignee": "Assignee"

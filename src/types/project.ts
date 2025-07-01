@@ -84,14 +84,14 @@ export enum TaskStatus {
   Done,
   ReStarted,
   Overdue,
-  Leaved,
+  Abandoned,
 }
 export const TASK_STATUS = [
   'Startable',
   'Started',
   'Done',
   'ReStarted',
-  'Leaved',
+  'Abandoned',
 ];
 export function taskStatusToString(status: TaskStatus) {
   switch (status) {

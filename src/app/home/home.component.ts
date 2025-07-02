@@ -4,7 +4,7 @@ import {SkeletonModule} from 'primeng/skeleton';
 import {PanelModule} from 'primeng/panel';
 import {ButtonModule} from 'primeng/button';
 import {TranslatePipe} from '@ngx-translate/core';
-import {Events, Notes} from '../../types/events';
+import {Events, CalendarEvent, Notes} from '../../types/events';
 import {EventListComponent} from "./event-list/event-list.component";
 import {DatePickerModule} from 'primeng/datepicker';
 import {CalendarComponent} from './calendar/calendar.component';
@@ -34,11 +34,14 @@ export class HomeComponent {
           ...it,
           lastEdit: stringToDate(it.lastEdit.toString())
         })))
-        this.deadlineEvents.push(...response[0].map(it => ({...it, expireDate: stringToDate(it.expireDate.toString()) })))
+        this.deadlineEvents.push(...response[0]
+          .filter(it => it.end !== undefined)
+          .map(it => ({ ...it, end: stringToDate(it.end!.toString()) }))
+        );
         this.todayEvents = this.deadlineEvents.filter(event => {
-          const format = (date: Date) => `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
-          return format(event.expireDate) == format(new Date())
-        })
+          const format = (date: Date) => `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+          return event.end instanceof Date && format(event.end) === format(new Date());
+        });
       },
       error: (error) => {
         console.log(error)
@@ -46,6 +49,12 @@ export class HomeComponent {
     })
   }
 
+deadlineEvents: CalendarEvent[] = [];
+todayEvents: CalendarEvent[] = [];
+
+
+/*
+  
   todayEvents: Events = [{
     title: 'Palestra',
     description: 'FitActive Creti',
@@ -82,5 +91,5 @@ export class HomeComponent {
 
   loading = false
 
-
+*/
 }

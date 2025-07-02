@@ -20,20 +20,23 @@ import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { IftaLabelModule } from 'primeng/iftalabel'; 
 import { CheckboxModule} from 'primeng/checkbox'; // Importa il modulo Checkbox
+import {ChangeDetectorRef} from '@angular/core';
+import {ApiService} from '../../service/api.service';
+import {SessionService} from '../../service/session.service';
+import {forkJoin, Observable} from 'rxjs';
 //import { RouterOutlet } from '@angular/router';
 
 // COMANDO npm install @fullcalendar/rrule rrule
 
 
 // manca ripeti tutti i primi lunedì del mese (?)
-// attività (distinguo tra attività e evento faccio un evento a cui dò solo una scadenza? e che va a finire nella lista)
 // traduzione in ing SOLO per il calendario (mesi, mese settimana anno, abbreviazioni della settimana nel calendario ecc) (eventi apposto)
 
 
 @Component({
   selector: 'app-calendar',
   standalone: true, //standalone
-  imports: [FullCalendarModule, PanelModule, FormsModule, CommonModule, DialogModule, ButtonModule, DatePickerModule , TranslatePipe, DropdownModule , FloatLabelModule, ColorPickerModule, InputTextModule, IftaLabelModule, CheckboxModule], //standalone
+  imports: [FullCalendarModule, PanelModule, FormsModule, CommonModule, DialogModule, ButtonModule, DatePickerModule , TranslatePipe, DropdownModule , FloatLabelModule, ColorPickerModule, InputTextModule, IftaLabelModule, CheckboxModule],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
@@ -68,8 +71,31 @@ export class CalendarComponent {
   ];
   taskStatuses :any[] = []
   repeatOptions:any[] = [];
-  constructor(private translate: TranslateService) {}
-  ngOnInit() {
+  constructor(
+    private translate: TranslateService,
+    private readonly apiService: ApiService,
+    private readonly translateService: TranslateService,
+    private readonly sessionService: SessionService
+
+) {}
+  ngOnInit(){
+  this.apiService.getEvents(
+      this.sessionService.getSession()!.user.username!,
+      this.sessionService.getSession()!.token!
+    ).subscribe({
+      next: (events) => {
+        this.calendarOptions.events = events.map(event => ({
+          ...event,
+          start: event.start,
+          end: event.end,
+          id: event._id
+        }));
+      },
+      error: (err) => {
+        console.error('Errore nel caricamento eventi', err);
+      }
+    });
+
     this.translate.get([
       'event.none',
       'event.daily',
@@ -99,8 +125,9 @@ export class CalendarComponent {
     });
   });
 
-  }
 
+  }
+   
   toggleWeekday(event: any) {
     const day = event.target.value;
     if (event.target.checked) {
@@ -230,10 +257,25 @@ addEvent() {
         0, 0, 0, 0
       );
     }
-  }
+  } //controlla
+  const username = this.sessionService.getSession()!.user.username!;
+  const token = this.sessionService.getSession()!.token!;
 
-  calendarApi.addEvent(newEvent);
-  this.resetForm();
+  this.apiService.createEvent(username, newEvent, token).subscribe({
+    next: (savedEvent: any) => {
+      const calendarApi = this.calendarComponent.getApi();
+      calendarApi.addEvent({
+        ...newEvent,
+        id: savedEvent._id,
+        start: newEvent.start,
+        end: newEvent.end
+      });
+      this.resetForm();
+    },
+    error: (err) => {
+      console.error("Errore durante il salvataggio dell'evento", err);
+    }
+  });
 }
 
   handleEventClick(clickInfo: any) {
@@ -293,6 +335,7 @@ updateEvent() {
   if (!this.selectedEvent) return;
 
   const calendarApi = this.calendarComponent.getApi();
+  const idd = this.selectedEvent.id;
   this.selectedEvent.remove();
 
   if (!this.theDate) {
@@ -386,17 +429,44 @@ updateEvent() {
       }
     }
   }
+this.apiService.updateEvent(
+    this.sessionService.getSession()!.user.username!,
+    idd,
+    newEvent,
+    this.sessionService.getSession()!.token!
+  ).subscribe({
+    next: (updatedEvent: any) => {
+      calendarApi.addEvent({
+        ...newEvent,
+        id: updatedEvent._id
+      });
 
-  calendarApi.addEvent(newEvent);
-  this.resetForm();
+      this.resetForm();
+    },
+    error: (err) => {
+      console.error('Errore durante aggiornamento evento', err);
+      alert('Errore durante aggiornamento evento');
+    }
+  });
 }
-
 
 deleteEvent() {
   if (this.selectedEvent) {
     if (confirm('Sei sicuro di voler eliminare questo evento?')) {
-      this.selectedEvent.remove();
-      this.resetForm();
+      const eventId = this.selectedEvent.id;
+      const userId = this.sessionService.getSession()!.user.username!;
+      const token = this.sessionService.getSession()!.token!;
+
+      this.apiService.deleteEvent(userId, eventId, token).subscribe({
+        next: () => {
+          this.selectedEvent!.remove();
+          this.resetForm();
+        },
+        error: (err) => {
+          console.error('Errore durante eliminazione evento', err);
+          alert('Errore durante eliminazione evento');
+        }
+      });
     }
   }
 }
@@ -466,7 +536,7 @@ getDuration(startTime: Date, endTime: Date): string {
     // Resetta i campi non rilevanti se è attività
     this.eventTime = null;
     this.eventEndTime = null;
-    this.eventLocation = '';  // opzionale, se vuoi
+    this.eventLocation = '';
     this.repeatType = '';
     this.repeatUntil = null;
     this.repeatWeekDays = [];

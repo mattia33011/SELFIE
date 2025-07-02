@@ -1,11 +1,20 @@
-export type Events = Event[]
+export  type CalendarEvent = {
+  title: string;
+  color?: string;
+  start?: Date | string;
+  end?: Date | string;
+  allDay?: boolean;
+  _id: string;
+  extendedProps?: {
+    luogo?: string;
+    tipo?: 'attività' | 'evento';
+    stato?: 'da_fare' | 'in_corso' | 'completata';
+  };
+}
 
-export type Event = {
-    title: string,
-    expireDate: Date,
-    description?: string,
-    color?: "success" | "info" | "warn" | "danger" | "help"
-  }
+export type Events = CalendarEvent[];
+
+
 
 export type Notes = Note[]
 
@@ -22,8 +31,8 @@ export type Note = {
 }
 
 
-export function isEvent(e: Event | Note): e is Event{
+export function isEvent(e: CalendarEvent | Note): e is CalendarEvent{
     if(!e)
       return false
-    return 'title' in e && 'expireDate' in e 
+    return 'title' in e && 'end' in e 
   }

@@ -9,6 +9,8 @@ export  type CalendarEvent = {
     luogo?: string;
     tipo?: 'attività' | 'evento';
     stato?: 'da_fare' | 'in_corso' | 'completata';
+    //forse ci va da mettere la roba rrule
+    
   };
 }
 

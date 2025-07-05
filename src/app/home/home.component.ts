@@ -87,9 +87,9 @@ todayEvents: CalendarEvent[] = [];
 
   deadlineEvents: Events = []
 
-
+*/
 
   loading = false
 
-*/
+
 }

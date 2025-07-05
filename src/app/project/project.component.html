@@ -1,0 +1,110 @@
+<div id="content" class="col-span-12">
+  <div id="header" class="flex flex-col md:flex-row justify-between py-3">
+    <div class="flex flex-row justify-between">
+      <span class="text-4xl font-semibold text-primary-900 dark:text-primary-0">
+        {{ "projectTitle" | translate }}
+      </span>
+      <span id="mobile" class="md:hidden">
+        <p-button
+          icon="pi pi-plus"
+          (onClick)="isProjectDialogVisible = true"
+          [text]="true"
+        ></p-button>
+      </span>
+    </div>
+    <div id="actions" class="md:flex flex-row justify-end hidden">
+      <p-button id="desktop" (onClick)="isProjectDialogVisible = true"
+        >{{ "add-project" | translate }}
+      </p-button>
+    </div>
+  </div>
+  <app-data-view [data]="projects"></app-data-view>
+</div>
+
+<p-dialog
+  [modal]="true"
+  [header]="'addProject' | translate"
+  [(visible)]="isProjectDialogVisible"
+  (onHide)="projectFormGroup.reset()"
+>
+  <form class="flex flex-col gap-3" [formGroup]="projectFormGroup">
+    <div class="flex flex-col gap-2">
+      <label>{{ "enterName" | translate }}</label>
+      <input formControlName="name" pInputText />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label>Note</label>
+      <textarea formControlName="note" pTextarea></textarea>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label>{{ "selectRange" | translate }}</label>
+      <p-datepicker
+        appendTo="body"
+        formControlName="range"
+        selectionMode="range"
+        [minDate]="today"
+        dateFormat="dd/mm/yy"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label>{{ "addMember" | translate }}</label>
+      <p-inputgroup>
+        <p-inputgroup-addon>
+          <i class="pi pi-user"></i>
+        </p-inputgroup-addon>
+        <input
+          (keyup.enter)="searchNewMember(addMemberValue.value)"
+          pInputText
+          #addMemberValue
+          [placeholder]="'searchNewMember' | translate"
+        />
+        <p-inputgroup-addon>
+          <p-button
+            (click)="searchNewMember(addMemberValue.value)"
+            icon="pi pi-search"
+            severity="secondary"
+            variant="text"
+          />
+        </p-inputgroup-addon>
+      </p-inputgroup>
+      @if (userList.length > 0) {
+      <p-listbox
+        #listboxValue
+        formControlName="members"
+        [options]="userList"
+        [multiple]="true"
+        [checkbox]="true"
+        class="w-full"
+      />
+      } @if (projectFormGroup.get("members")?.value?.length &&
+      projectFormGroup.get("members")!.value!.length > 0) {
+      <span
+        >{{ "selectedMembers" | translate }} [@for (member of
+        projectFormGroup.get("members")!.value; track $index) {
+        {{ member }}
+        } ]</span
+      >
+      }
+    </div>
+  </form>
+  <ng-template #footer>
+    <div id="actions" class="flex flex-row gap-3 justify-end">
+      <p-button
+        [loading]="loading"
+        [disabled]="projectFormGroup.invalid"
+        (onClick)="saveProject()"
+        >{{ "confirmBtn" | translate }}</p-button
+      >
+      <p-button
+        [disabled]="loading"
+        severity="danger"
+        (onClick)="isProjectDialogVisible = false"
+        >{{ "close" | translate }}</p-button
+      >
+    </div>
+  </ng-template>
+</p-dialog>

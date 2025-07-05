@@ -15,7 +15,7 @@
                 <div class="relative">
                     <p-speed-dial [ariaLabel]="page.label | translate" [(visible)]="isSpeedDialVisible" [style]="{ position: 'absolute', left: 'calc(50% - 1.3rem)', bottom: 'calc(50% - 1.5rem)' }" [model]="noteItems" direction="up">
                         <ng-template #item let-item let-toggleCallback="toggleCallback">
-                            <p-button [ariaLabel]="item.id" [styleClass]="isSpeedDialVisible ? '!border-2 !border-primary-200' : '!hidden'"  rounded="true" [icon]="item.icon"></p-button>
+                            <p-button [ariaLabel]="item.id" [pTooltip]="item.desc | translate" (click)="item.callback()" [styleClass]="isSpeedDialVisible ? '!border-2 !border-primary-200' : '!hidden'"  rounded="true" [icon]="item.icon"></p-button>
                         </ng-template>
                     </p-speed-dial>
                 </div>

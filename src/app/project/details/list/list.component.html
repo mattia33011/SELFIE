@@ -1,0 +1,109 @@
+@if(tasks.length == 0){
+<div class="flex flex-row p-3 justify-center">
+  {{ "emptyList" | translate }}
+</div>
+} @else {
+<p-treetable
+  [value]="treeNodes"
+  [columns]="cols"
+  [paginator]="true"
+  [rows]="5"
+  [rowsPerPageOptions]="[5, 10, 25]"
+  [scrollable]="true"
+  [tableStyle]="{ 'min-width': '85rem' }"
+>
+  <ng-template #header let-columns>
+    <tr>
+      @for (col of columns; track $index) {
+      <th>
+        {{ col.header | translate }}
+      </th>
+      }
+    </tr>
+  </ng-template>
+  <ng-template #body let-rowNode let-rowData="rowData" let-columns="columns">
+    <tr [ttRow]="rowNode">
+      @for (col of columns; track $index) {
+      <td>
+        @switch (col.field) { @default {
+        {{ rowData[col.field] | translate }}
+        } @case ("status") {
+        <p-select
+          #status
+          appendTo="body"
+          [(ngModel)]="rowData['status']"
+          [readonly]="!isAuthor"
+          (onChange)="onChange(status.value, t(rowData['id']))"
+          [disabled]="isStatusDisabled(rowData)"
+          [options]="statusOptions"
+        >
+          <ng-template let-item #selectedItem>
+            <div class="flex items-center gap-2">
+              <div>{{ item | translate }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-item #item>
+            <div class="flex items-center gap-2">
+              <div>{{ item | translate }}</div>
+            </div>
+          </ng-template>
+        </p-select>
+        } @case ("output") {
+        <div class="flex-row flex gap-2">
+          <p-button
+            [disabled]="!isAuthor"
+            icon="pi-arrow-circle-up pi"
+            rounded="true"
+            (click)="outputAction.emit(t(rowData['id']))"
+            [rounded]="true"
+          />
+          <span class="flex items-center">{{
+            (rowData["output"]?.length > 0 ? "delivered" : "notDelivered")
+              | translate
+          }}</span>
+        </div>
+        } @case ("input") {
+        <div class="flex-row flex gap-2">
+          <p-button
+            [disabled]="!isAuthor"
+            icon="pi-arrow-circle-down pi"
+            rounded="true"
+            (click)="inputAction.emit(t(rowData['id']))"
+            [rounded]="true"
+          />
+          <span class="flex items-center">{{
+            (rowData["input"]?.length > 0 ? "entered" : "notEntered")
+              | translate
+          }}</span>
+        </div>
+        } @case ("actions") {
+        <div class="flex flex-row gap-3">
+          <p-button
+            icon="pi pi-plus"
+            [disabled]="!isAuthor"
+            (click)="addSubTaskAction.emit(t(rowData['id']))"
+          />
+          <p-button
+            icon="pi pi-save"
+            (click)="saveActions.emit(t(rowData['id']))"
+            [disabled]="!isAuthor || isUpdated(rowData['id'])"
+          />
+          @if (isAuthor) {
+
+          <p-button
+            icon="pi pi-trash"
+            (click)="openDeletePopup(t(rowData['id'])!, $event)"
+            severity="danger"
+          />
+          }
+        </div>
+        } }
+      </td>
+      }
+    </tr>
+  </ng-template>
+  <ng-template #emptymessage>
+    {{ "emptyList" | translate }}
+  </ng-template>
+</p-treetable>
+}

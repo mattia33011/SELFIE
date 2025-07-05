@@ -1,4 +1,4 @@
-<p-menubar styleClass="" [model]="items">
+<p-menubar #menu styleClass="" [model]="items">
   <ng-template #start>
     <div class="flex flex-row gap-3 items-center">
       <a  class="" routerLink="/home">
@@ -56,7 +56,7 @@
   </ng-template>
 </p-menubar>
 
-<p-popover #profile>
+<p-popover #profile [appendTo]="menu">
   <ul class="list-none text-center" (click)="profile.toggle($event)">
     @for (option of options; track $index) {
     <li

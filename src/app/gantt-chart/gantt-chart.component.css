@@ -1,0 +1,15 @@
+.gantt-chart-container {
+    width: 100%;
+  }
+  
+
+.gantt .bar {
+    fill: red !important;
+}
+.gantt .bar-progress {
+    fill: yellow !important;
+}
+
+.gantt .bar-label {
+    fill: rebeccapurple !important;
+}

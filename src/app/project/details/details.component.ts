@@ -250,11 +250,14 @@ export class DetailsComponent {
         name: this.translateService.instant('list'),
         value: 'list',
       },
-      {
-        name: this.translateService.instant('addTask'),
-        value: 'addTask',
-      },
     ];
+
+    if(this.isAuthor)
+      this.viewOptions.push(
+        {
+          name: this.translateService.instant('addTask'),
+          value: 'addTask',
+        })
   }
 
   getProfilePicture(user: string) {

@@ -3,6 +3,7 @@ import {
   Component,
   Signal,
   WritableSignal,
+  input,
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Route, Router } from '@angular/router';
@@ -51,6 +52,7 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ToastModule } from 'primeng/toast';
 import { AddTaskComponent } from '../add-task/add-task.component';
+import { Observable, ReplaySubject } from 'rxjs';
 
 @Component({
   selector: 'app-details',
@@ -75,8 +77,10 @@ import { AddTaskComponent } from '../add-task/add-task.component';
     TextareaModule,
     ToggleButtonModule,
     DatePickerModule,
+    ConfirmDialogModule,
     ToastModule,
     AddTaskComponent,
+    FormsModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './details.component.html',
@@ -88,7 +92,7 @@ export class DetailsComponent {
   constructor(
     activatedRoute: ActivatedRoute,
     private confirmationService: ConfirmationService,
-    router: Router,
+    private router: Router,
     private translateService: TranslateService,
     private apiService: ApiService,
     private session: SessionService,
@@ -108,17 +112,19 @@ export class DetailsComponent {
       this.initViewOptions();
     });
 
-    this.taskSignal = signal(this.project.tasks);
-    this.tasks = this.taskSignal().map(convertTaskToGanttTask);
+    this.isAuthor = this.project.author == session.getSession()?.user.username
+    this.initViewOptions();
+    this.tasks = this.project.tasks.map(convertTaskToGanttTask);
+    this.taskObservable.next(this.project.tasks);
+    if (this.tasks.length == 0) this.viewMode = 'addTask';
+
   }
-
-  taskSignal!: WritableSignal<Task[]>;
-
+  isAuthor: boolean = false
+  taskObservable = new ReplaySubject<Task[]>();
   taskFormGroup = new FormGroup({
-    id: new FormControl('', [Validators.required, Validators.minLength(1)]),
     name: new FormControl('', [Validators.required, Validators.minLength(1)]),
     input: new FormControl('', [Validators.required]),
-    isMilestone: new FormControl(false, [Validators.required]),
+    isMilestone: new FormControl(false),
     range: new FormControl(
       [],
       [Validators.required, minArrayLengthValidator(2)]
@@ -126,6 +132,27 @@ export class DetailsComponent {
     linkedTask: new FormControl<string[]>([]),
     authors: new FormControl<string[]>([], Validators.required),
   });
+  _isInputVisible = true;
+  set isInputVisible(v: boolean) {
+    if (!v) this.inputValue = undefined;
+
+    this._isInputVisible = v;
+  }
+  get isInputVisible() {
+    return this._isInputVisible;
+  }
+
+  inputValue?: { taskID: string; value: string };
+  _isOutputVisible = true;
+  outputValue?: { taskID: string; value: string };
+  set isOutputVisible(v: boolean) {
+    if (!v) this.outputValue = undefined;
+
+    this._isOutputVisible = v;
+  }
+  get isOutputVisible() {
+    return this._isOutputVisible;
+  }
   today = new Date();
   _viewMode: 'list' | 'gantt' | 'addTask' = 'list';
   set viewMode(value: any) {
@@ -161,14 +188,13 @@ export class DetailsComponent {
   }
 
   _addTaskDialog = false;
-  set addTaskDialog(v: boolean){
-    if(!v)
-      this.taskFormGroup.reset()
+  set addTaskDialog(v: boolean) {
+    if (!v) this.taskFormGroup.reset();
 
     this._addTaskDialog = v;
   }
-  get addTaskDialog(){
-    return this._addTaskDialog
+  get addTaskDialog() {
+    return this._addTaskDialog;
   }
   _addMemberVisible = false;
   set addMemberVisible(v: boolean) {
@@ -187,7 +213,6 @@ export class DetailsComponent {
   profileImages: { userID: string; imageUrl?: string }[] = [];
   tasks: GanttTask[] = [];
   ngAfterViewInit() {
-    this.initViewOptions();
     const members = [this.project.author, ...this.project.members];
     const session = this.session.getSession()!;
     profilePictureSubject.subscribe((it) => {
@@ -236,7 +261,7 @@ export class DetailsComponent {
     return this.profileImages.find((it) => it.userID == user)?.imageUrl;
   }
   openTaskDialog(task: Task) {
-    this.taskFormGroup.get('linkedTask')?.setValue([task.id])
+    this.taskFormGroup.get('linkedTask')?.setValue([task.id]);
     this.openDialog('addTask');
   }
   openDialog(dialogStatus: DialogStatus) {
@@ -248,30 +273,97 @@ export class DetailsComponent {
 
   userList: string[] = [];
   selectedMembers: string[] = [];
-
+  updatedTasks: Task[] = [];
   handleTaskEmitters(
-    task: Task,
-    action: 'delete' | 'add' | 'status' | 'input' | 'output'
+    data: any,
+    action: 'delete' | 'add' | 'status' | 'input' | 'output' | 'saveUpdated'
   ) {
     switch (action) {
       case 'add':
+        this.addTask();
         break;
       case 'delete':
+        this.openDeleteTaskPopup(data.task.id, data.clickEvent);
         break;
       case 'input':
+        this.isInputVisible = true;
+        this.inputValue = {
+          taskID: data.id,
+          value: data.input,
+        };
         break;
       case 'output':
+        this.isOutputVisible = true;
+        this.outputValue = {
+          taskID: data.id,
+          value: data.output,
+        };
+        break;
+      case 'saveUpdated':
+        const task = this.updatedTasks.find((it) => it.id == data.id);
+        this.updateTask(task!);
+
         break;
       case 'status':
+        const index = this.updatedTasks.findIndex((it) => it.id == data.id);
+        if (index == -1) this.updatedTasks.push(data);
+        else this.updatedTasks[index] = data;
+
+        console.log(this.updatedTasks);
         break;
     }
   }
+
+  saveInput() {
+    const task = this.project.tasks.find(
+      (it) => this.inputValue!.taskID == it.id
+    )!;
+    if (task.input == this.inputValue?.value) {
+      this.isInputVisible = false;
+      return;
+    }
+
+    task.input = this.inputValue?.value;
+    this.updateTask(task, () => (this.isInputVisible = false));
+  }
+  saveOutput() {
+    const task = this.project.tasks.find(
+      (it) => this.outputValue!.taskID == it.id
+    )!;
+    if (task.output == this.outputValue?.value) {
+      this.isOutputVisible = false;
+      return;
+    }
+
+    task.output = this.outputValue?.value;
+    task.status = TaskStatus.Done;
+    this.updateTask(task, () => (this.isOutputVisible = false));
+  }
+  updateTask(task: Task, callback?: () => void) {
+    const index = this.project.tasks.findIndex((it) => it.id == task.id);
+    this.project.tasks[index] = task;
+    this.apiService
+      .updateProject(
+        this.project,
+        this.session.getSession()!.user.username,
+        this.session.getSession()!.token
+      )
+      .subscribe({
+        next: (it) => {
+          console.log(this.project);
+          this.resetHistory(this.project);
+          this.taskObservable.next(this.project.tasks);
+          this.updatedTasks = [];
+          if (callback) callback();
+        },
+      });
+  }
+
   confirmLoading = false;
   async addTask() {
-    //TODO call the api
     console.log(JSON.stringify(this.taskFormGroup.value));
     const task: Task = {
-      id: this.taskFormGroup.value.id!,
+      id: (this.tasks.length + 1).toString(),
       linkedTask: this.taskFormGroup.value.linkedTask!,
       name: this.taskFormGroup.value.name!,
       authors: this.taskFormGroup.value.authors!,
@@ -281,39 +373,100 @@ export class DetailsComponent {
       expire: this.taskFormGroup.value.range![1],
       status: TaskStatus.Startable,
     };
-    this.project.tasks.push(task);
-    this.taskSignal.set(this.project.tasks);
-    this.tasks = this.project.tasks.map(convertTaskToGanttTask);
 
-    this.confirmLoading = true;
-    this.messageService.add({
-      severity: 'success',
-      summary: this.translateService.instant('addedTask'),
-      detail: `Task ${task.name} ${this.translateService.instant('added')}`,
-      life: 3000,
-    });
-    await new Promise((resolve) => setTimeout(() => resolve(undefined), 1000));
-    this.confirmLoading = false;
-    this.viewMode = 'list';
-
-    this.cd.detectChanges();
+    this.apiService
+      .putTaskInProject(
+        this.project.id,
+        task,
+        this.session.getSession()!.user.username,
+        this.session.getSession()!.token
+      )
+      .subscribe({
+        next: (it) => {
+          this.project = it;
+          this.confirmLoading = true;
+          this.messageService.add({
+            severity: 'success',
+            summary: this.translateService.instant('addedTask'),
+            detail: `Task ${task.name} ${this.translateService.instant(
+              'added'
+            )}`,
+            life: 3000,
+          });
+          this.confirmLoading = false;
+          this.viewMode = 'list';
+          this.resetHistory(this.project);
+          this.cd.detectChanges();
+          this.closeDialog();
+        },
+      });
   }
+
+  resetHistory(project: Project) {
+    this.tasks = project.tasks.map(convertTaskToGanttTask);
+    this.taskObservable.next(project.tasks);
+    history.replaceState({ project: project }, '', window.location.href);
+  }
+
+  loading = false;
   searchNewMember(v: string) {
-    //TODO call the api
-    this.userList = ['ciro', 'gamma', 'alessio'];
+    if (v.length == 0) this.userList = [];
+    else
+      this.apiService
+        .autoSuggestUsers(
+          v,
+          this.session.getSession()!.user.username,
+          this.session.getSession()!.token
+        )
+        .subscribe({
+          next: (users) => {
+            this.userList = users.filter(
+              (it) => !this.project.members.includes(it)
+            );
+          },
+        });
   }
+
   addMembers() {
-    //TODO call the api
-    this.closeDialog();
+    if (this.selectedMembers.length == 0) return;
+    this.selectedMembers.forEach((it) => this.project.members.push(it));
+    this.apiService
+      .updateProject(
+        this.project,
+        this.session.getSession()!.user.username,
+        this.session.getSession()!.token
+      )
+      .subscribe({
+        next: (it) => {
+          this.resetHistory(this.project);
+          this.closeDialog();
+        },
+      });
   }
-  delete() {
-    //TODO call the api
-    this.closeDialog();
+  async delete(taskID: string) {
+    this.project.tasks.splice(
+      this.project.tasks.findIndex((it) => it.id == taskID),
+      1
+    );
+    this.apiService
+      .updateProject(
+        this.project,
+        this.session.getSession()!.user.username,
+        this.session.getSession()!.token
+      )
+      .subscribe({
+        next: () => {
+          this.resetHistory(this.project);
+          if (this.project.tasks.length == 0) this.viewMode = 'addTask';
+          this.closeDialog();
+        },
+      });
   }
   openDeleteMemberPopup(user: string, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: this.translateService.instant('deleteMemberPopup'),
+      header: user,
       icon: 'pi pi-info-circle',
       rejectButtonProps: {
         label: this.translateService.instant('close'),
@@ -327,6 +480,42 @@ export class DetailsComponent {
       accept: async () => {
         //TODO call the api
         this.project.members.splice(this.project.members.indexOf(user), 1);
+        this.apiService
+          .updateProject(
+            this.project,
+            this.session.getSession()!.user.username,
+            this.session.getSession()!.token
+          )
+          .subscribe({
+            next: (it) => {
+              this.resetHistory(this.project);
+            },
+          });
+      },
+    });
+  }
+
+  openDeleteProjectDialog(event: Event){
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: this.translateService.instant('deleteProjectDialog'),
+      header: this.translateService.instant('deleteProject'),
+      icon: 'pi pi-exclamation-triangle',
+      rejectButtonProps: {
+        label: this.translateService.instant('close'),
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: this.translateService.instant('delete'),
+        severity: 'danger',
+      },
+      accept: async () => {
+        this.apiService.deleteProject(this.project.id, this.session.getSession()!.user.username, this.session.getSession()!.token).subscribe({
+          next: () => {
+            this.router.navigate(['/project'])
+          }
+        })
       },
     });
   }
@@ -334,7 +523,8 @@ export class DetailsComponent {
   openDeleteTaskPopup(taskID: string, event: Event) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: this.translateService.instant('deleteMemberPopup'),
+      message: this.translateService.instant('deleteTaskPopup'),
+      header: 'ID: ' + taskID,
       icon: 'pi pi-info-circle',
       rejectButtonProps: {
         label: this.translateService.instant('close'),
@@ -342,16 +532,14 @@ export class DetailsComponent {
         outlined: true,
       },
       acceptButtonProps: {
-        label: this.translateService.instant('deleteMemberBtn'),
+        label: this.translateService.instant('deleteTaskBtn'),
         severity: 'danger',
       },
       accept: async () => {
-        //TODO call the api
-        
+        await this.delete(taskID);
       },
     });
   }
-
 }
 
 type DialogStatus = 'none' | 'addMember' | 'deleteMember' | 'addTask';

@@ -10,6 +10,7 @@
         <span class="text-2xl">{{ "activities" | translate }}</span>
         <div class="flex flex-row justify-end">
           <p-selectbutton
+            [disabled]="project.tasks.length == 0"
             [options]="viewOptions"
             [(ngModel)]="viewMode"
             optionLabel="name"
@@ -20,13 +21,15 @@
       </div>
       @switch (viewMode) { @case ("list") {
       <app-list
-        [tasks]="taskSignal()"
-        (addSubTaskAction)="handleTaskEmitters($event, 'add')"
+        [taskObservable]="taskObservable"
         (addSubTaskAction)="openTaskDialog($event)"
         (changeStatus)="handleTaskEmitters($event, 'status')"
         (deleteAction)="handleTaskEmitters($event, 'delete')"
         (inputAction)="handleTaskEmitters($event, 'input')"
         (outputAction)="handleTaskEmitters($event, 'output')"
+        (saveActions)="handleTaskEmitters($event, 'saveUpdated')"
+        [updatedTasks]="updatedTasks"
+        [isAuthor]="isAuthor"
       ></app-list>
       } @case ("gantt") {
       <app-gantt-chart [tasks]="tasks" [language]="lang"></app-gantt-chart>
@@ -53,25 +56,40 @@
       <div class="flex flex-col md:flex-row gap-3">
         @for (member of project.members; track $index) {
         <app-profile-chip
-          (click)="openDeleteMemberPopup(member, $event)"
+          (click)="isAuthor ? openDeleteMemberPopup(member, $event) : undefined"
           class="cursor-pointer"
           [name]="member"
           [imageUrl]="getProfilePicture(member)"
         />
         }
       </div>
+      @if(isAuthor){
       <div id="actions" class="flex flex-row justify-end">
         <p-button (click)="openDialog('addMember')"
           >{{ "addMember" | translate }} <i class="pi pi-plus"></i
         ></p-button>
       </div>
+      }
     </div>
   </div>
+  @if(isAuthor){
+  <div class="flex flex-row mt-2 justify-center w-full">
+    <p-button
+      text="true"
+      severity="danger"
+      [fluid]="true"
+      (click)="openDeleteProjectDialog($event)"
+    >
+      {{ "delete" | translate }}
+    </p-button>
+  </div>
+  }
 </p-card>
 
-<p-confirmpopup />
+<p-confirmdialog />
 <p-toast />
 <p-dialog
+  resizable="false"
   #addMemberDialog
   modal="true"
   [(visible)]="addMemberVisible"
@@ -108,20 +126,24 @@
     />
     }
     <div class="flex flex-row gap-3 justify-end">
-      <p-button (click)="addMembers()">{{ "confirmBtn" | translate }}</p-button>
-      <p-button severity="danger" (click)="closeDialog()">{{
-        "close" | translate
+      <p-button [loading]="loading" (click)="addMembers()">{{
+        "confirmBtn" | translate
       }}</p-button>
+      <p-button
+        [disabled]="loading"
+        severity="danger"
+        (click)="closeDialog()"
+        >{{ "close" | translate }}</p-button
+      >
     </div>
   </div>
 </p-dialog>
 
-
-
-<p-dialog 
-modal="true"
-[(visible)]="addTaskDialog"
-[header]="'addTask' | translate"
+<p-dialog
+  resizable="false"
+  modal="true"
+  [(visible)]="addTaskDialog"
+  [header]="'addTask' | translate"
 >
   <app-add-task
     [taskFormGroup]="taskFormGroup"
@@ -129,5 +151,47 @@ modal="true"
     [tasks]="project.tasks"
     (confirmAction)="addTask()"
     [loading]="confirmLoading"
-></app-add-task>
+  ></app-add-task>
 </p-dialog>
+
+@if (inputValue) {
+<p-dialog
+  resizable="false"
+  [modal]="true"
+  [(visible)]="isInputVisible"
+  [header]="'enterInput' | translate"
+>
+  <textarea
+    [(ngModel)]="inputValue!.value"
+    pTextarea
+    cols="30"
+    rows="5"
+  ></textarea>
+  <div class="flex flex-row justify-end gap-3">
+    <p-button (onClick)="saveInput()">{{ "save" | translate }}</p-button>
+    <p-button (onClick)="isInputVisible = false" severity="danger">{{
+      "close" | translate
+    }}</p-button>
+  </div>
+</p-dialog>
+} @if (outputValue) {
+<p-dialog
+  resizable="false"
+  [modal]="true"
+  [(visible)]="isOutputVisible"
+  [header]="'enterOutput' | translate"
+>
+  <textarea
+    [(ngModel)]="outputValue.value"
+    pTextarea
+    cols="30"
+    rows="5"
+  ></textarea>
+  <div class="flex flex-row justify-end gap-3">
+    <p-button (onClick)="saveOutput()">{{ "save" | translate }}</p-button>
+    <p-button (onClick)="isOutputVisible = false" severity="danger">{{
+      "close" | translate
+    }}</p-button>
+  </div>
+</p-dialog>
+}

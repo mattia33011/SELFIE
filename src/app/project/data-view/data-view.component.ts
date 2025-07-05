@@ -1,5 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { Project, Task, TaskStatus, taskStatusToString } from '../../../types/project';
+import {
+  Project,
+  Task,
+  TaskStatus,
+  taskStatusToString,
+} from '../../../types/project';
 import { DataViewModule } from 'primeng/dataview';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -10,36 +15,41 @@ import { routes } from '../../app.routes';
   selector: 'app-data-view',
   imports: [DataViewModule, ButtonModule, TranslatePipe],
   templateUrl: './data-view.component.html',
-  styleUrl: './data-view.component.css'
+  styleUrl: './data-view.component.css',
 })
 export class DataViewComponent {
-  constructor(private router: Router){}
+  constructor(private router: Router) {}
 
   @Input()
-  data!: Project[]
-
+  data!: Project[];
 
   calculateMilestoneCompleted(tasks: Task[]) {
-
-    const total = tasks.filter(it => it.isMilestone)
-    const completed = total.filter(it => it.status == TaskStatus.Done)
-
-    return completed.length * 100 / total.length
+    const total = tasks.filter((it) => it.isMilestone);
+    const completed = total.filter((it) => it.status == TaskStatus.Done);
+    if (total.length == 0) return 100;
+    return (completed.length * 100) / total.length;
   }
 
   retrieveMemberFromProject(project: Project) {
-    return project.members.reduce((prev, curr) => `${prev}, ${curr}`, project.author)
+    return project.members.reduce(
+      (prev, curr) => `${prev}, ${curr}`,
+      project.author
+    );
   }
 
   getMainTasks(project: Project) {
-    return project.tasks.filter(it => it.isMilestone).sort((a,b) => a.expire.getTime() - b.expire.getTime() )
+    return project.tasks
+      .filter((it) => it.isMilestone)
+      .sort((a, b) => a.expire.getTime() - b.expire.getTime());
   }
 
-  getStatus(taskStatus: TaskStatus){
-    return taskStatusToString(taskStatus)
+  getStatus(taskStatus: TaskStatus) {
+    return taskStatusToString(taskStatus);
   }
 
-  goToDetails(project:Project){
-    this.router.navigate([`project/${project.name.replaceAll(" ", "-")}`], {state: {"project": project}})
+  goToDetails(project: Project) {
+    this.router.navigate([`project/${project.name.replaceAll(' ', '-')}`], {
+      state: { project: project },
+    });
   }
 }

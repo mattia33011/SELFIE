@@ -1,3 +1,8 @@
+@if(tasks.length == 0){
+<div class="flex flex-row p-3 justify-center">
+  {{ "emptyList" | translate }}
+</div>
+} @else {
 <p-treetable
   [value]="treeNodes"
   [columns]="cols"
@@ -24,9 +29,11 @@
         {{ rowData[col.field] | translate }}
         } @case ("status") {
         <p-select
-          (onChange)="changeStatus.emit(t(rowData['id']))"
+          #status
+          appendTo="body"
           [(ngModel)]="rowData['status']"
-          [disabled]="isStatusDisabled(rowData['status'])"
+          (onChange)="onChange(status.value, t(rowData['id']))"
+          [disabled]="isStatusDisabled(rowData)"
           [options]="statusOptions"
         >
           <ng-template let-item #selectedItem>
@@ -41,25 +48,58 @@
           </ng-template>
         </p-select>
         } @case ("output") {
-        <p-button (click)="outputAction.emit(t(rowData['id']))" [rounded]="true"
-          ><i class="pi-arrow-circle-up pi"></i
-        ></p-button>
+        <div class="flex-row flex gap-2">
+          <p-button
+            icon="pi-arrow-circle-up pi"
+            rounded="true"
+            (click)="outputAction.emit(t(rowData['id']))"
+            [rounded]="true"
+          />
+          <span class="flex items-center">{{
+            (rowData["output"]?.length > 0 ? "delivered" : "notDelivered")
+              | translate
+          }}</span>
+        </div>
         } @case ("input") {
-        <p-button (click)="inputAction.emit(t(rowData['id']))" [rounded]="true"
-          ><i class="pi-arrow-circle-down pi"></i
-        ></p-button>
+        <div class="flex-row flex gap-2">
+          <p-button
+            icon="pi-arrow-circle-down pi"
+            rounded="true"
+            (click)="inputAction.emit(t(rowData['id']))"
+            [rounded]="true"
+          />
+          <span class="flex items-center">{{
+            (rowData["input"]?.length > 0 ? "entered" : "notEntered")
+              | translate
+          }}</span>
+        </div>
         } @case ("actions") {
         <div class="flex flex-row gap-3">
-          <p-button (click)="addSubTaskAction.emit(t(rowData['id']))"
-            ><i class="pi pi-plus"></i
-          ></p-button>
-          <p-button (click)="deleteAction.emit(t(rowData['id']))"
-            ><i class="pi pi-trash"></i
-          ></p-button>
+          <p-button
+            icon="pi pi-plus"
+            (click)="addSubTaskAction.emit(t(rowData['id']))"
+          />
+          <p-button
+            icon="pi pi-save"
+            (click)="saveActions.emit(t(rowData['id']))"
+            [disabled]="isUpdated(rowData['id'])"
+          />
+          @if (isAuthor) {
+
+          <p-button
+            icon="pi pi-trash"
+            (click)="openDeletePopup(t(rowData['id'])!, $event)"
+            severity="danger"
+          />
+          }
         </div>
         } }
       </td>
       }
     </tr>
   </ng-template>
+  <ng-template #emptymessage>
+    {{ "emptyList" | translate }}
+  </ng-template>
 </p-treetable>
+}

@@ -14,7 +14,7 @@
     "tomato": "Timer Pomodoro",
     "event": "Eventi"
   },
-  "home":{
+  "home": {
     "deadlines": "Scadenze",
     "today": "Oggi",
     "noTodayEvents": "Nessun evento registrato oggi",
@@ -55,7 +55,7 @@
     "backLogin": "Vuoi tornare al login ?",
     "clickHere": "Clicca qui"
   },
-  "activate":{
+  "activate": {
     "user": "Utente attivato",
     "no": "C'è stato un problema nell'attivazione dell'utente"
   },
@@ -123,7 +123,7 @@
     "endSession": "Termina sessione",
     "dateCompleted": "Data"
   },
-  "note":{
+  "note": {
     "newFolder": "Nuova cartella",
     "newNote": "Nuova nota",
     "folderSelected": "Hai selezionato una cartella!"
@@ -166,7 +166,7 @@
   "Done": "Completata",
   "ReStarted": "Riattivata",
   "Overdue": "Scaduto",
-  "Leaved": "Abbandonato",
+  "Abandoned": "Abbandonato",
   "projectTitle": "Gestione Progetti",
   "activities": "Attività",
   "Quarter Day": "Quarto di giorno",
@@ -192,5 +192,27 @@
   "isNotMilestone": "Non è una milestone",
   "selectRange": "Seleziona la data di inizio e di scadenza",
   "isLinkedTask": "Task collegate",
-  "assignee": "Assegnatari"
+  "assignee": "Assegnatari",
+  "delivered": "Consegnata",
+  "entered": "Inserita",
+  "notDelivered": "Non consegnata",
+  "notEntered": "Non inserita",
+  "emptyList": "Non è stato trovato alcun risultato",
+  "selectedMembers": "Membri selezionati:",
+  "addProject": "Aggiungi progetto",
+  "deleteTaskPopup": "Vuoi eliminare questa task ?",
+  "deleteTaskBtn": "Elimina Task",
+  "save": "Salva",
+  "enterOutput": "Inserisci il risultato",
+  "id": "ID",
+  "name": "Nome",
+  "input": "Consegna",
+  "output": "Risulato",
+  "start": "Inizio",
+  "expire": "Scadenza",
+  "status": "Status",
+  "actions": "Azioni",
+  "delete": "Elimina",
+  "deleteProjectDialog": "Vuoi davvero eliminare questo progetto ?",
+  "deleteProject": "Elimina progetto"
 }

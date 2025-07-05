@@ -7,12 +7,12 @@
     </ng-template>
 </full-calendar>
 
-<p-dialog header="Evento" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' , height: '50rem' }" (onHide)="resetForm()">
+<p-dialog header="Evento" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' , height: '50rem' }" (onHide)="resetForm()" >
     <div class="popup" *ngIf="visible"> <!--dai indicazioni a form-group su css-->
         <div class="form-group">
             <label for="isTask">{{ 'event.isTask' | translate }}</label>
             <p-checkbox label="È un'attività" [(ngModel)]="isTask" binary="true" (onChange)="onIsTaskChange()" aria-label="Seleziona se è un'attività"></p-checkbox>
-            <p-dropdown *ngIf="isTask" [options]="taskStatuses" [(ngModel)]="taskStatus" aria-placeholder="Seleziona uno stato"></p-dropdown>
+            <p-select *ngIf="isTask" [options]="taskStatuses" [(ngModel)]="taskStatus" aria-placeholder="Seleziona uno stato"></p-select>
         </div>
 
         <div class="form-group">
@@ -69,7 +69,7 @@
         <!-- Per la ripetizione -->
             <div class="flex-col items-left">
                 <p-floatlabel class="w-full md:w-56" variant="in">
-                    <p-dropdown  [(ngModel)]="repeatType"  [options]="repeatOptions"  optionLabel="label" placeholder="{{'event.none' | translate }}"></p-dropdown>
+                    <p-select [(ngModel)]="repeatType"  [options]="repeatOptions"  optionLabel="label" optionValue="value" placeholder="{{'event.none' | translate }}"></p-select>
                     <label for="repeatType">{{ "event.repeat" | translate }}</label>
                 </p-floatlabel>
             </div>
@@ -90,7 +90,7 @@
             <!-- Data fine ripetizione -->
             <div *ngIf="repeatType && repeatType !== 'custom'" class="flex-col items-left">
                 <label for="repeatUntil">{{ 'event.repeatUntil' | translate }}</label>
-                <input id="repeatUntil" [(ngModel)]="repeatUntil" type="date" />
+                <p-datepicker inputId="repeatUntil" [(ngModel)]="repeatUntil" showIcon iconDisplay="input"/>
             </div>
             
             <!-- 

@@ -12,7 +12,7 @@
         }
         @else {
             @for (event of _content; track $index ; let i = $index) {
-                <p-button styleClass="!px-0 !justify-start rounded-none md:!rounded-xm" size="large" [severity]="event.color ?? 'success'"  fluid="true">
+                <p-button styleClass="!px-0 !justify-start rounded-none md:!rounded-xm" size="large"  fluid="true">
 
                     <span class="w-full !text-left px-2 !text-nowrap">
                         <h3 class="font-semibold  text-xl truncate">{{event.title}} </h3>

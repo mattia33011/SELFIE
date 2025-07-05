@@ -14,26 +14,32 @@ import { ButtonModule } from 'primeng/button';
 import rrulePlugin from '@fullcalendar/rrule';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { DropdownModule } from 'primeng/dropdown';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { IftaLabelModule } from 'primeng/iftalabel'; 
 import { CheckboxModule} from 'primeng/checkbox'; // Importa il modulo Checkbox
+import {ChangeDetectorRef} from '@angular/core';
+import { SelectModule } from 'primeng/select';
+import {ApiService} from '../../service/api.service';
+import {SessionService} from '../../service/session.service';
+import {forkJoin, Observable} from 'rxjs';
 //import { RouterOutlet } from '@angular/router';
 
 // COMANDO npm install @fullcalendar/rrule rrule
 
 
-// manca ripeti tutti i primi lunedì del mese (?)
-// attività (distinguo tra attività e evento faccio un evento a cui dò solo una scadenza? e che va a finire nella lista)
-// traduzione in ing SOLO per il calendario (mesi, mese settimana anno, abbreviazioni della settimana nel calendario ecc) (eventi apposto)
+// piccolezze da aggiustare rq che finisce sara quando i danni maggiori sono apposto
+// togliere "task status" di extended properties per gli eventi
+// i colori strani che ogni tanto dopo la modifiche si tolgono
+// nell'html cambia checkbox con qualcosa di primeng miseria è bruttissimo quello per ora. tutto il popup lo è ma basta fare due colonne
+// traduzione in ing SOLO per il calendario (mesi, mese settimana anno, abbreviazioni della settimana nel calendario ecc (come diavolo si fa)) (eventi apposto)
 
 
 @Component({
   selector: 'app-calendar',
   standalone: true, //standalone
-  imports: [FullCalendarModule, PanelModule, FormsModule, CommonModule, DialogModule, ButtonModule, DatePickerModule , TranslatePipe, DropdownModule , FloatLabelModule, ColorPickerModule, InputTextModule, IftaLabelModule, CheckboxModule], //standalone
+  imports: [FullCalendarModule, PanelModule, FormsModule, CommonModule, DialogModule, ButtonModule, DatePickerModule , TranslatePipe, SelectModule , FloatLabelModule, ColorPickerModule, InputTextModule, IftaLabelModule, CheckboxModule],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
@@ -68,8 +74,35 @@ export class CalendarComponent {
   ];
   taskStatuses :any[] = []
   repeatOptions:any[] = [];
-  constructor(private translate: TranslateService) {}
-  ngOnInit() {
+  constructor(
+    private translate: TranslateService,
+    private readonly apiService: ApiService,
+    private readonly translateService: TranslateService,
+    private readonly sessionService: SessionService
+
+) {}
+  ngOnInit(){
+  this.apiService.getEvents(
+      this.sessionService.getSession()!.user.username!,
+      this.sessionService.getSession()!.token!
+    ).subscribe({
+      next: (events) => {
+        this.calendarOptions.events = events.map(event => ({
+          ...event,
+          start: event.start,
+          end: event.end,
+          id: event._id,
+          title: event.title,
+          color: event.color,
+          allDay: event.allDay,
+          extendedProps: event.extendedProps
+        }));
+      },
+      error: (err) => {
+        console.error('Errore nel caricamento eventi', err);
+      }
+    });
+
     this.translate.get([
       'event.none',
       'event.daily',
@@ -99,8 +132,9 @@ export class CalendarComponent {
     });
   });
 
-  }
 
+  }
+   
   toggleWeekday(event: any) {
     const day = event.target.value;
     if (event.target.checked) {
@@ -140,6 +174,11 @@ export class CalendarComponent {
     this.visible = true; // Mostra il popup
     //this.isEditMode = false; 
   }
+addOneDay(date: Date): Date {
+  const result = new Date(date);
+  result.setDate(result.getDate() + 1);
+  return result;
+}
 
 addEvent() {
   if (!this.eventName.trim()) {
@@ -184,6 +223,16 @@ addEvent() {
     },
     allDay: this.isTask || !this.eventTime  // allDay se attività o senza orario
   };
+  //per salvare in meta rruleData così viene mantenuto quando vado a cliccare e modificare evento
+  newEvent.extendedProps = {
+    ...newEvent.extendedProps,
+    rruleData: {
+      freq: this.repeatType,
+      interval: this.repeatInterval,
+      until: this.repeatUntil,
+      byweekday: this.repeatWeekDays
+    }
+  };
 
   if (!this.isTask && this.repeatType && this.repeatType !== 'none') {
     // Se NON è attività e c'è ripetizione
@@ -194,12 +243,18 @@ addEvent() {
       monthly: 'MONTHLY',
       yearly: 'YEARLY'
     };
-
+    
     newEvent.rrule = {
-      freq: freqMap[this.repeatType],
-      dtstart: startDateTime,
+      freq: this.repeatType,
+      dtstart: startDateTime.toISOString(),
+
       interval: this.repeatInterval || 1,
-      until: this.repeatUntil || undefined,
+      until: this.repeatUntil ? (
+        newEvent.allDay
+          ? this.formatDateOnly(this.addOneDay(this.repeatUntil))
+          : this.repeatUntil.toISOString()
+      ) : undefined,
+
       byweekday: this.repeatWeekDays.length ? this.repeatWeekDays : undefined
     };
 
@@ -207,9 +262,8 @@ addEvent() {
       newEvent.duration = this.getDuration(this.eventTime, this.eventEndTime);
     }
   } else {
+      newEvent.start = startDateTime;
     // Eventi singoli o attività (senza rrule)
-    newEvent.start = startDateTime;
-
     if (!this.isTask && this.eventEndTime) {
       // Se evento (non attività) con orario di fine
       const endDateTime = new Date(
@@ -230,12 +284,43 @@ addEvent() {
         0, 0, 0, 0
       );
     }
+    if (newEvent.allDay && newEvent.end) {
+      const adjustedEnd = new Date(newEvent.end);
+      adjustedEnd.setDate(adjustedEnd.getDate() + 1);
+      newEvent.end = adjustedEnd;
+    }
   }
+  const username = this.sessionService.getSession()!.user.username!;
+  const token = this.sessionService.getSession()!.token!;
 
-  calendarApi.addEvent(newEvent);
-  this.resetForm();
+  this.apiService.createEvent(username, newEvent, token).subscribe({
+    next: (savedEvent: any) => {
+      const calendarApi = this.calendarComponent.getApi();
+      console.log('newEvent prima di addEvent:', newEvent);
+      calendarApi.addEvent({
+        ...newEvent,
+        id: savedEvent._id,
+        start: newEvent.start,
+        end: newEvent.end,
+        allDay: newEvent.allDay,
+        rrule: newEvent.rrule,
+        color: newEvent.color,
+        
+        extendedProps: {
+          ...newEvent.extendedProps
+        }
+      });
+      this.resetForm();
+    },
+    error: (err) => {
+      console.error("Errore durante il salvataggio dell'evento", err);
+    }
+  });
+  
 }
-
+formatDateOnly(date: Date): string {
+  return date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+}
   handleEventClick(clickInfo: any) {
     const event = clickInfo.event;
     this.selectedEvent = event;
@@ -248,7 +333,7 @@ addEvent() {
     const end = event.end;
 
     this.theDate = start ? new Date(start) : null;
-    this.eventTime = start ? new Date(start) : null;
+    this.eventTime = event.eventTime;
     
     if (event.allDay && end) {
       const adjustedEnd = new Date(end);
@@ -260,20 +345,14 @@ addEvent() {
 
     this.eventEndTime = end && !event.allDay ? new Date(end) : null;
 
-    const plainEvent = event.toPlainObject();
-    const rrule = plainEvent.rrule;
+    const rruleData = event.extendedProps?.rruleData;
 
-    if (rrule) {
-      this.repeatType = this.getRepeatTypeFromRRule(rrule);
-      this.repeatUntil = rrule.until ? new Date(rrule.until) : null;
-      this.repeatInterval = rrule.interval || 1;
-      this.repeatWeekDays = rrule.byweekday || [];
-    } else {
-      this.repeatType = '';
-      this.repeatUntil = null;
-      this.repeatWeekDays = [];
+    if (rruleData) {
+      this.repeatType = rruleData.freq;
+      this.repeatInterval = rruleData.interval;
+      this.repeatUntil = rruleData.until ? new Date(rruleData.until) : null;
+      this.repeatWeekDays = rruleData.byweekday || [];
     }
-
     this.visible = true;
   }
 
@@ -293,6 +372,7 @@ updateEvent() {
   if (!this.selectedEvent) return;
 
   const calendarApi = this.calendarComponent.getApi();
+  const idd = this.selectedEvent.id;
   this.selectedEvent.remove();
 
   if (!this.theDate) {
@@ -310,7 +390,25 @@ updateEvent() {
     // Per eventi allDay la fine è esclusiva quindi aggiungiamo un giorno
     endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1);
   }
-
+let startDateTime: Date;
+  if (!this.eventTime || this.isTask) {
+    // Se è attività o non c'è orario => data solo con ore 0
+    startDateTime = new Date(
+      this.theDate.getFullYear(),
+      this.theDate.getMonth(),
+      this.theDate.getDate(),
+      0, 0, 0, 0
+    );
+  } else {
+    startDateTime = new Date(
+      this.theDate.getFullYear(),
+      this.theDate.getMonth(),
+      this.theDate.getDate(),
+      this.eventTime.getHours(),
+      this.eventTime.getMinutes(),
+      0, 0
+    );
+  }
   let newEvent: any = {
     title: this.eventName,
     color: this.eventColor,
@@ -331,14 +429,28 @@ updateEvent() {
       monthly: 'MONTHLY',
       yearly: 'YEARLY'
     };
-
+//?????? controlla se serve add one day alla fine
     newEvent.rrule = {
-      freq: freqMap[this.repeatType],
-      dtstart: startDate,
+      freq: this.repeatType,
+      dtstart: startDateTime.toISOString(),
       interval: this.repeatInterval || 1,
-      until: this.repeatUntil || undefined,
+      until: this.repeatUntil ? (
+        newEvent.allDay
+          ? this.formatDateOnly(this.addOneDay(this.repeatUntil))
+          : this.repeatUntil.toISOString()
+      ) : undefined,
+
       byweekday: this.repeatWeekDays.length ? this.repeatWeekDays : undefined
     };
+    newEvent.extendedProps = {
+      ...newEvent.extendedProps,
+        rruleData: {
+          freq: this.repeatType,
+          interval: this.repeatInterval,
+          until: this.repeatUntil,
+          byweekday: this.repeatWeekDays
+        }
+      };
 
     if (!isAllDay && this.eventTime && this.eventEndTime) {
       newEvent.duration = this.getDuration(this.eventTime, this.eventEndTime);
@@ -346,6 +458,7 @@ updateEvent() {
       newEvent.duration = '01:00';
     }
   } else {
+    
     // start
     if (!isAllDay && this.eventTime) {
       newEvent.start = new Date(
@@ -386,17 +499,52 @@ updateEvent() {
       }
     }
   }
+this.apiService.updateEvent(
+    this.sessionService.getSession()!.user.username!,
+    idd,
+    newEvent,
+    this.sessionService.getSession()!.token!
+  ).subscribe({
+    next: (updatedEventId: any) => {
+      calendarApi.addEvent({
+        ...newEvent,
+        id: idd,
+        start: newEvent.start,
+        end: newEvent.end,
+        allDay: newEvent.allDay,
+        rrule: newEvent.rrule,
+        color: newEvent.color,
+        extendedProps: {
+          ...newEvent.extendedProps
+        }
+      });
 
-  calendarApi.addEvent(newEvent);
-  this.resetForm();
+      this.resetForm();
+    },
+    error: (err) => {
+      console.error('Errore durante aggiornamento evento', err);
+      alert('Errore durante aggiornamento evento');
+    }
+  });
 }
-
 
 deleteEvent() {
   if (this.selectedEvent) {
     if (confirm('Sei sicuro di voler eliminare questo evento?')) {
-      this.selectedEvent.remove();
-      this.resetForm();
+      const eventId = this.selectedEvent.id;
+      const userId = this.sessionService.getSession()!.user.username!;
+      const token = this.sessionService.getSession()!.token!;
+
+      this.apiService.deleteEvent(userId, eventId, token).subscribe({
+        next: () => {
+          this.selectedEvent!.remove();
+          this.resetForm();
+        },
+        error: (err) => {
+          console.error('Errore durante eliminazione evento', err);
+          alert('Errore durante eliminazione evento');
+        }
+      });
     }
   }
 }
@@ -451,12 +599,12 @@ getDuration(startTime: Date, endTime: Date): string {
     this.eventLocation = '';
     this.visible = false; // Chiude il popup
     this.eventColor = '#99ff63'; // Reset del colore evento 
-    this.repeatType = ''; // Reset del tipo di ripetizione
+    this.repeatType = 'none'; // Reset del tipo di ripetizione
     this.repeatUntil = null; // Reset della data di fine ripetizione
     this.repeatInterval = 1; // Reset dell'intervallo di ripetizione
     this.repeatWeekDays = []; // Reset dei giorni della settimana 
     this.selectedEvent = null;
-    this.selectedEvent.eventname = '';
+    //this.selectedEvent.eventname = '';
     this.isTask = false;
     this.taskStatus = 'da_fare';
 
@@ -466,8 +614,8 @@ getDuration(startTime: Date, endTime: Date): string {
     // Resetta i campi non rilevanti se è attività
     this.eventTime = null;
     this.eventEndTime = null;
-    this.eventLocation = '';  // opzionale, se vuoi
-    this.repeatType = '';
+    this.eventLocation = '';
+    this.repeatType = 'none';
     this.repeatUntil = null;
     this.repeatWeekDays = [];
   }

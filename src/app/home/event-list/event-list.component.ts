@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Event, Events, isEvent, Note, Notes } from '../../../types/events';
+import { CalendarEvent, Events, isEvent, Note, Notes } from '../../../types/events';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -23,13 +23,13 @@ export class EventListComponent {
     return this.content.map(this.castContent)
   }
 
-  castContent(e: Event | Note): Content{
+  castContent(e: CalendarEvent | Note): Content{
     if (isEvent(e)){
       return {
         title: e.title,
         color: e.color,
-        date: e.expireDate,
-        subtitle: e.description
+        date: new Date(e.end ?? e.start ?? new Date()),
+        subtitle: e.extendedProps?.luogo ?? ''
       }
     } else {
       return {
@@ -43,4 +43,4 @@ export class EventListComponent {
 
 }
 
-type Content = {title: string, color?: "success" | "info" | "warn" | "danger" | "help", date: Date, subtitle?: string}
+type Content = {title: string, color?: string, date: Date, subtitle: string }

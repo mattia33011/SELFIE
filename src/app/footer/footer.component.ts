@@ -42,7 +42,10 @@ export class FooterComponent {
     this.noteItems = [
       {id: 'add', icon: 'pi pi-plus', desc: "add-event", callback: () => undefined},
       {id: 'add-project', icon: 'pi pi-calendar-plus', desc: "add-project", callback: () => undefined},
-      {id: 'new-project', icon: 'pi pi-sitemap',desc: "project-view", callback: () => router.navigate(["project"])},
+      {id: 'new-project', icon: 'pi pi-sitemap',desc: "project-view", callback: () => {
+        this.isSpeedDialVisible=false
+        router.navigate(["project"])
+      }},
     ]
   }
 

@@ -1,60 +1,81 @@
 <p-dataview #dv [value]="data">
-    <ng-template #list let-items>
-      <div class="grid grid-cols-12 gap-4 px-5 py-4 rounded-full grid-nogutter">
-        @for (item of items; track $index) {
-        <div
+  <ng-template #list let-items>
+    <div class="grid grid-cols-12 gap-4 px-5 py-4 rounded-full grid-nogutter">
+      @for (item of items; track $index) {
+      <div
         (click)="goToDetails(item)"
-          class="col-span-12 px-2 hover:bg-surface-500 hover:cursor-pointer rounded-md bg-surface-700"
-        >
-          <div class="flex flex-row sm:items-center px-2 gap-4">
+        class="col-span-12 px-2 hover:bg-surface-500 hover:cursor-pointer rounded-md bg-surface-700"
+      >
+        <div class="flex flex-row sm:items-center px-2 gap-4">
+          <div
+            class="flex flex-col xl:flex-row justify-between xl:items-center py-3 flex-1 gap-6"
+          >
             <div
-              class="flex flex-col md:flex-row justify-between md:items-center py-3 flex-1 gap-6"
+              class="flex flex-row xl:flex-col justify-center text-center xl:text-start col-span-3 items-start gap-3"
             >
-              <div class="flex flex-row md:flex-col col-span-3 items-start gap-3">
-                <div class="flex flex-col gap-3">
+              <div class="flex flex-col gap-3">
+                <div
+                  class="text-lg font-medium text-surface-900 mt-2 text-surface-900 dark:text-surface-0"
+                >
+                  {{ item.name }}
+                </div>
+                <span
+                  class="font-medium text-secondary text-sm text-surface-900 dark:text-surface-0"
+                  >{{ item.note }}</span
+                >
+
+                <div
+                  class="bg-surface-100 dark:bg-surface-700"
+                  style="border-radius: 30px"
+                >
                   <div
-                    class="text-lg font-medium text-surface-900 mt-2 text-surface-900 dark:text-surface-0"
+                    class="bg-surface-0 dark:bg-surface-900 flex items-center gap-4 justify-center py-1 px-2"
+                    style="
+                      border-radius: 30px;
+                      box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.04),
+                        0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+                    "
                   >
-                    {{ item.name }}
-                  </div>
-                  <span class="font-medium text-secondary text-sm text-surface-900 dark:text-surface-0">{{
-                    item.note
-                  }}</span>
-  
-                  <div
-                    class="bg-surface-100 dark:bg-surface-700"
-                    style="border-radius: 30px"
-                  >
-                    <div
-                      class="bg-surface-0 dark:bg-surface-900 flex items-center gap-4 justify-center py-1 px-2"
-                      style="
-                        border-radius: 30px;
-                        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.04),
-                          0px 1px 2px 0px rgba(0, 0, 0, 0.06);
-                      "
+                    <span
+                      class="text-surface-900 dark:text-surface-0 font-medium text-sm"
                     >
-                      <span
-                        class="text-surface-900 dark:text-surface-0 font-medium text-sm"
-                      >
-                        {{ "milestoneProgress" | translate }}:
-                        {{ calculateMilestoneCompleted(item.tasks) }}%
-                      </span>
-                    </div>
+                      {{ "milestoneProgress" | translate }}:
+                      {{ calculateMilestoneCompleted(item.tasks) }}%
+                    </span>
                   </div>
                 </div>
               </div>
-              <div class="col-span-6 gap-2  flex flex-col justify-center text-center">
-                <span
-                  class="text-xl font-semibold text-surface-900 dark:text-surface-0"
+            </div>
+            <div
+              class="col-span-6 gap-2 flex flex-col justify-center text-center"
+            >
+              <span
+                class="text-xl font-semibold text-surface-900 dark:text-surface-0"
+              >
+                {{ "mainTasks" | translate }}
+              </span>
+              @for (task of getMainTasks(item); track $index) {
+
+              <div id="mobile" class="flex flex-row justify-center md:hidden text-center">
+                <div
+                  class="text-center flex flex-row gap-4 text-surface-900 dark:text-surface-0 py-1 px-3 rounded-full !bg-primary-700 justify-center w-1/2"
                 >
-                  {{ "mainTasks" | translate }}
-                </span>
-                @for (task of getMainTasks(item); track $index) {
-                <div class="text-center flex flex-row gap-4 text-surface-900 dark:text-surface-0 py-1 px-3 rounded-full !bg-primary-700">
-                  <span class="text-md font-semibold text-surface-900 dark:text-surface-0">{{ task.name }}</span>
+                  {{ task.name }}
+                </div>
+              </div>
+
+              <div
+                id="desktop"
+                class="hidden md:flex flex-col justify-center text-center"
+              >
+                <div
+                  class="text-center flex flex-row gap-4 text-surface-900 dark:text-surface-0 py-1 px-3 rounded-full !bg-primary-700 justify-center"
+                >
                   <span
-                    >Status: {{ getStatus(task.status) | translate }}
-                  </span>
+                    class="text-md font-semibold text-surface-900 dark:text-surface-0"
+                    >{{ task.name }}</span
+                  >
+                  <span>Status: {{ getStatus(task.status) | translate }} </span>
                   <span
                     >{{ "starting" | translate }}:
                     {{ task.start.toLocaleDateString() }}
@@ -64,30 +85,36 @@
                     {{ task.expire.toLocaleDateString() }}
                   </span>
                 </div>
-                }
               </div>
-              <div class="flex flex-col py-3 col-span-3 md:items-end gap-8">
-                <span
-                  class="text-lg text-end font-semibold text-surface-900 dark:text-surface-0"
-                >
-                  {{ "starting" | translate }}:
-                  {{ item.start.toLocaleDateString() }}
-                  <br />
-                  {{ "expiration" | translate }}:
-                  {{ item.expire.toLocaleDateString() }}
-                </span>
-                <span
-                  class="text-md text-end text-surface-900 dark:text-surface-0"
-                >
-                  {{ "members" | translate }}:
-                  {{ retrieveMemberFromProject(item) }}
-                </span>
-              </div>
+
+              }
+            </div>
+            <div class="flex flex-col py-3 col-span-3 xl:items-end gap-8">
+              <span
+                class="text-lg text-center xl:text-end font-semibold text-surface-900 dark:text-surface-0"
+              >
+                {{ "starting" | translate }}:
+                {{ item.start.toLocaleDateString() }}
+                <br />
+                {{ "expiration" | translate }}:
+                {{ item.expire.toLocaleDateString() }}
+              </span>
+              <span
+                class="text-md text-center xl:text-end text-surface-900 dark:text-surface-0"
+              >
+                {{ "members" | translate }}:
+                {{ retrieveMemberFromProject(item) }}
+              </span>
             </div>
           </div>
         </div>
-        }
       </div>
-    </ng-template>
-  </p-dataview>
-  
+      }
+    </div>
+  </ng-template>
+  <ng-template #emptymessage>
+    <div class="flex flex-row w-full text-center justify-center pb-4 text-xl">
+      {{'emptyList' | translate}}
+    </div>
+  </ng-template>
+</p-dataview>

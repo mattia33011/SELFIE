@@ -84,14 +84,14 @@ export enum TaskStatus {
   Done,
   ReStarted,
   Overdue,
-  Leaved,
+  Abandoned,
 }
 export const TASK_STATUS = [
   'Startable',
   'Started',
   'Done',
   'ReStarted',
-  'Leaved',
+  'Abandoned',
 ];
 export function taskStatusToString(status: TaskStatus) {
   switch (status) {
@@ -110,5 +110,25 @@ export function taskStatusToString(status: TaskStatus) {
       return 'Overdue';
     case 6:
       return 'Leaved';
+  }
+}
+
+export function stringToTaskStatus(status: string) {
+  switch (status) {
+    default:
+    case "NotStartable":
+      return TaskStatus.NotStartable;
+    case "Startable":
+      return TaskStatus.Startable;
+    case "Started":
+      return TaskStatus.Started;
+    case "Done":
+      return TaskStatus.Done;
+    case "ReStarted":
+      return TaskStatus.ReStarted;
+    case "Overdue":
+      return TaskStatus.Overdue;
+    case "Abandoned":
+      return TaskStatus.Abandoned;
   }
 }

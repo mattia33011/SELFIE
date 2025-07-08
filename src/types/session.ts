@@ -1,6 +1,7 @@
 export type Session = {
   token: string;
   user: User;
+  loggedAt?: Date
 };
 
 export type User = {

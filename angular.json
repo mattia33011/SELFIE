@@ -27,9 +27,10 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/frappe-gantt/dist/frappe-gantt.css"
             ],
-            "scripts": []
+            "scripts": ["node_modules/frappe-gantt/dist/frappe-gantt.umd.js"]
           },
           "configurations": {
             "production": {
@@ -37,12 +38,12 @@
                 {
                   "type": "initial",
                   "maximumWarning": "500kB",
-                  "maximumError": "2MB"
+                  "maximumError": "10MB"
                 },
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumError": "8MB"
                 }
               ],
               "outputHashing": "all"

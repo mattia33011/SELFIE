@@ -18,38 +18,54 @@ export class SessionService {
   }
 
   setToken(session: Session, rememberMe?: boolean) {
-    if (rememberMe) localStorage.setItem('session', JSON.stringify(session));
+    if (rememberMe)
+      localStorage.setItem(
+        'session',
+        JSON.stringify({ ...session, loggedAt: new Date() })
+      );
     sessionStorage.setItem('session', JSON.stringify(session));
   }
   getSession(): Session | undefined {
     const sessionStr =
       sessionStorage.getItem('session') ?? localStorage.getItem('session');
-    if (sessionStr) {
-      const session = JSON.parse(sessionStr) as Session;
+    if (!sessionStr) return undefined;
+
+    const session = JSON.parse(sessionStr) as Session;
+    if(!session.loggedAt)
       return {
         ...session,
         user: { ...session.user, birthDate: new Date(session.user.birthDate) },
       };
+      
+    const expiration = new Date(session.loggedAt.getTime() + (10 * 60 * 60 * 1000)); // 10 ore
+    
+    if(expiration < session.loggedAt){
+      this.signOut()
+      return undefined  
     }
+    
+    return {
+      ...session,
+      user: { ...session.user, birthDate: new Date(session.user.birthDate) },
+    };
 
-    return undefined;
   }
-  profilePictureUrl?: string
+  profilePictureUrl?: string;
   loadProfilePicture() {
     const user = this.getSession();
     if (user)
       this.apiService.getProfilePicture(user).subscribe({
         next: (res) => {
-          this.profilePictureUrl = res
-          profilePictureSubject.next(res)
+          this.profilePictureUrl = res;
+          profilePictureSubject.next(res);
         },
         error: (err) => {
-          profilePictureSubject.next(undefined)
-        }
+          profilePictureSubject.next(undefined);
+        },
       });
   }
   signOut() {
-    this.profilePictureUrl = undefined
+    this.profilePictureUrl = undefined;
     localStorage.removeItem('session');
     sessionStorage.removeItem('session');
     this.router.navigate(['/login']);
@@ -73,4 +89,4 @@ export const retrieveIconFromUserField = (key: keyof User) => {
   }
 };
 
-export const profilePictureSubject = new ReplaySubject<string | undefined>(10)
+export const profilePictureSubject = new ReplaySubject<string | undefined>(10);

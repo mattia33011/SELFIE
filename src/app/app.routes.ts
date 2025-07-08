@@ -10,6 +10,8 @@ import { PomodoroComponent } from './pomodoro/pomodoro.components';
 
 import { ActivateAccountComponent } from './register/activate-account/activate-account.component';
 import { NoteComponent } from './note/note.components';
+import { ProjectComponent } from './project/project.component';
+import { DetailsComponent } from './project/details/details.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -37,17 +39,31 @@ export const routes: Routes = [
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
+    canActivate: [notLoggedAuthGuard],
   },
   {
     path: 'pomodoro',
     component: PomodoroComponent,
+    canActivate: [loggedAuthGuard],
   },
   {
     path: 'note',
     component: NoteComponent,
+    canActivate: [loggedAuthGuard],
+  },
+  {
+    path: 'project',
+    component: ProjectComponent,
+    canActivate: [loggedAuthGuard],
+  },
+  {
+    path: 'project/:projectName',
+    component: DetailsComponent,
+    canActivate: [loggedAuthGuard],
   },
   {
     path: 'activate',
     component: ActivateAccountComponent,
+    canActivate: [notLoggedAuthGuard],
   },
 ];

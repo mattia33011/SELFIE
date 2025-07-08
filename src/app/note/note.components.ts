@@ -91,8 +91,6 @@ export class NoteComponent {
     }
 
 
-
-
     addFolder(parentNode: TreeNode | null = null) {
         if (this.value == null) {
             alert("Inserire un nome per la cartella");
@@ -118,7 +116,13 @@ export class NoteComponent {
         } else {
             this.files.push(newFolder);
         }
-                this.apiService.pushNote(this.sessionService.getSession()!.user.username!, [newFolder], this.sessionService.getSession()!.token!).subscribe({
+        this.updateStructure();
+        /*
+        this.apiService.pushNote(
+                    this.sessionService.getSession()!.user.username!, 
+                    [newFolder], 
+                    this.sessionService.getSession()!.token!)
+                .subscribe({
             next: (response) => {
                 console.log(response);
             },
@@ -126,6 +130,7 @@ export class NoteComponent {
                 console.log(error);
             },
         });
+        */
     }
 
     addNote() {
@@ -152,6 +157,8 @@ export class NoteComponent {
         } else {
             this.files.push(newNote);
         }
+        this.updateStructure();
+        /*
         this.apiService.pushNote(this.sessionService.getSession()!.user.username!, [newNote], this.sessionService.getSession()!.token!).subscribe({
             next: (response) => {
                 console.log(response);
@@ -160,6 +167,17 @@ export class NoteComponent {
                 console.log(error);
             },
         });
+        */
+    }
+    updateStructure(){
+        this.apiService.pushNote(this.sessionService.getSession()!.user.username!, this.files, this.sessionService.getSession()!.token!).subscribe({
+            next: (response) => {
+                console.log(response);
+            },
+            error: (error) => {
+                console.log(error);
+            } 
+    }      );
     }
 
     saveNote() {
@@ -170,6 +188,8 @@ export class NoteComponent {
             if (this.recentNotes.length > 5) {
                 this.recentNotes.shift(); // vogliamo al massimo 5 note
             }
+            this.updateStructure();
+            /*
             this.apiService.putNote(this.sessionService.getSession()!.user.username!, this.selectedNote, this.sessionService.getSession()!.token!).subscribe({
                 next: (response) => {
                     console.log(response);
@@ -178,6 +198,7 @@ export class NoteComponent {
                     console.log(error);
                 },
             });
+            */
         }
     }
 
@@ -197,6 +218,8 @@ export class NoteComponent {
             }
             this.selectedNote = null;
             this.text = '';
+            this.updateStructure();
+            /*
             this.apiService.deleteNote(this.sessionService.getSession()!.user.username!, this.selectedNote, this.sessionService.getSession()!.token!).subscribe({
                 next: (response) => {
                     console.log(response);
@@ -205,6 +228,7 @@ export class NoteComponent {
                     console.log(error);
                 },
             });
+            */
         }
     }
 }

@@ -99,32 +99,33 @@
                                 <th>{{"pomodoro.actionsTask" | translate }}</th>
                             </tr>
                         </ng-template>
-                        <ng-template #body let-task let-index="rowIndex" let-editing="editing">
+                        <ng-template pTemplate="body" let-task let-index="rowIndex" let-editing="editing">
                             <tr [pReorderableRow]="index">
                                 <td>
                                     <span class="pi pi-bars" pReorderableRowHandle></span>
                                 </td>
-                                <td [pEditableColumn]="task.name" pEditableColumnField="name">
+                                <td pEditableColumn>
                                     <p-cellEditor>
-                                        <ng-template #input>
-                                        <input
-                                        pInputText
-                                        type="text"
-                                        [(ngModel)]="task.name"
-                                        required />
+                                        <ng-template pTemplate="input">
+                                            <input
+                                                pInputText
+                                                type="text"
+                                                [(ngModel)]="task.name"
+                                                (ngModelChange)="onTaskNameEdit(task.id, $event)"
+                                                required />
                                         </ng-template>
-                                        <ng-template #output>
-                                    <div style="max-width: 15rem; word-wrap: break-word;">
-                                        {{ task.name }}
-                                    </div>
-                                </ng-template>
+                                        <ng-template pTemplate="output">
+                                            <div style="max-width: 15rem; word-wrap: break-word;">
+                                                {{ task.name }}
+                                            </div>
+                                        </ng-template>
                                     </p-cellEditor>
                                 </td>
                                 <td>{{ task.completed ? ("pomodoro.completedTask" | translate) : ("pomodoro.pendingTask" | translate) }}</td>
                                 <td>
                                     <div class="flex items-center gap-2">
-                                    <p-button label="{{'pomodoro.completeTask' | translate }}" (click)="completeTask(index)" *ngIf="!task.completed"></p-button>
-                                    <p-button icon="pi pi-trash" [style]="{ 'height': '2.6rem', 'width': '2.6rem', 'margin-left':'0.6rem'}" (click)="removeTask(index)"></p-button>
+                                        <p-button label="{{'pomodoro.completeTask' | translate }}" (click)="completeTask(index)" *ngIf="!task.completed"></p-button>
+                                        <p-button icon="pi pi-trash" [style]="{ 'height': '2.6rem', 'width': '2.6rem', 'margin-left':'0.6rem'}" (click)="removeTask(index)"></p-button>
                                     </div>
                                 </td>
                             </tr>

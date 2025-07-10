@@ -516,6 +516,7 @@ export class DetailsComponent {
       accept: async () => {
         this.apiService.deleteProject(this.project.id, this.session.getSession()!.user.username, this.session.getSession()!.token).subscribe({
           next: () => {
+            history.replaceState({ project: undefined }, '', window.location.href);
             this.router.navigate(['/project'])
           }
         })

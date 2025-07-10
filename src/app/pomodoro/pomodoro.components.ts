@@ -18,11 +18,12 @@ import { TableModule } from 'primeng/table';
 import { DividerModule } from 'primeng/divider';
 import { DialogModule } from 'primeng/dialog';
 import { timer } from 'rxjs';
-import { Task, Pomodoro, TaskDTO } from '../../types/pomodoro';
+import { Task, Pomodoro, TaskDTO, StudySessionDTO, StudySession } from '../../types/pomodoro';
 import { SessionService } from '../service/session.service';
 import { forkJoin, Observable } from 'rxjs';
 import { ApiService } from '../service/api.service';
 import { stringToDate } from '../../utils/timeConverter';
+
 
 @Component({
   selector: 'app-timer',
@@ -49,6 +50,7 @@ import { stringToDate } from '../../utils/timeConverter';
   providers: [MessageService, ApiService],
 })
 export class PomodoroComponent implements OnInit {
+
   //variabili per il timer
   standardTime: number = 60; // 25 minuti
   interval?: number;
@@ -70,7 +72,8 @@ export class PomodoroComponent implements OnInit {
     shortBreakDuration: 5 * 60,
     longBreakDuration: 15 * 60,
     longBreakInterval: 4,
-  };
+    id: '1'
+  } as Pomodoro;
 
   //variabili visualizzazione finestra di dialogo
   pomodoroVisuale: number = this.pomodoro.pomodoroDuration / 60;
@@ -85,11 +88,7 @@ export class PomodoroComponent implements OnInit {
 
   screenWidth: number = window.innerWidth;
 
-  pomodoroHistory: {
-    pomodoroNumber: number;
-    taskCompleted: number;
-    date: string;
-  }[] = [];
+  pomodoroHistory: StudySession[] = [];
 
   @HostListener('window:resize', ['$event'])
   onResize(event: Event): void {
@@ -97,6 +96,7 @@ export class PomodoroComponent implements OnInit {
   }
 
   constructor(
+
     private readonly messageService: MessageService,
     private readonly translateService: TranslateService,
     private readonly themeService: ThemeService,
@@ -104,6 +104,7 @@ export class PomodoroComponent implements OnInit {
     protected readonly sessionService: SessionService
   ) {
     this.remaningTime = this.pomodoro.pomodoroDuration;
+    
   }
 
   ngOnInit() {
@@ -116,8 +117,10 @@ export class PomodoroComponent implements OnInit {
         this.sessionService.getSession()!.user.username!,
         this.sessionService.getSession()!.token!
       ),
+      
       this.apiService.getPomodoro(
         this.sessionService.getSession()!.user.username!,
+        '1',
         this.sessionService.getSession()!.token!
       ),
       this.apiService.getStudySessions(
@@ -130,23 +133,28 @@ export class PomodoroComponent implements OnInit {
           this.tasks.push(
             ...(response[0] as TaskDTO[]).map((it) => ({
               id: i++,
-              _id: it.id,
+              _id: it._id,
               name: it.taskName,
               completed: it.taskCompleted,
             }))
           );
-          this.pomodoro = (response[1] as any[])[0] as Pomodoro;
-          this.pomodoroVisuale = this.pomodoro.pomodoroDuration / 60;
-          this.shortBreakVisuale = this.pomodoro.shortBreakDuration / 60;
-          this.longBreakVisuale = this.pomodoro.longBreakDuration / 60;
-          this.formGroup.get("timer")?.setValue(this.pomodoro.pomodoroDuration)
-          this.updateKnobTime();
-          
-          this.pomodoroHistory = response[2] as {
+          if(response[1] != null) {
+            this.pomodoro  = response[1] as Pomodoro;
+          }
+          this.pomodoroHistory = (response[2] as {
+            id: number;
             pomodoroNumber: number;
             taskCompleted: number;
             date: string;
-          }[];
+            _id?: string;
+          }[]).map(it => ({
+            id: it.id,
+            pomodoroNumber: it.pomodoroNumber,
+            taskCompleted: it.taskCompleted,
+            date: it.date,
+            _id: it._id
+          }))
+          
       },
       error: (error) => {
         console.log(error);
@@ -154,9 +162,9 @@ export class PomodoroComponent implements OnInit {
     });
   }
 
-  chiamataPomodoro(callback?: () => any) {
+  chiamataPomodoro() {
     this.formGroup.get("timer")?.setValue(this.pomodoro.pomodoroDuration)
-    return this.apiService
+    this.apiService
       .putPomodoro(
         this.sessionService.getSession()!.user.username!,
         this.pomodoro,
@@ -164,14 +172,21 @@ export class PomodoroComponent implements OnInit {
       )
       .subscribe({
         next: (response) => {
-            if(callback)
-                callback()
           console.log(response);
+          // Update the pomodoro object with the response
+          this.pomodoro = response as Pomodoro;
+          // Optionally update visual variables if needed
+          this.pomodoroVisuale = Number(this.pomodoro.pomodoroDuration) ? Number(this.pomodoro.pomodoroDuration) / 60 : 25;
+          this.shortBreakVisuale = Number(this.pomodoro.shortBreakDuration) ? Number(this.pomodoro.shortBreakDuration) / 60 : 5;
+          this.longBreakVisuale = Number(this.pomodoro.longBreakDuration) ? Number(this.pomodoro.longBreakDuration) / 60 : 15;
+          this.formGroup.get("timer")?.setValue(Number(this.pomodoro.pomodoroDuration) || 25 * 60);
+          this.updateKnobTime();
         },
         error: (error) => {
           console.log(error);
         },
       });
+
   }
 
   showDialog() {
@@ -194,7 +209,6 @@ export class PomodoroComponent implements OnInit {
 
     this.updateKnobTime();
     this.setUpTimer();
-    this.chiamataPomodoro();
   }
 
   set remaningTime(value: number) {
@@ -215,10 +229,9 @@ export class PomodoroComponent implements OnInit {
     }
   }
   skipTimer() {
-    this.pauses(() => {
-        this.stopTimer();
-        this.updateKnobTime();
-    })
+    this.pauses();
+    this.updateKnobTime();
+
   }
 
   setUpTimer() {
@@ -226,31 +239,31 @@ export class PomodoroComponent implements OnInit {
     this.stopTimer();
     this.startStop = 'START';
     this.pause = false;
-    this.pomodoro.pomodoroType = 'pomodoro';
+    this.pomodoro.pomodoroType = "pomodoro";
     this.updateKnobTime();
     this.chiamataPomodoro();
   }
 
-  pauses(callback?: () => any) {
+  pauses() {
     if (!this.pause) {
       if (this.pomodoro.pomodoroNumber % this.pomodoro.longBreakInterval == 0) {
         this.remaningTime = this.pomodoro.longBreakDuration;
         this.knobTIME = this.pomodoro.longBreakDuration;
-        this.pomodoro.pomodoroType = 'longBreak';
+        this.pomodoro.pomodoroType = "longBreak";
       } else {
         this.remaningTime = this.pomodoro.shortBreakDuration;
         this.knobTIME = this.pomodoro.shortBreakDuration;
-        this.pomodoro.pomodoroType = 'shortBreak';
+        this.pomodoro.pomodoroType = "shortBreak";
       }
       this.pomodoro.pomodoroNumber++;
     } else {
       this.remaningTime = this.pomodoro.pomodoroDuration;
       this.knobTIME = this.pomodoro.pomodoroDuration;
-      this.pomodoro.pomodoroType = 'pomodoro';
+      this.pomodoro.pomodoroType = "pomodoro";
     }
     this.startStop = 'START';
     this.pause = !this.pause;
-    return this.chiamataPomodoro(callback);
+    this.chiamataPomodoro();
   }
 
   startTimer() {
@@ -292,12 +305,16 @@ export class PomodoroComponent implements OnInit {
   }
 
   updateKnobTime() {
-    if (this.pomodoro.pomodoroType === 'pomodoro') {
+    
+    if (this.pomodoro.pomodoroType == 'pomodoro') {
       this.knobTIME = this.pomodoro.pomodoroDuration;
-    } else if (this.pomodoro.pomodoroType === 'shortBreak') {
+      this.formGroup.get('timer')?.setValue(this.pomodoro.pomodoroDuration);
+    } else if (this.pomodoro.pomodoroType == 'shortBreak') {
       this.knobTIME = this.pomodoro.shortBreakDuration;
-    } else if (this.pomodoro.pomodoroType === 'longBreak') {
+      this.formGroup.get('timer')?.setValue(this.pomodoro.shortBreakDuration);
+    } else if (this.pomodoro.pomodoroType == 'longBreak') {
       this.knobTIME = this.pomodoro.longBreakDuration;
+      this.formGroup.get('timer')?.setValue(this.pomodoro.longBreakDuration);
     }
   }
 
@@ -310,6 +327,9 @@ export class PomodoroComponent implements OnInit {
   }
 
   addTask() {
+    if(this.newTaskName == '') {
+      return;
+    }
     if (this.newTaskName.trim()) {
       this.tasks.push({
         id: this.tasks.length + 1,
@@ -321,12 +341,19 @@ export class PomodoroComponent implements OnInit {
     this.apiService
       .pushTask(
         this.sessionService.getSession()!.user.username!,
-        this.tasks,
+        [this.tasks[this.tasks.length - 1]],
         this.sessionService.getSession()!.token!
       )
       .subscribe({
         next: (response) => {
           console.log(response);
+          var i = 0;
+          this.tasks = (response as TaskDTO[]).map((it) => ({
+            id: i++,
+            _id: it._id,
+            name: it.taskName,
+            completed: it.taskCompleted,
+          }));
         },
         error: (error) => {
           console.log(error);
@@ -359,7 +386,28 @@ export class PomodoroComponent implements OnInit {
     this.apiService
       .putTask(
         this.sessionService.getSession()!.user.username!,
-        this.tasks,
+        [this.tasks[index]],
+        this.sessionService.getSession()!.token!
+      )
+      .subscribe({
+        next: (response) => {
+          console.log(response);
+        },
+        error: (error) => {
+          console.log(error);
+        },
+      });
+  }
+
+  onTaskNameEdit(taskid: any, $event: any) {
+    const task = this.tasks.find((task) => task.id === taskid);
+    if (!task) {
+      return;
+    }
+    this.apiService
+      .putTask(
+        this.sessionService.getSession()!.user.username!,
+        [task],
         this.sessionService.getSession()!.token!
       )
       .subscribe({
@@ -382,22 +430,31 @@ export class PomodoroComponent implements OnInit {
       ' ' +
       now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     this.pomodoroHistory.push({
+      id: this.pomodoroHistory.length + 1,
       pomodoroNumber: this.pomodoro.pomodoroNumber,
       taskCompleted: this.completedTasks,
       date: dateCompleted,
+      
     });
     this.pomodoro.pomodoroNumber = 1;
     this.completedTasks = 0;
     this.setUpTimer();
     this.apiService
-      .pushStudySessions(
+      .putStudySession(
         this.sessionService.getSession()!.user.username!,
-        this.pomodoroHistory[this.pomodoroHistory.length - 1],
+        [this.pomodoroHistory[this.pomodoroHistory.length - 1]],
         this.sessionService.getSession()!.token!
       )
       .subscribe({
         next: (response) => {
           console.log(response);
+          this.pomodoroHistory = (response as StudySessionDTO[]).map((it) => ({
+            id: this.pomodoroHistory.length + 1,
+            _id: it._id,
+            pomodoroNumber: it.pomodoroNumber,
+            taskCompleted: it.taskCompleted,
+            date: it.date,
+          }));
         },
         error: (error) => {
           console.log(error);
@@ -410,9 +467,8 @@ export class PomodoroComponent implements OnInit {
     this.apiService
       .deleteStudySession(
         this.sessionService.getSession()!.user.username!,
-        this.pomodoroHistory,
         this.sessionService.getSession()!.token!,
-        index
+        this.pomodoroHistory[index]!._id!
       )
       .subscribe({
         next: (response) => {

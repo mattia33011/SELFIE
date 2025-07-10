@@ -19,6 +19,7 @@ export type Note = {
     parent: Note,
     droppableNode: boolean,
     lastEdit: Date,
+    _id?: string
 }
 
 

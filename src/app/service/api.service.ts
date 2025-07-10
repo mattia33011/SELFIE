@@ -8,8 +8,9 @@ import {
 import { Session, User } from '../../types/session';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Events, Notes } from '../../types/events';
-import { Task, TaskDTO } from '../../types/pomodoro';
+import { Events, Note, Notes } from '../../types/events';
+import { Pomodoro, StudySession, Task, TaskDTO } from '../../types/pomodoro';
+import { _ } from '@ngx-translate/core';
 import { Project, TaskStatus } from '../../types/project';
 
 @Injectable({
@@ -91,9 +92,20 @@ export class ApiService {
     });
   }
 
-  pushNote(userID: string, note: Notes, token: string) {
-    return this.http.post(`${this.baseUrl}/users/${userID}/notes`, note, {
-      headers: { authorization: this.resolveBearerToken(token) },
+  pushNote(userID: string, notes: Notes, token: string) {
+    const mappedNote = notes.map((note: any) => ({
+      label: note.label,
+      expanded: note.expanded,
+      content: note.content,
+      icon: note.icon,
+      children: note.children,
+      type: note.type,
+      parent: note.parent,
+      droppableNode: note.droppableNode,
+      lastEdit: note.lastEdit,
+    }));
+    return this.http.post(`${this.baseUrl}/users/${userID}/notes`, mappedNote, {
+      headers: {authorization: this.resolveBearerToken(token)},
     });
   }
 
@@ -122,28 +134,32 @@ export class ApiService {
       }
     );
   }
-  pushStudySessions(userID: string, pomodoroHistory: any, token: string) {
-    return this.http.post(
-      `${this.baseUrl}/users/${userID}/pomodoro/oldSessions`,
-      pomodoroHistory,
-      {
-        headers: { authorization: this.resolveBearerToken(token) },
-      }
-    );
+  pushStudySessions(userID: string, pomodoroHistory: StudySession[], token: string ) {
+    const mappedSession = pomodoroHistory.map((session: StudySession) => ({
+      pomodoroNumber: session.pomodoroNumber,
+      taskCompleted: session.taskCompleted,
+      date: session.date,
+    }));
+    return this.http.put(`${this.baseUrl}/users/${userID}/pomodoro/oldSessions`, mappedSession, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+  putStudySession(userID: string, sessions: StudySession[], token: string) {
+    const mappedSession = sessions.map((session: StudySession) => ({
+      _id: session._id,
+      pomodoroNumber: session.pomodoroNumber,
+      taskCompleted: session.taskCompleted,
+      date: session.date,
+    }));
+    return this.http.put(`${this.baseUrl}/users/${userID}/pomodoro/oldSessions`, mappedSession, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
   }
 
-  deleteStudySession(
-    userID: string,
-    pomodoroHistory: any,
-    token: string,
-    indexSession: number
-  ) {
-    return this.http.delete(
-      `${this.baseUrl}/users/${userID}/pomodoro/oldStudySession/${indexSession}`,
-      {
-        headers: { authorization: this.resolveBearerToken(token) },
-      }
-    );
+  deleteStudySession(userID: string, token: string, indexSession: string) {
+    return this.http.delete(`${this.baseUrl}/users/${userID}/pomodoro/oldSessions/${indexSession}`, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
   }
 
   //api per le task
@@ -156,7 +172,9 @@ export class ApiService {
     );
   }
   putTask(userID: string, tasks: Task[], token: string) {
-    const mappedTask = tasks.map((task) => ({
+
+    const mappedTask = tasks.map(task => ({
+      _id: task._id,
       taskName: task.name,
       taskStatus: task.completed ? 'completed' : 'pending',
       taskCompleted: task.completed,
@@ -194,14 +212,14 @@ export class ApiService {
     );
   }
 
-  getPomodoro(userID: string, token: string) {
-    return this.http.get(`${this.baseUrl}/users/${userID}/pomodoro`, {
-      headers: { authorization: this.resolveBearerToken(token) },
+  getPomodoro(userID: string, pomodoroId: string, token: string) {
+    return this.http.get(`${this.baseUrl}/users/${userID}/pomodoro/pomodoroinfo/${pomodoroId}`, {
+      headers: {authorization: this.resolveBearerToken(token)},
     });
   }
-  putPomodoro(userID: string, pomodoro: any, token: string) {
-    return this.http.put(`${this.baseUrl}/users/${userID}/pomodoro`, pomodoro, {
-      headers: { authorization: this.resolveBearerToken(token) },
+  putPomodoro(userID: string, pomodoro: Pomodoro, token: string) {
+    return this.http.put(`${this.baseUrl}/users/${userID}/pomodoro/pomodoroinfo`, pomodoro, {
+      headers: {authorization: this.resolveBearerToken(token)},
     });
   }
 

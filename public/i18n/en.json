@@ -120,7 +120,11 @@
     "numbertaskCompleted": "Tasks completed",
     "numberPomodoroCompleted": "Pomodoros completed",
     "endSession": "End session",
-    "dateCompleted": "Date"
+    "dateCompleted": "Date",
+    "pomodoroFinished": "Pomodoro finished",
+    "pomodoroDesc": "Time to rest!",
+    "breakFinished": "Break finished",
+    "breakDesc": "Time to work!"
   },
   "note":{
     "newFolder": "New Folder",

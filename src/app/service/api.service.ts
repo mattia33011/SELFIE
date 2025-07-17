@@ -74,47 +74,33 @@ export class ApiService {
     });
   }
 
-  getNotes(userID: string, token: string, dateFilter?: Date) {
-    return this.http.get<Notes>(`${this.baseUrl}/users/${userID}/notes`, {
-      headers: { authorization: this.resolveBearerToken(token) },
-    })
-    .pipe(
-      map((notes) =>
-        notes.map((note) => ({
-          label : note.label,
-          author: note.author,
-          members: note.members,
-          expanded: note.expanded,
-          content: note.content,
-          icon: note.icon,
-          children: note.children,
-          type: note.type,
-          parent: note.parent,
-          droppableNode: note.droppableNode,
-          lastEdit: note.lastEdit,
-          _id: note._id,
-        }))
-      )
+getNotes(userID: string, token: string) {
+    return this.http.get<any>(`${this.baseUrl}/users/${userID}/notes`, {
+        headers: { authorization: this.resolveBearerToken(token) }
+    }).pipe(
+        map(response => {
+            const notesArray = Array.isArray(response) ? response : Object.values(response);
+            
+            return notesArray.map((note: any) => ({
+                key: note._id,
+                label: note.label,
+                author: note.author,
+                members: note.members,
+                parent: note.parent,
+                data: note.content,
+                icon: note.icon,
+                children: note.children ,
+                type: note.type,
+                expanded: note.expanded,
+                _id: note._id?.$oid,
+                lastEdit: note.lastEdit
+            }));
+        })
     );
-    /*
-    const params = dateFilter
-      ? {
-          dateFilter: dateFilter.toString(),
-        }
-      : undefined;
-    return this.http.get<Notes>(`${this.baseUrl}/users/${userID}/notes`, {
-      headers: { authorization: this.resolveBearerToken(token) },
-      params: params,
-    });
-  }
+}
 
-  putNote(userID: string, note: Notes, token: string) {
-    return this.http.put(`${this.baseUrl}/users/${userID}/notes`, note, {
-      headers: { authorization: this.resolveBearerToken(token) },
-    });
-    */
-  }
 
+  
   pushNote(userID: string, notes: Notes, token: string) {
     const mappedNote = notes.map((note: any) => ({
       label: note.label,

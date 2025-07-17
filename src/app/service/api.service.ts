@@ -75,6 +75,28 @@ export class ApiService {
   }
 
   getNotes(userID: string, token: string, dateFilter?: Date) {
+    return this.http.get<Notes>(`${this.baseUrl}/users/${userID}/notes`, {
+      headers: { authorization: this.resolveBearerToken(token) },
+    })
+    .pipe(
+      map((notes) =>
+        notes.map((note) => ({
+          label : note.label,
+          author: note.author,
+          members: note.members,
+          expanded: note.expanded,
+          content: note.content,
+          icon: note.icon,
+          children: note.children,
+          type: note.type,
+          parent: note.parent,
+          droppableNode: note.droppableNode,
+          lastEdit: note.lastEdit,
+          _id: note._id,
+        }))
+      )
+    );
+    /*
     const params = dateFilter
       ? {
           dateFilter: dateFilter.toString(),
@@ -90,11 +112,14 @@ export class ApiService {
     return this.http.put(`${this.baseUrl}/users/${userID}/notes`, note, {
       headers: { authorization: this.resolveBearerToken(token) },
     });
+    */
   }
 
   pushNote(userID: string, notes: Notes, token: string) {
     const mappedNote = notes.map((note: any) => ({
       label: note.label,
+      author: note.author,
+      members: note.members,
       expanded: note.expanded,
       content: note.content,
       icon: note.icon,
@@ -115,6 +140,13 @@ export class ApiService {
       {
         headers: { authorization: this.resolveBearerToken(token) },
       }
+    ). pipe(
+      map((notes) =>
+        notes.map((note) => ({
+          ...note,
+          lastEdit: new Date(note.lastEdit),
+        }))
+      )
     );
   }
 

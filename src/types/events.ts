@@ -11,11 +11,13 @@ export type Notes = Note[]
 
 export type Note = {
     label: string, 
+    author: string,
+    members: string[], 
     expanded: boolean,
     content: string,
     type: string,
     icon: string,
-    children: Notes,
+    children: any[],
     parent: Note,
     droppableNode: boolean,
     lastEdit: Date,

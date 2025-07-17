@@ -42,19 +42,30 @@ export class NoteComponent {
     value: string | undefined;
     selectedNote: any = null;
     selectedFiles!: TreeNode[];
-    files: any[] = [];
+    files: Note[] = [];
 
     ngOnInit(): void {
+        
         forkJoin([
             this.apiService.getNotes(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!)
             ]).subscribe({
             next: (response) => {
-                if (response[0]) {
-                    this.files.push(...response[0].map(it => ({
-                        ...it,
-                        lastEdit: stringToDate(it.lastEdit.toString())
-                    })));
-                }
+                this.files= response[0].map((note: Note) => ({
+                    label: note.label,
+                    author: note.author,
+                    members: note.members,
+                    expanded: note.expanded,
+                    content: note.content,
+                    icon: note.icon,
+                    children: note.children,
+                    type: note.type,
+                    parent: note.parent,
+                    droppableNode: note.droppableNode,
+                    lastEdit: note.lastEdit,
+                    _id: note._id,
+                }));
+                this.recentNotes = this.files.filter(note => note.type === 'note').map(note => note.label);
+
             },
             error: (error) => {
                 console.log(error)
@@ -92,12 +103,14 @@ export class NoteComponent {
 
 
     addFolder(parentNode: TreeNode | null = null) {
-        if (this.value == null) {
+        if (this.value == null || this.value.trim() === '') {
             alert("Inserire un nome per la cartella");
             return;
         }
         const newFolder: Note = {
             label: this.value,
+            author: this.sessionService.getSession()!.user.username!,
+            members: [],
             expanded: true,
             content: '',
             type: 'folder',
@@ -116,8 +129,8 @@ export class NoteComponent {
         } else {
             this.files.push(newFolder);
         }
-        this.updateStructure();
-        /*
+        //this.updateStructure();
+        
         this.apiService.pushNote(
                     this.sessionService.getSession()!.user.username!, 
                     [newFolder], 
@@ -130,16 +143,18 @@ export class NoteComponent {
                 console.log(error);
             },
         });
-        */
+        this.value = ''; // Clear the input field after adding
     }
 
     addNote() {
-        if (this.value == null) {
+        if (this.value == null || this.value.trim() === '') {
             alert("Inserire un nome per la nota");
             return;
         }
         const newNote: Note =    {
-            label: this.value, 
+            label: this.value,
+            author: this.sessionService.getSession()!.user.username!,
+            members: [],
             expanded: true,
             content: 'Scrivi qui...',
             type: 'note',
@@ -157,8 +172,8 @@ export class NoteComponent {
         } else {
             this.files.push(newNote);
         }
-        this.updateStructure();
-        /*
+        //this.updateStructure();
+        
         this.apiService.pushNote(this.sessionService.getSession()!.user.username!, [newNote], this.sessionService.getSession()!.token!).subscribe({
             next: (response) => {
                 console.log(response);
@@ -167,7 +182,7 @@ export class NoteComponent {
                 console.log(error);
             },
         });
-        */
+        this.value = ''; // Clear the input field after adding
     }
     updateStructure(){
         this.apiService.pushNote(this.sessionService.getSession()!.user.username!, this.files, this.sessionService.getSession()!.token!).subscribe({
@@ -184,13 +199,13 @@ export class NoteComponent {
         if (this.selectedNote) {
             this.selectedNote.content = this.text;
             this.recentNotes.push(this.selectedNote.label);
-            this.selectedNote.lastEdit = new Date();
+            this.selectedNote.lastEdit = Date();
             if (this.recentNotes.length > 5) {
                 this.recentNotes.shift(); // vogliamo al massimo 5 note
             }
-            this.updateStructure();
-            /*
-            this.apiService.putNote(this.sessionService.getSession()!.user.username!, this.selectedNote, this.sessionService.getSession()!.token!).subscribe({
+            //this.updateStructure();
+            
+            this.apiService.pushNote(this.sessionService.getSession()!.user.username!, this.selectedNote, this.sessionService.getSession()!.token!).subscribe({
                 next: (response) => {
                     console.log(response);
                 },
@@ -198,7 +213,7 @@ export class NoteComponent {
                     console.log(error);
                 },
             });
-            */
+            
         }
     }
 
@@ -218,8 +233,8 @@ export class NoteComponent {
             }
             this.selectedNote = null;
             this.text = '';
-            this.updateStructure();
-            /*
+            //this.updateStructure();
+            
             this.apiService.deleteNote(this.sessionService.getSession()!.user.username!, this.selectedNote, this.sessionService.getSession()!.token!).subscribe({
                 next: (response) => {
                     console.log(response);
@@ -228,7 +243,7 @@ export class NoteComponent {
                     console.log(error);
                 },
             });
-            */
+            
         }
     }
 }

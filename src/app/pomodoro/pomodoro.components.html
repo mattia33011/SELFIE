@@ -51,6 +51,8 @@
                     </p>
                 </div>
 
+                <p-toast/>
+
                 <!-- Manteniamo valueTemplate per il formato -->
                 <p-knob formControlName="timer" [readonly]="true" [max]="knobTIME" [valueTemplate]="formattedTimer" />
                 <p>#{{ pomodoro.pomodoroNumber }}</p>

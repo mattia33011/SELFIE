@@ -74,27 +74,38 @@ export class ApiService {
     });
   }
 
-  getNotes(userID: string, token: string, dateFilter?: Date) {
-    const params = dateFilter
-      ? {
-          dateFilter: dateFilter.toString(),
-        }
-      : undefined;
-    return this.http.get<Notes>(`${this.baseUrl}/users/${userID}/notes`, {
-      headers: { authorization: this.resolveBearerToken(token) },
-      params: params,
-    });
-  }
+getNotes(userID: string, token: string) {
+    return this.http.get<any>(`${this.baseUrl}/users/${userID}/notes`, {
+        headers: { authorization: this.resolveBearerToken(token) }
+    }).pipe(
+        map(response => {
+            const notesArray = Array.isArray(response) ? response : Object.values(response);
+            
+            return notesArray.map((note: any) => ({
+                key: note._id,
+                label: note.label,
+                author: note.author,
+                members: note.members,
+                parent: note.parent,
+                data: note.content,
+                icon: note.icon,
+                children: note.children ,
+                type: note.type,
+                expanded: note.expanded,
+                _id: note._id?.$oid,
+                lastEdit: note.lastEdit
+            }));
+        })
+    );
+}
 
-  putNote(userID: string, note: Notes, token: string) {
-    return this.http.put(`${this.baseUrl}/users/${userID}/notes`, note, {
-      headers: { authorization: this.resolveBearerToken(token) },
-    });
-  }
 
+  
   pushNote(userID: string, notes: Notes, token: string) {
     const mappedNote = notes.map((note: any) => ({
       label: note.label,
+      author: note.author,
+      members: note.members,
       expanded: note.expanded,
       content: note.content,
       icon: note.icon,
@@ -115,6 +126,13 @@ export class ApiService {
       {
         headers: { authorization: this.resolveBearerToken(token) },
       }
+    ). pipe(
+      map((notes) =>
+        notes.map((note) => ({
+          ...note,
+          lastEdit: new Date(note.lastEdit),
+        }))
+      )
     );
   }
 

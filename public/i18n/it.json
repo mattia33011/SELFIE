@@ -121,7 +121,11 @@
     "numbertaskCompleted": "Task completate",
     "numberPomodoroCompleted": "Pomodoro completati",
     "endSession": "Termina sessione",
-    "dateCompleted": "Data"
+    "dateCompleted": "Data",
+    "pomodoroFinished": "Pomodoro finito",
+    "pomodoroDesc": "Tempo di rilassarsi!",
+    "breakFinished": "Pausa finita",
+    "breakDesc": "Tempo di lavorare!"
   },
   "note": {
     "newFolder": "Nuova cartella",

@@ -23,6 +23,7 @@ import { SessionService } from '../service/session.service';
 import { forkJoin, Observable } from 'rxjs';
 import { ApiService } from '../service/api.service';
 import { stringToDate } from '../../utils/timeConverter';
+import { ToastModule } from 'primeng/toast';
 
 
 @Component({
@@ -44,6 +45,7 @@ import { stringToDate } from '../../utils/timeConverter';
     TableModule,
     DividerModule,
     DialogModule,
+    ToastModule
   ],
   templateUrl: './pomodoro.components.html',
   styleUrl: './pomodoro.components.css',
@@ -162,6 +164,22 @@ export class PomodoroComponent implements OnInit {
     });
   }
 
+  showNotification(type: string){
+    if (type== "pomodoro"){
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translateService.instant('pomodoro.pomodoroFinished'),
+        detail: this.translateService.instant('pomodoro.pomodoroDesc'),
+      });
+    }else{
+      this.messageService.add({
+        severity: 'info',
+        summary: this.translateService.instant('pomodoro.breakFinished'),
+        detail: this.translateService.instant('pomodoro.breakDesc'),
+      });
+    }
+  }
+
   chiamataPomodoro() {
     this.formGroup.get("timer")?.setValue(this.pomodoro.pomodoroDuration)
     this.apiService
@@ -250,16 +268,19 @@ export class PomodoroComponent implements OnInit {
         this.remaningTime = this.pomodoro.longBreakDuration;
         this.knobTIME = this.pomodoro.longBreakDuration;
         this.pomodoro.pomodoroType = "longBreak";
+        this.showNotification("pomodoro");
       } else {
         this.remaningTime = this.pomodoro.shortBreakDuration;
         this.knobTIME = this.pomodoro.shortBreakDuration;
         this.pomodoro.pomodoroType = "shortBreak";
+        this.showNotification("pomodoro");
       }
       this.pomodoro.pomodoroNumber++;
     } else {
       this.remaningTime = this.pomodoro.pomodoroDuration;
       this.knobTIME = this.pomodoro.pomodoroDuration;
       this.pomodoro.pomodoroType = "pomodoro";
+      this.showNotification("break");
     }
     this.startStop = 'START';
     this.pause = !this.pause;

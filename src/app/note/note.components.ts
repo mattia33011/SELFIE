@@ -98,7 +98,10 @@ ngOnInit(): void {
     }
 
     private _overrideAllowDrop(dragNode: any, dropNode: any, dragNodeScope: any): boolean {
-        return dropNode.type === 'folder'; // Example: Only allow dropping on folders
+        if (!dropNode) {
+            return true; 
+        }
+        return dropNode.type === 'folder';
     }
     openNote(event: any) {
         if (event.node.type === 'note') {
@@ -309,4 +312,11 @@ duplicateNote(note: Note) {
             
         }
     }
+
+onNodeDrop(event: any): void {
+    
+}
+
+
+
 }

@@ -269,9 +269,10 @@ duplicateNote(note: Note) {
             if (this.recentNotes.length > 5) {
                 this.recentNotes.shift(); // vogliamo al massimo 5 note
             }
+
             //this.updateStructure();
             
-            this.apiService.pushNote(this.sessionService.getSession()!.user.username!, this.selectedNote, this.sessionService.getSession()!.token!).subscribe({
+            this.apiService.pushNote(this.sessionService.getSession()!.user.username!, [this.selectedNote], this.sessionService.getSession()!.token!).subscribe({
                 next: (response) => {
                     console.log(response);
                 },
@@ -297,9 +298,6 @@ duplicateNote(note: Note) {
                     this.files.splice(index, 1);
                 }
             }
-            this.selectedNote = null;
-            this.text = '';
-            //this.updateStructure();
             
             this.apiService.deleteNote(this.sessionService.getSession()!.user.username!, this.selectedNote, this.sessionService.getSession()!.token!).subscribe({
                 next: (response) => {
@@ -309,6 +307,8 @@ duplicateNote(note: Note) {
                     console.log(error);
                 },
             });
+            this.selectedNote = null;
+            this.text = '';
             
         }
     }

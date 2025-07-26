@@ -82,7 +82,6 @@ getNotes(userID: string, token: string) {
             const notesArray = Array.isArray(response) ? response : Object.values(response);
             
             return notesArray.map((note: any) => ({
-                key: note._id,
                 label: note.label,
                 author: note.author,
                 members: note.members,
@@ -92,7 +91,7 @@ getNotes(userID: string, token: string) {
                 children: note.children ,
                 type: note.type,
                 expanded: note.expanded,
-                _id: note._id?.$oid,
+                _id: note._id,
                 lastEdit: note.lastEdit
             }));
         })
@@ -115,7 +114,7 @@ getNotes(userID: string, token: string) {
       droppableNode: note.droppableNode,
       lastEdit: note.lastEdit,
     }));
-    return this.http.post(`${this.baseUrl}/users/${userID}/notes`, mappedNote, {
+    return this.http.put(`${this.baseUrl}/users/${userID}/notes`, mappedNote, {
       headers: {authorization: this.resolveBearerToken(token)},
     });
   }
@@ -136,8 +135,8 @@ getNotes(userID: string, token: string) {
     );
   }
 
-  deleteNote(userID: string, note: Notes, token: string) {
-    return this.http.delete(`${this.baseUrl}/users/${userID}/notes/${note}`, {
+  deleteNote(userID: string, note: Note, token: string) {
+    return this.http.delete(`${this.baseUrl}/users/${userID}/notes/${note._id}`, {
       headers: { authorization: this.resolveBearerToken(token) },
     });
   }

@@ -106,7 +106,6 @@ export class PomodoroComponent implements OnInit {
     protected readonly sessionService: SessionService
   ) {
     this.remaningTime = this.pomodoro.pomodoroDuration;
-    
   }
 
   ngOnInit() {
@@ -146,11 +145,21 @@ export class PomodoroComponent implements OnInit {
       )
       .subscribe({
       next: (response) => {
-          if(response != null) {
+        let aggiunta = response as Pomodoro;
+          if(aggiunta != null && aggiunta.pomodoroNumber != null && aggiunta.pomodoroType!= null){
             this.pomodoro  = response as Pomodoro;
-          }else(
-            this.chiamataPomodoro()
-          );
+            this.updateKnobTime();
+          }else{
+            this.pomodoro = {
+              pomodoroNumber: 1,
+              pomodoroType: 'pomodoro',
+              pomodoroDuration: 25 * 60,
+              shortBreakDuration: 5 * 60,
+              longBreakDuration: 15 * 60,
+              longBreakInterval: 4,
+              id: '1'
+            } as Pomodoro
+          };
         }}
         )
   }
@@ -177,23 +186,32 @@ export class PomodoroComponent implements OnInit {
         )}})
   }
 
-  showNotification(type: string){
-    if (type== "pomodoro"){
-      this.messageService.add({
-        severity: 'success',
-        summary: this.translateService.instant('pomodoro.pomodoroFinished'),
-        detail: this.translateService.instant('pomodoro.pomodoroDesc'),
-      });
-    }else{
-      this.messageService.add({
-        severity: 'info',
-        summary: this.translateService.instant('pomodoro.breakFinished'),
-        detail: this.translateService.instant('pomodoro.breakDesc'),
-      });
+showNotification(type: string) {
+  try {
+    if (!this.messageService) {
+      console.error('MessageService is not available');
+      return;
     }
+
+    const keys = type === "pomodoro"
+      ? ['pomodoro.pomodoroFinished', 'pomodoro.pomodoroDesc']
+      : ['pomodoro.breakFinished', 'pomodoro.breakDesc'];
+
+    this.translateService.get(keys).subscribe(translations => {
+      this.messageService.add({
+        severity: type === "pomodoro" ? 'success' : 'info',
+        summary: translations[keys[0]],
+        detail: translations[keys[1]],
+        life: 3000
+      });
+    });
+  } catch (error) {
+    console.error('Error showing notification:', error);
   }
+}
 
   chiamataPomodoro() {
+
     this.apiService
       .putPomodoro(
         this.sessionService.getSession()!.user.username!,
@@ -203,13 +221,6 @@ export class PomodoroComponent implements OnInit {
       .subscribe({
         next: (response) => {
           console.log(response);
-          /*
-          this.pomodoro = response as Pomodoro;
-          this.pomodoroVisuale = Number(this.pomodoro.pomodoroDuration) ? Number(this.pomodoro.pomodoroDuration) / 60 : 25;
-          this.shortBreakVisuale = Number(this.pomodoro.shortBreakDuration) ? Number(this.pomodoro.shortBreakDuration) / 60 : 5;
-          this.longBreakVisuale = Number(this.pomodoro.longBreakDuration) ? Number(this.pomodoro.longBreakDuration) / 60 : 15;
-          this.formGroup.get("timer")?.setValue(Number(this.pomodoro.pomodoroDuration) || 25 * 60);
-          */
         },
         error: (error) => {
           console.log(error);
@@ -256,6 +267,7 @@ export class PomodoroComponent implements OnInit {
     }
   }
   skipTimer() {
+    this.stopTimer();
     this.pauses();
     this.updateKnobTime();
 
@@ -491,15 +503,18 @@ export class PomodoroComponent implements OnInit {
           console.log(error);
         },
       });
+      console.log(this.pomodoroHistory[0]._id);
   }
 
   removeSession(index: number) {
+    const sessionToDelete = this.pomodoroHistory[index];
     this.pomodoroHistory.splice(index, 1);
+    
     this.apiService
       .deleteStudySession(
         this.sessionService.getSession()!.user.username!,
         this.sessionService.getSession()!.token!,
-        this.pomodoroHistory[index]!._id!
+        sessionToDelete._id!
       )
       .subscribe({
         next: (response) => {
@@ -507,10 +522,10 @@ export class PomodoroComponent implements OnInit {
         },
         error: (error) => {
           console.log(error);
+          this.pomodoroHistory.splice(index, 0, sessionToDelete);
         },
       });
   }
-
   //PARTE DEI CICLI!
 
   //to-do: programmare dei cicli di studio

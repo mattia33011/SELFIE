@@ -124,6 +124,10 @@ export const TRANSLATIONS = {
       numberPomodoroCompleted: 'Pomodoro completati',
       endSession: 'Termina sessione',
       dateCompleted: 'Data',
+      pomodoroFinished: 'Pomodoro terminato',
+      pomodoroDesc: 'È tempo di riposare!',
+      breakFinished: 'Pausa terminata',
+      breakDesc: 'È tempo di lavorare!',
     },
     note: {
       newFolder: 'Nuova cartella',
@@ -342,6 +346,10 @@ export const TRANSLATIONS = {
       numberPomodoroCompleted: 'Pomodoros completed',
       endSession: 'End session',
       dateCompleted: 'Date',
+      pomodoroFinished: 'Pomodoro finished',
+      pomodoroDesc: "Time to rest!",
+      breakFinished: 'Break finished',
+      breakDesc: "Time to work!",
     },
     note: {
       newFolder: 'New Folder',

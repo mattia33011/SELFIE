@@ -60,6 +60,7 @@ export class NoteComponent {
     ];
 
 ngOnInit(): void {
+    
     this.apiService.getNotes(
         this.sessionService.getSession()!.user.username!,
         this.sessionService.getSession()!.token!

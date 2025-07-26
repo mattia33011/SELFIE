@@ -12,6 +12,7 @@ export type TaskDTO = {
   taskCompleted: boolean;
 };
 
+
 export type StudySession ={
   id: number,
   pomodoroNumber: number,

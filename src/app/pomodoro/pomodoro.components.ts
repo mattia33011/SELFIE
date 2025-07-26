@@ -114,36 +114,54 @@ export class PomodoroComponent implements OnInit {
       timer: this.pomodoro.pomodoroDuration,
     });
 
-    forkJoin([
-      this.apiService.getTasks(
+    this.loadTasks();
+    this.loadPomodoro();
+    this.loadSessions();
+  }
+
+  loadTasks(){
+     this.apiService.getTasks(
         this.sessionService.getSession()!.user.username!,
         this.sessionService.getSession()!.token!
-      ),
-      
-      this.apiService.getPomodoro(
-        this.sessionService.getSession()!.user.username!,
-        '1',
-        this.sessionService.getSession()!.token!
-      ),
-      this.apiService.getStudySessions(
-        this.sessionService.getSession()!.user.username!,
-        this.sessionService.getSession()!.token!
-      ),
-    ]).subscribe({
+      ).subscribe({
       next: (response) => {
           let i = 0;
           this.tasks.push(
-            ...(response[0] as TaskDTO[]).map((it) => ({
+            ...(response as TaskDTO[]).map((it) => ({
               id: i++,
               _id: it._id,
               name: it.taskName,
               completed: it.taskCompleted,
             }))
+
+          );}}
+        )
+      }
+
+  loadPomodoro(){
+     this.apiService.getPomodoro(
+        this.sessionService.getSession()!.user.username!,
+        this.pomodoro.id,
+        this.sessionService.getSession()!.token!
+      )
+      .subscribe({
+      next: (response) => {
+          if(response != null) {
+            this.pomodoro  = response as Pomodoro;
+          }else(
+            this.chiamataPomodoro()
           );
-          if(response[1] != null) {
-            this.pomodoro  = response[1] as Pomodoro;
-          }
-          this.pomodoroHistory = (response[2] as {
+        }}
+        )
+  }
+
+  loadSessions(){
+    this.apiService.getStudySessions(
+        this.sessionService.getSession()!.user.username!,
+        this.sessionService.getSession()!.token!
+      ).subscribe({
+      next: (response) => {
+          this.pomodoroHistory = (response as {
             id: number;
             pomodoroNumber: number;
             taskCompleted: number;
@@ -155,13 +173,8 @@ export class PomodoroComponent implements OnInit {
             taskCompleted: it.taskCompleted,
             date: it.date,
             _id: it._id
-          }))
-          
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
+          })
+        )}})
   }
 
   showNotification(type: string){
@@ -181,7 +194,6 @@ export class PomodoroComponent implements OnInit {
   }
 
   chiamataPomodoro() {
-    this.formGroup.get("timer")?.setValue(this.pomodoro.pomodoroDuration)
     this.apiService
       .putPomodoro(
         this.sessionService.getSession()!.user.username!,
@@ -191,14 +203,13 @@ export class PomodoroComponent implements OnInit {
       .subscribe({
         next: (response) => {
           console.log(response);
-          // Update the pomodoro object with the response
+          /*
           this.pomodoro = response as Pomodoro;
-          // Optionally update visual variables if needed
           this.pomodoroVisuale = Number(this.pomodoro.pomodoroDuration) ? Number(this.pomodoro.pomodoroDuration) / 60 : 25;
           this.shortBreakVisuale = Number(this.pomodoro.shortBreakDuration) ? Number(this.pomodoro.shortBreakDuration) / 60 : 5;
           this.longBreakVisuale = Number(this.pomodoro.longBreakDuration) ? Number(this.pomodoro.longBreakDuration) / 60 : 15;
           this.formGroup.get("timer")?.setValue(Number(this.pomodoro.pomodoroDuration) || 25 * 60);
-          this.updateKnobTime();
+          */
         },
         error: (error) => {
           console.log(error);
@@ -224,8 +235,6 @@ export class PomodoroComponent implements OnInit {
     this.formGroup.patchValue({
       timer: this.pomodoro.pomodoroDuration,
     });
-
-    this.updateKnobTime();
     this.setUpTimer();
   }
 
@@ -284,6 +293,7 @@ export class PomodoroComponent implements OnInit {
     }
     this.startStop = 'START';
     this.pause = !this.pause;
+    this.updateKnobTime();
     this.chiamataPomodoro();
   }
 
@@ -500,4 +510,10 @@ export class PomodoroComponent implements OnInit {
         },
       });
   }
+
+  //PARTE DEI CICLI!
+
+  //to-do: programmare dei cicli di studio
+  //input: quante ore devi studiare? (te lo fa in multipli di 5) e ti da un output con 2 diverse opzioni? cicli da 20-5-10 oppure da 30-10-15
+
 }

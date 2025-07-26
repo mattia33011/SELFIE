@@ -1,5 +1,17 @@
 # Selfie
 
+## How to deploy
+
+to build the frontend run:
+
+```bash
+ng build --configuration production
+```
+
+then it will generate dist folder and inside it there will be anothe folder called selfie/browser
+
+copy the folder "browser" inside the backend src/ folder and rename it as "frontend"
+
 ### LINK BUILD
 https://mega.nz/folder/yR0BRZwD#PRcUA4VTMjD1h29MEBYgVg
 

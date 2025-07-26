@@ -105,7 +105,7 @@ export class ProfileComponent {
   onFileChange(event: any) {
     const file = event.target.files[0] as File | undefined;
     if (!file) return;
-    if(file.size > 5000000){
+    if(file.size > 1000000){
       onMessageSubject.next({severity: 'warn', summary: this.translateService.instant('http.warning'), detail: this.translateService.instant('profile.fileTooBig')})
       return;
     }

@@ -8,23 +8,19 @@ export type Event = {
   }
 
 export type Notes = Note[]
-
 export type Note = {
     label: string;
-    author: string;
-    members: string[];
     expanded: boolean;
     content: string;
     icon: string;
-    children: Note[];
+    children: string[];
     type: 'note' | 'folder';
-    parent: Note | string | null;
+    parent: string | null;
     droppableNode: boolean;
     lastEdit: Date;
-    _id?: string; // Riceveremo stringa dal backend
-    data?: string; // Per PrimeNG Tree
+    _id?: string;
+    data?: string;
 };
-
 export function isEvent(e: Event | Note): e is Event{
     if(!e)
       return false

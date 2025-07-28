@@ -83,8 +83,6 @@ getNotes(userID: string, token: string) {
             
             return notesArray.map((note: any) => ({
                 label: note.label,
-                author: note.author,
-                members: note.members,
                 parent: note.parent,
                 data: note.content,
                 icon: note.icon,
@@ -100,24 +98,22 @@ getNotes(userID: string, token: string) {
 
 
   
-  pushNote(userID: string, notes: Notes, token: string) {
-    const mappedNote = notes.map((note: any) => ({
+pushNote(userID: string, notes: Notes, token: string) {
+    const mappedNotes = notes.map((note: any) =>({
       label: note.label,
-      author: note.author,
-      members: note.members,
-      expanded: note.expanded,
-      content: note.content,
-      icon: note.icon,
-      children: note.children,
-      type: note.type,
-      parent: note.parent,
-      droppableNode: note.droppableNode,
-      lastEdit: note.lastEdit,
-    }));
-    return this.http.put(`${this.baseUrl}/users/${userID}/notes`, mappedNote, {
-      headers: {authorization: this.resolveBearerToken(token)},
+                parent: note.parent,
+                data: note.content,
+                icon: note.icon,
+                children: note.children ,
+                type: note.type,
+                expanded: note.expanded,
+                _id: note._id,
+                lastEdit: note.lastEdit
+    }) )
+    return this.http.put(`${this.baseUrl}/users/${userID}/notes`, mappedNotes, {
+        headers: {authorization: this.resolveBearerToken(token)},
     });
-  }
+}
 
   getRecentNotes(userID: string, token: string) {
     return this.http.get<Notes>(
@@ -135,8 +131,8 @@ getNotes(userID: string, token: string) {
     );
   }
 
-  deleteNote(userID: string, note: Note, token: string) {
-    return this.http.delete(`${this.baseUrl}/users/${userID}/notes/${note._id}`, {
+  deleteNote(userID: string, noteid: string, token: string) {
+    return this.http.delete(`${this.baseUrl}/users/${userID}/notes/${noteid}`, {
       headers: { authorization: this.resolveBearerToken(token) },
     });
   }

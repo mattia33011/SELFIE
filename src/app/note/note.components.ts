@@ -104,6 +104,10 @@ ngOnInit(): void {
         }
         return dropNode.type === 'folder';
     }
+    
+
+
+
     openNote(event: any) {
         if (event.node.type === 'note') {
             this.selectedNote = event.node;
@@ -113,67 +117,63 @@ ngOnInit(): void {
             this.text = '';
         }
     }
-    
+    /*
     onContextMenu(event: any, Note: Note) {
         this.selectedNote = Note;
         this.cm.show(event);
     }
+        */
     onHide() {
         this.selectedNote = null;
         this.text = '';
     }
 
 
-addFolder(parentNode: any = null) {  // Usa 'any' temporaneamente per evitare errori di tipo
+addFolder(parentNode: any = null) {
     if (!this.value || this.value.trim() === '') {
-        alert("Inserire un nome per la cartella");
+        alert("name cannot be empty");
         return;
+    }
+    if(this.selectedNote && this.selectedNote.type == 'folder') {
+        parentNode = this.selectedNote;
     }
 
     const newFolder: Note = {
         label: this.value,
-        author: this.sessionService.getSession()!.user.username!,
-        members: [],
         expanded: true,
         content: '',
         type: 'folder',
         icon: 'pi pi-folder',
         children: [],
-        parent: parentNode ? parentNode._id || parentNode.label : null, // Usa _id o label come fallback
+        parent: parentNode ? parentNode._id : null,
         droppableNode: true,
         lastEdit: new Date(),
     };
 
-    if (parentNode) {
-        if (!Array.isArray(parentNode.children)) {
-            parentNode.children = [];
-        }
-        parentNode.children.push(newFolder);
-    } else {
-        this.files.push(newFolder);
-    }
+    // Add to the appropriate parent or root
+    const targetArray = parentNode ? parentNode.children : this.files;
+    targetArray.push(newFolder);
 
     this.apiService.pushNote(
         this.sessionService.getSession()!.user.username!, 
         [newFolder], 
         this.sessionService.getSession()!.token!
     ).subscribe({
-        next: (response: any) => {  // Usa 'any' per la risposta
+        next: (response: any) => {
             if (response?.[0]?._id) {
                 newFolder._id = response[0]._id;
-                // Aggiorna riferimento nell'albero
-                const targetArray = parentNode ? parentNode.children : this.files;
-                const index = targetArray.findIndex((item: any) => item.label === newFolder.label);
-                if (index !== -1) {
-                    targetArray[index]._id = response[0]._id;
-                }
             }
+            if(newFolder.parent){
+                this.selectedNote.children.push(newFolder._id);
+                this.updateNote(this.selectedNote);
+            }
+            
         },
         error: (error) => console.error(error)
     });
+    
     this.value = '';
 }
-
 duplicateNote(note: Note) {
     if (!note) {
         console.error('No note selected for duplication');
@@ -181,8 +181,6 @@ duplicateNote(note: Note) {
     }
     const duplicatedNote: Note = {
         label: `${note.label} (Copy)`,
-        author: note.author,
-        members: [],
         expanded: note.expanded,
         content: note.content,
         icon: note.icon,
@@ -213,21 +211,22 @@ duplicateNote(note: Note) {
         error: (error) => console.error(error)
     });
 }
-    addNote() {
+    addNote(parentNode: any = null) {
         if (this.value == null || this.value.trim() === '') {
             alert("Inserire un nome per la nota");
             return;
         }
+         if(this.selectedNote && this.selectedNote.type == 'folder') {
+             parentNode = this.selectedNote;
+        }
         const newNote: Note =    {
             label: this.value,
-            author: this.sessionService.getSession()!.user.username!,
-            members: [],
             expanded: true,
             content: 'Scrivi qui...',
             type: 'note',
             icon: 'pi pi-clipboard',
             children: [],
-            parent: this.selectedNote ?? null,
+            parent: parentNode ? parentNode._id : null,
             droppableNode: false,
             lastEdit: new Date(),
         };
@@ -236,14 +235,24 @@ duplicateNote(note: Note) {
                 this.selectedNote.children = [];
             }
             this.selectedNote.children.push(newNote);
+            newNote.parent= this.selectedNote._id;
         } else {
             this.files.push(newNote);
         }
-        //this.updateStructure();
-        
-        this.apiService.pushNote(this.sessionService.getSession()!.user.username!, [newNote], this.sessionService.getSession()!.token!).subscribe({
+
+        this.apiService.pushNote(
+            this.sessionService.getSession()!.user.username!, 
+            [newNote], 
+            this.sessionService.getSession()!.token!
+        ).subscribe({
             next: (response) => {
                 console.log(response);
+                if(newNote.parent){
+                    this.selectedNote.children.push(newNote._id);
+                    this.updateNote(this.selectedNote);
+                }
+                
+
             },
             error: (error) => { 
                 console.log(error);
@@ -251,8 +260,8 @@ duplicateNote(note: Note) {
         });
         this.value = ''; // Clear the input field after adding
     }
-    updateStructure(){
-        this.apiService.pushNote(this.sessionService.getSession()!.user.username!, this.files, this.sessionService.getSession()!.token!).subscribe({
+    updateNote(noteUpdates: Note){
+        this.apiService.pushNote(this.sessionService.getSession()!.user.username!, [noteUpdates], this.sessionService.getSession()!.token!).subscribe({
             next: (response) => {
                 console.log(response);
             },
@@ -262,62 +271,189 @@ duplicateNote(note: Note) {
     }      );
     }
 
-    saveNote() {
-        if (this.selectedNote) {
-            this.selectedNote.content = this.text;
-            this.recentNotes.push(this.selectedNote.label);
-            this.selectedNote.lastEdit = Date();
-            if (this.recentNotes.length > 5) {
-                this.recentNotes.shift(); // vogliamo al massimo 5 note
-            }
+saveNote() {
+    if (!this.selectedNote) return;
 
-            //this.updateStructure();
-            
-            this.apiService.pushNote(this.sessionService.getSession()!.user.username!, [this.selectedNote], this.sessionService.getSession()!.token!).subscribe({
-                next: (response) => {
-                    console.log(response);
-                },
-                error: (error) => {
-                    console.log(error);
-                },
-            });
-            
-        }
-    }
-
-    deleteNote() {
-        if (this.selectedNote) {
-            const parent = this.selectedNote.parent;
-            if (parent) {
-                const index = parent.children.indexOf(this.selectedNote);
-                if (index !== -1) {
-                    parent.children.splice(index, 1);
-                }
-            } else {
-                const index = this.files.indexOf(this.selectedNote);
-                if (index !== -1) {
-                    this.files.splice(index, 1);
-                }
-            }
-            
-            this.apiService.deleteNote(this.sessionService.getSession()!.user.username!, this.selectedNote, this.sessionService.getSession()!.token!).subscribe({
-                next: (response) => {
-                    console.log(response);
-                },
-                error: (error) => {
-                    console.log(error);
-                },
-            });
-            this.selectedNote = null;
-            this.text = '';
-            
-        }
-    }
-
-onNodeDrop(event: any): void {
+    this.selectedNote.content = this.text;
+    this.selectedNote.lastEdit = new Date();
     
+    if (this.recentNotes.length > 5) {
+        this.recentNotes.shift();
+    }
+
+    this.apiService.pushNote(
+        this.sessionService.getSession()!.user.username!, 
+        [this.selectedNote], 
+        this.sessionService.getSession()!.token!
+    ).subscribe({
+        next: (response) => console.log('Note saved', response),
+        error: (error) => console.error('Save error', error)
+    });
 }
 
 
+
+deleteNote(note: Note | null = null) {
+    try {
+        // Get the note to delete
+        const noteToDelete = note || this.selectedNote;
+        
+        // Validate the note and its ID
+        if (!noteToDelete) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Warning',
+                detail: 'No note selected for deletion'
+            });
+            return;
+        }
+
+        if (!noteToDelete._id) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Note has no valid ID'
+            });
+            return;
+        }
+
+
+        // Delete from backend
+        this.apiService.deleteNote(
+            this.sessionService.getSession()!.user.username!, 
+            noteToDelete._id, 
+            this.sessionService.getSession()!.token!
+        ).subscribe({
+            next: (response) => {
+                // Remove from frontend structure
+                this.removeNoteFromStructure(noteToDelete);
+                this.selectedNote = null;
+                this.text = '';
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Note deleted successfully'
+                });
+            },
+            error: (error) => {
+                console.error('Delete error', error);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to delete note'
+                });
+            }
+        });
+    } catch (error) {
+        console.error('Error in deleteNote:', error);
+        this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'An unexpected error occurred'
+        });
+    }
+}
+
+// Update the context menu handler
+onContextMenu(event: any, note: Note) {
+    if (!note?._id) {
+        this.messageService.add({
+            severity: 'warn',
+            summary: 'Warning',
+            detail: 'Cannot select note - missing ID'
+        });
+        return;
+    }
+    this.selectedNote = note;
+    this.cm.show(event);
+}
+
+
+private removeNoteFromStructure(note: Note) {
+    const removeFromParent = (nodes: Note[], parent: Note | null = null): boolean => {
+        for (let i = 0; i < nodes.length; i++) {
+            // Check if current node is the one to remove
+            if (nodes[i]._id === note._id) {
+                if (parent) {
+                    // Remove from parent's children array (which contains IDs)
+                    parent.children = parent.children.filter(childId => childId !== note._id);
+                } else {
+                    // Remove from root files array
+                    this.files = this.files.filter(file => file._id !== note._id);
+                }
+                return true;
+            }
+
+            // If current node has children (array of IDs), we need to find the actual child notes
+            if (nodes[i].children && nodes[i].children.length > 0) {
+                // Get the actual child note objects (not just IDs)
+                const childNotes = this.getChildNotes(nodes[i]);
+                
+                // Recursively check the child notes
+                if (removeFromParent(childNotes, nodes[i])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
+    removeFromParent(this.files);
+}
+
+    // Helper method to get actual note objects from child IDs
+    private getChildNotes(parent: Note): Note[] {
+        if (!parent.children) return [];
+        
+        return parent.children
+            .map(childId => this.findNoteById(childId))
+            .filter(note => note !== null) as Note[];
+    }
+
+    // Existing findNoteById method (updated to work with new structure)
+    private findNoteById(id: any, notes: Note[] = this.files): Note | null {
+        for (const note of notes) {
+            if (note._id?.toString() === id?.toString()) return note;
+            
+            // Check children if they exist as objects (shouldn't happen in new structure)
+            if (note.children && note.children.length > 0) {
+                const childNotes = this.getChildNotes(note);
+                const found = this.findNoteById(id, childNotes);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
+// Update the onNodeDrop method
+onNodeDrop(event: any): void {
+    if (!event.dragNode || !event.dropNode) return;
+
+    // Update parent reference
+    event.dragNode.parent = event.dropNode.type === 'folder' ? event.dropNode._id : null;
+    
+    // Save the updated note
+    this.apiService.pushNote(
+        this.sessionService.getSession()!.user.username!,
+        [event.dragNode],
+        this.sessionService.getSession()!.token!
+    ).subscribe({
+        next: (response) => {
+            console.log('Node moved successfully', response);
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Note moved successfully'
+            });
+        },
+        error: (error) => {
+            console.error('Move error', error);
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Failed to move note'
+            });
+        }
+    });
+}
 
 }

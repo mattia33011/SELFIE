@@ -8,7 +8,7 @@ to build the frontend run:
 ng build --configuration production
 ```
 
-then it will generate dist folder and inside it there will be anothe folder called selfie/browser
+then it will generate dist folder and inside it there will be another folder called selfie/browser
 
 copy the folder "browser" inside the backend src/ folder and rename it as "frontend"
 

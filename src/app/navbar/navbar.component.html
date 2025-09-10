@@ -1,7 +1,7 @@
 <p-menubar #menu styleClass="" [model]="items">
   <ng-template #start>
     <div class="flex flex-row gap-3 items-center">
-      <a  class="" routerLink="/home">
+      <a class="" routerLink="/home">
         <img
           class="cursor-pointer xm:w-full min-w-[90px]"
           ngSrc="selfie-logo-{{
@@ -15,9 +15,16 @@
       </a>
 
       <span class="text-center text-sm md:text-base text-nowrap">
-        {{ today.toLocaleDateString() }}
+        {{ timeMachine.today()?.toLocaleDateString() }}
         <i class="pi pi-calendar text-sm md:text-base"></i>
       </span>
+      <p-button
+        (onClick)="toggleDialog()"
+        icon="pi pi-clock"
+        [rounded]="true"
+        variant="text"
+        size="large"
+      />
     </div>
   </ng-template>
   <ng-template #item let-item let-root="root">
@@ -27,13 +34,6 @@
   </ng-template>
   <ng-template #end>
     <div class="flex items-center justify-content-end gap-2">
-      <input
-        class="w-8 h-1/2"
-        size="small"
-        type="text"
-        pInputText
-        placeholder="Search"
-      />
       <p-avatar
         (click)="profile.toggle($event)"
         shape="circle"
@@ -74,3 +74,39 @@
     </li>
   </ul>
 </p-popover>
+
+<p-dialog
+  #dialog
+  [(visible)]="isDialogOpened"
+  (onHide)="resetForm()"
+  modal="true"
+  position="top"
+  styleClass="px-5 md:w-1/2"
+>
+  <ng-template #header>
+    <h3 class="text-xl">Time Machine</h3>
+  </ng-template>
+  <div class="flex flex-col justify-center gap-3">
+    <label for="picker">Actual time</label>
+    <p-date-picker
+      id="picker"
+      fluid="true"
+      dateFormat="dd/mm/yy"
+      [(ngModel)]="today"
+      [appendTo]="dialog"
+    />
+    <div
+      class="w-full flex md:flex-row md:justify-end flex-col-reverse justify-center gap-3"
+    >
+      <p-button severity="secondary" fluid="true" (onClick)="toggleDialog()"
+        >Back</p-button
+      >
+      <p-button severity="danger" fluid="true" (onClick)="resetTime()"
+        >Reset</p-button
+      >
+      <p-button severity="primary" fluid="true" (onClick)="setTime()"
+        >Save</p-button
+      >
+    </div>
+  </div>
+</p-dialog>

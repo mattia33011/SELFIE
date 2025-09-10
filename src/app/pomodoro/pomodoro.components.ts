@@ -24,6 +24,7 @@ import { forkJoin, Observable } from 'rxjs';
 import { ApiService } from '../service/api.service';
 import { stringToDate } from '../../utils/timeConverter';
 import { ToastModule } from 'primeng/toast';
+import { TimeMachineService } from '../service/time-machine.service';
 
 
 @Component({
@@ -103,7 +104,8 @@ export class PomodoroComponent implements OnInit {
     private readonly translateService: TranslateService,
     private readonly themeService: ThemeService,
     private readonly apiService: ApiService,
-    protected readonly sessionService: SessionService
+    protected readonly sessionService: SessionService,
+    protected readonly timeMachine: TimeMachineService
   ) {
     this.remaningTime = this.pomodoro.pomodoroDuration;
   }
@@ -467,8 +469,11 @@ showNotification(type: string) {
     if (this.pomodoro.pomodoroNumber == 0) {
       return;
     }
-    const now = new Date();
-    const dateCompleted =
+    const now = this.timeMachine.today();
+    if(!now)
+      return;
+    
+      const dateCompleted =
       now.toLocaleDateString() +
       ' ' +
       now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

@@ -1,11 +1,13 @@
-<full-calendar #fullcalendar [options]="calendarOptions" class="h-full">
-    <ng-template #eventContent let-arg>
-        <span class="w-full !text-left px-2 !text-nowrap">
-            <h4 class="font-semibold  text-xl truncate">{{arg.event.title}} </h4>
-            <p class="truncate">{{ arg.event.extendedProps.luogo}}</p>
-        </span>
-    </ng-template>
-</full-calendar>
+@if (calendarOptions) {
+    <full-calendar #fullcalendar [options]="calendarOptions" [deepChangeDetection]="true" class="h-full">
+        <ng-template #eventContent let-arg>
+            <span class="w-full !text-left px-2 !text-nowrap">
+                <h4 class="font-semibold  text-xl truncate">{{arg.event.title}} </h4>
+                <p class="truncate">{{ arg.event.extendedProps.luogo}}</p>
+            </span>
+        </ng-template>
+    </full-calendar>
+}
 
 <p-dialog header="Evento" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' , height: '50rem' }" (onHide)="resetForm()">
     <div class="popup" *ngIf="visible"> <!--dai indicazioni a form-group su css-->

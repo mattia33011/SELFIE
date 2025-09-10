@@ -8,6 +8,7 @@ import { Task } from '../../../types/project';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
+import { TimeMachineService } from '../../service/time-machine.service';
 
 @Component({
   selector: 'app-add-task',
@@ -31,5 +32,5 @@ export class AddTaskComponent {
   @Input() loading!: boolean;
   @Output() confirmAction = new EventEmitter<void>();
 
-  today = new Date();
+  constructor(protected readonly timeMachine: TimeMachineService) {}
 }

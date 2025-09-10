@@ -8,6 +8,7 @@ import { SessionService } from './service/session.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { onMessageSubject } from './service/toast.service';
+import { TimeMachineService } from './service/time-machine.service';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +24,8 @@ export class AppComponent {
     private readonly translateService: TranslateService,
     protected readonly sessionService: SessionService,
     private readonly themeService: ThemeService,
-    private readonly messageService: MessageService
+    private readonly messageService: MessageService,
+    private readonly timeMachine: TimeMachineService
   ) {}
 
   ngOnInit() {

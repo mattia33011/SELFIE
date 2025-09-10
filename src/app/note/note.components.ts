@@ -16,6 +16,7 @@ import {forkJoin, Observable} from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {stringToDate} from '../../utils/timeConverter';
 import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
+import { TimeMachineService } from '../service/time-machine.service';
 
 @Component({
     selector: 'notes',
@@ -59,6 +60,8 @@ export class NoteComponent {
         }        
     ];
 
+
+
 ngOnInit(): void {
     
     this.apiService.getNotes(
@@ -92,7 +95,7 @@ ngOnInit(): void {
         this.screenWidth = (event.target as Window).innerWidth;
     }
 
-    constructor(private messageService: MessageService, private readonly apiService: ApiService, protected readonly sessionService: SessionService) {
+    constructor(private messageService: MessageService, private readonly apiService: ApiService, protected readonly sessionService: SessionService, protected timeMachine: TimeMachineService) {
         Tree.prototype.allowDrop = (dragNode: any, dropNode: any, dragNodeScope: any): boolean => {
             return this._overrideAllowDrop(dragNode, dropNode, dragNodeScope);
         }; 
@@ -147,7 +150,7 @@ addFolder(parentNode: any = null) {
         children: [],
         parent: parentNode ? parentNode._id : null,
         droppableNode: true,
-        lastEdit: new Date(),
+        lastEdit: this.timeMachine.today() ?? new Date(),
     };
 
     // Add to the appropriate parent or root
@@ -189,7 +192,7 @@ duplicateNote(note: Note) {
         parent: note.parent,
         droppableNode: note.droppableNode,
         _id: undefined, // Rimuovi l'ID per creare un nuovo documento
-        lastEdit: new Date() // Aggiorna la data dell'ultima modifica
+        lastEdit: this.timeMachine.today() ?? new Date() // Aggiorna la data dell'ultima modifica
     };
     if (note.type === 'folder') {
         duplicatedNote.children = note.children ? [...note.children] : [];
@@ -228,7 +231,7 @@ duplicateNote(note: Note) {
             children: [],
             parent: parentNode ? parentNode._id : null,
             droppableNode: false,
-            lastEdit: new Date(),
+            lastEdit: this.timeMachine.today() ?? new Date(),
         };
         if (this.selectedNote && this.selectedNote.type === 'folder') {
             if (!this.selectedNote.children) {
@@ -275,7 +278,7 @@ saveNote() {
     if (!this.selectedNote) return;
 
     this.selectedNote.content = this.text;
-    this.selectedNote.lastEdit = new Date();
+    this.selectedNote.lastEdit = this.timeMachine.today();
     
     if (this.recentNotes.length > 5) {
         this.recentNotes.shift();

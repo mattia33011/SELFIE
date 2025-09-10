@@ -13,6 +13,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { SelfieTheme } from '../../public/selfie-theme';
 import { TRANSLATIONS } from '../types/translations';
 import { Observable, of } from 'rxjs';
+import { TimeMachineService } from './service/time-machine.service';
 
 export class CustomTranslateLoader implements TranslateLoader {
   constructor() {}
@@ -27,7 +28,6 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(),
-
     provideTranslateService({
       defaultLanguage: 'it',
       loader: {

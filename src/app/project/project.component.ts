@@ -22,6 +22,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { ListboxModule } from 'primeng/listbox';
 import { Session } from '../../types/session';
+import { TimeMachineService } from '../service/time-machine.service';
 
 @Component({
   selector: 'app-project',
@@ -60,7 +61,6 @@ export class ProjectComponent {
     ),
   });
   
-  today = new Date();
   datePlusOneDay(date: Date) {
     return new Date(date.getTime() + 24 * 60 * 60 * 1000);
   }
@@ -68,6 +68,7 @@ export class ProjectComponent {
   constructor(
     private apiService: ApiService,
     private sessionService: SessionService,
+    protected readonly timeMachine: TimeMachineService,
     router: Router
   ) {
     //@ts-ignore

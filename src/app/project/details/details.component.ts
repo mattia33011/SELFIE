@@ -53,6 +53,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { ToastModule } from 'primeng/toast';
 import { AddTaskComponent } from '../add-task/add-task.component';
 import { Observable, ReplaySubject } from 'rxjs';
+import { TimeMachineService } from '../../service/time-machine.service';
 
 @Component({
   selector: 'app-details',
@@ -97,7 +98,8 @@ export class DetailsComponent {
     private apiService: ApiService,
     private session: SessionService,
     private cd: ChangeDetectorRef,
-    private messageService: MessageService
+    private messageService: MessageService,
+    protected readonly timeMachine: TimeMachineService
   ) {
     const project = router.getCurrentNavigation()?.extras.state?.['project'];
     if (project == undefined) {
@@ -153,7 +155,6 @@ export class DetailsComponent {
   get isOutputVisible() {
     return this._isOutputVisible;
   }
-  today = new Date();
   _viewMode: 'list' | 'gantt' | 'addTask' = 'list';
   set viewMode(value: any) {
     if (value == '' || value == undefined) return;

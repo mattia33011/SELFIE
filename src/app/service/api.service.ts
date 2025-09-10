@@ -74,61 +74,62 @@ export class ApiService {
     });
   }
 
-getNotes(userID: string, token: string) {
-    return this.http.get<any>(`${this.baseUrl}/users/${userID}/notes`, {
-        headers: { authorization: this.resolveBearerToken(token) }
-    }).pipe(
-        map(response => {
-            const notesArray = Array.isArray(response) ? response : Object.values(response);
-            
-            return notesArray.map((note: any) => ({
-                label: note.label,
-                parent: note.parent,
-                data: note.content,
-                icon: note.icon,
-                children: note.children ,
-                type: note.type,
-                expanded: note.expanded,
-                _id: note._id,
-                lastEdit: note.lastEdit
-            }));
+  getNotes(userID: string, token: string) {
+    return this.http
+      .get<any>(`${this.baseUrl}/users/${userID}/notes`, {
+        headers: { authorization: this.resolveBearerToken(token) },
+      })
+      .pipe(
+        map((response) => {
+          const notesArray = Array.isArray(response)
+            ? response
+            : Object.values(response);
+
+          return notesArray.map((note: any) => ({
+            label: note.label,
+            parent: note.parent,
+            data: note.content,
+            icon: note.icon,
+            children: note.children,
+            type: note.type,
+            expanded: note.expanded,
+            _id: note._id,
+            lastEdit: note.lastEdit,
+          }));
         })
-    );
-}
+      );
+  }
 
-
-  
-pushNote(userID: string, notes: Notes, token: string) {
-    const mappedNotes = notes.map((note: any) =>({
+  pushNote(userID: string, notes: Notes, token: string) {
+    const mappedNotes = notes.map((note: any) => ({
       label: note.label,
-                parent: note.parent,
-                data: note.content,
-                icon: note.icon,
-                children: note.children ,
-                type: note.type,
-                expanded: note.expanded,
-                _id: note._id,
-                lastEdit: note.lastEdit
-    }) )
+      parent: note.parent,
+      data: note.content,
+      icon: note.icon,
+      children: note.children,
+      type: note.type,
+      expanded: note.expanded,
+      _id: note._id,
+      lastEdit: note.lastEdit,
+    }));
     return this.http.put(`${this.baseUrl}/users/${userID}/notes`, mappedNotes, {
-        headers: {authorization: this.resolveBearerToken(token)},
+      headers: { authorization: this.resolveBearerToken(token) },
     });
-}
+  }
 
   getRecentNotes(userID: string, token: string) {
-    return this.http.get<Notes>(
-      `${this.baseUrl}/users/${userID}/notes/recent`,
-      {
+    return this.http
+      .get<Notes>(`${this.baseUrl}/users/${userID}/notes/recent`, {
         headers: { authorization: this.resolveBearerToken(token) },
-      }
-    ). pipe(
-      map((notes) =>
-        notes.map((note) => ({
-          ...note,
-          lastEdit: new Date(note.lastEdit),
-        }))
-      )
-    );
+      })
+      .pipe(
+        map((notes) =>
+          notes.map((note) => ({
+            ...note,
+            lastEdit: new Date(note.lastEdit),
+          }))
+        )
+      );
   }
 
   deleteNote(userID: string, noteid: string, token: string) {
@@ -147,15 +148,23 @@ pushNote(userID: string, notes: Notes, token: string) {
       }
     );
   }
-  pushStudySessions(userID: string, pomodoroHistory: StudySession[], token: string ) {
+  pushStudySessions(
+    userID: string,
+    pomodoroHistory: StudySession[],
+    token: string
+  ) {
     const mappedSession = pomodoroHistory.map((session: StudySession) => ({
       pomodoroNumber: session.pomodoroNumber,
       taskCompleted: session.taskCompleted,
       date: session.date,
     }));
-    return this.http.put(`${this.baseUrl}/users/${userID}/pomodoro/oldSessions`, mappedSession, {
-      headers: {authorization: this.resolveBearerToken(token)},
-    });
+    return this.http.put(
+      `${this.baseUrl}/users/${userID}/pomodoro/oldSessions`,
+      mappedSession,
+      {
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
   }
   putStudySession(userID: string, sessions: StudySession[], token: string) {
     const mappedSession = sessions.map((session: StudySession) => ({
@@ -164,15 +173,22 @@ pushNote(userID: string, notes: Notes, token: string) {
       taskCompleted: session.taskCompleted,
       date: session.date,
     }));
-    return this.http.put(`${this.baseUrl}/users/${userID}/pomodoro/oldSessions`, mappedSession, {
-      headers: {authorization: this.resolveBearerToken(token)},
-    });
+    return this.http.put(
+      `${this.baseUrl}/users/${userID}/pomodoro/oldSessions`,
+      mappedSession,
+      {
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
   }
 
   deleteStudySession(userID: string, token: string, indexSession: string) {
-    return this.http.delete(`${this.baseUrl}/users/${userID}/pomodoro/oldSessions/${indexSession}`, {
-      headers: {authorization: this.resolveBearerToken(token)},
-    });
+    return this.http.delete(
+      `${this.baseUrl}/users/${userID}/pomodoro/oldSessions/${indexSession}`,
+      {
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
   }
 
   //api per le task
@@ -185,8 +201,7 @@ pushNote(userID: string, notes: Notes, token: string) {
     );
   }
   putTask(userID: string, tasks: Task[], token: string) {
-
-    const mappedTask = tasks.map(task => ({
+    const mappedTask = tasks.map((task) => ({
       _id: task._id,
       taskName: task.name,
       taskStatus: task.completed ? 'completed' : 'pending',
@@ -226,14 +241,21 @@ pushNote(userID: string, notes: Notes, token: string) {
   }
 
   getPomodoro(userID: string, pomodoroId: string, token: string) {
-    return this.http.get(`${this.baseUrl}/users/${userID}/pomodoro/pomodoroinfo/${pomodoroId}`, {
-      headers: {authorization: this.resolveBearerToken(token)},
-    });
+    return this.http.get(
+      `${this.baseUrl}/users/${userID}/pomodoro/pomodoroinfo/${pomodoroId}`,
+      {
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
   }
   putPomodoro(userID: string, pomodoro: Pomodoro, token: string) {
-    return this.http.put(`${this.baseUrl}/users/${userID}/pomodoro/pomodoroinfo`, pomodoro, {
-      headers: {authorization: this.resolveBearerToken(token)},
-    });
+    return this.http.put(
+      `${this.baseUrl}/users/${userID}/pomodoro/pomodoroinfo`,
+      pomodoro,
+      {
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
   }
 
   getEvents(userID: string, token: string) {
@@ -266,7 +288,11 @@ pushNote(userID: string, notes: Notes, token: string) {
             ...it,
             start: new Date(it.start),
             expire: new Date(it.expire),
-            tasks: it.tasks.map(it => ({...it, expire: new Date(it.expire), start: new Date(it.start)}))
+            tasks: it.tasks.map((it) => ({
+              ...it,
+              expire: new Date(it.expire),
+              start: new Date(it.start),
+            })),
           }))
         )
       );
@@ -295,7 +321,7 @@ pushNote(userID: string, notes: Notes, token: string) {
           headers: { authorization: this.resolveBearerToken(token) },
         }
       )
-      .pipe(this.mapProjectObservable())
+      .pipe(this.mapProjectObservable());
   }
 
   updateProject(project: Project, userID: string, token: string) {
@@ -325,9 +351,17 @@ pushNote(userID: string, notes: Notes, token: string) {
       );
   }
 
+  setToday(date: Date) {
+    return this.http.post<void>(`${this.baseUrl}/time`, { date });
+  }
+  resetToday() {
+    return this.http.post<void>(`${this.baseUrl}/time/reset`, {});
+  }
+  getToday() {
+    return this.http.get<{today: Date}>(`${this.baseUrl}/time`);
+  }
 
-
-  mapProjectObservable(){
+  mapProjectObservable() {
     return map((it: Project) => ({
       ...it,
       expire: new Date(it.expire),
@@ -336,6 +370,6 @@ pushNote(userID: string, notes: Notes, token: string) {
         expire: new Date(task.expire),
         start: new Date(task.start),
       })),
-    }))
+    }));
   }
 }

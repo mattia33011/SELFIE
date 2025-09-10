@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { Menubar } from 'primeng/menubar';
@@ -15,10 +15,14 @@ import { SessionService } from '../service/session.service';
 import { Router, RouterModule } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ApiService } from '../service/api.service';
-
+import { TimeMachineService } from '../service/time-machine.service';
+import { Button } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { DatePickerModule } from 'primeng/datepicker';
 @Component({
   selector: 'app-navbar',
   imports: [
+    DialogModule,
     NgOptimizedImage,
     TranslatePipe,
     ListboxModule,
@@ -32,6 +36,8 @@ import { ApiService } from '../service/api.service';
     ImageModule,
     ToggleSwitchModule,
     FormsModule,
+    Button,
+    DatePickerModule,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
@@ -40,11 +46,18 @@ export class NavbarComponent {
   constructor(
     protected readonly themeService: ThemeService,
     protected readonly sessionService: SessionService,
-    private readonly router: Router
-  ) {}
-
+    private readonly router: Router,
+    protected readonly timeMachine: TimeMachineService
+  ) {
+    effect(() => {
+      const today = timeMachine.today()
+      if(today)
+        this.today = today;
+    });
+  }
+  today!: Date;
   items: MenuItem[] | undefined;
-  today = new Date();
+  isDialogOpened = false;
 
   private _checked: boolean = false;
 
@@ -65,12 +78,31 @@ export class NavbarComponent {
     ];
     this.items = [];
     this.checked = this.themeService.isDarkMode();
-    this.sessionService.loadProfilePicture()
-    this.themeService.listen.subscribe(res => {
-      this._checked = res == 'dark' ? true : false
-    })
+    this.sessionService.loadProfilePicture();
+    this.themeService.listen.subscribe((res) => {
+      this._checked = res == 'dark' ? true : false;
+    });
   }
   ngOnCheck() {
     this.checked = this.themeService.isDarkMode();
+  }
+
+  toggleDialog() {
+    this.isDialogOpened = !this.isDialogOpened;
+  }
+  resetForm() {
+    this.today = this.timeMachine.today()!;
+  }
+  resetTime() {
+    this.timeMachine.resetToday(() => {
+      this.toggleDialog();
+    });
+  }
+  setTime() {
+    if (this.today == this.timeMachine.today()) return;
+
+    this.timeMachine.setToday(this.today, () => {
+      this.toggleDialog();
+    });
   }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
@@ -31,6 +31,7 @@ import {
 } from '../../utils/password-utils';
 import { DatePickerModule } from 'primeng/datepicker';
 import { onMessageSubject } from '../service/toast.service';
+import { TimeMachineService } from '../service/time-machine.service';
 
 @Component({
   selector: 'app-register',
@@ -58,12 +59,17 @@ export class RegisterComponent {
   constructor(
     private readonly apiService: ApiService,
     private readonly router: Router,
-    private readonly translateService: TranslateService
+    private readonly translateService: TranslateService,
+    private readonly timeMachine: TimeMachineService
   ) {
-    this.maxDate = new Date();
+    effect(() => {
+      const today = timeMachine.today()
+      if(today)
+        this.maxDate = today
+    })
   }
   loading = false;
-  maxDate: Date;
+  maxDate!: Date;
   form: FormGroup = new FormGroup(
     {
       firstName: new FormControl<string>('', [

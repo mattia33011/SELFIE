@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { providePrimeNG } from 'primeng/config';
@@ -14,6 +14,7 @@ import { SelfieTheme } from '../../public/selfie-theme';
 import { TRANSLATIONS } from '../types/translations';
 import { Observable, of } from 'rxjs';
 import { TimeMachineService } from './service/time-machine.service';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export class CustomTranslateLoader implements TranslateLoader {
   constructor() {}
@@ -43,6 +44,9 @@ export const appConfig: ApplicationConfig = {
           darkModeSelector: '.selfie-dark',
         },
       },
-    }),
+    }), provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          }),
   ],
 };

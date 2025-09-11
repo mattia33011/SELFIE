@@ -12,6 +12,7 @@ import { ApiService } from '../service/api.service';
 import { forkJoin, Observable } from 'rxjs';
 import { stringToDate } from '../../utils/timeConverter';
 import { TimeMachineService } from '../service/time-machine.service';
+import { NotificationService } from '../service/notification.service';
 
 @Component({
   selector: 'app-home',
@@ -32,7 +33,8 @@ export class HomeComponent {
   constructor(
     protected readonly sessionService: SessionService,
     private readonly apiService: ApiService,
-    private readonly timeMachine: TimeMachineService
+    private readonly timeMachine: TimeMachineService, 
+    private readonly notificationService: NotificationService
   ) {
     effect(() => {
       const today = timeMachine.today();
@@ -67,6 +69,12 @@ export class HomeComponent {
           color: 'warn',
         },
       ];
+
+      this.todayEvents.forEach(it => {
+        setTimeout(() => {
+          notificationService.showNotification(it.title, {body: `Scade oggi ${it.description ?? ''}` })
+        }, 1000)
+      })
     });
     this.todayEvents = [];
   }

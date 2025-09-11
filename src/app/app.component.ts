@@ -9,6 +9,7 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { onMessageSubject } from './service/toast.service';
 import { TimeMachineService } from './service/time-machine.service';
+import { NotificationService } from './service/notification.service';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +26,8 @@ export class AppComponent {
     protected readonly sessionService: SessionService,
     private readonly themeService: ThemeService,
     private readonly messageService: MessageService,
-    private readonly timeMachine: TimeMachineService
+    private readonly timeMachine: TimeMachineService,
+    private readonly notificationService: NotificationService
   ) {}
 
   ngOnInit() {

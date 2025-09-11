@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NotificationService {
-
   constructor() {
-    this.requestPermission()
-   }
+    this.requestPermission();
+  }
 
   requestPermission(): Promise<NotificationPermission> {
     if (!('Notification' in window)) {
@@ -23,10 +22,11 @@ export class NotificationService {
     }
 
     if (Notification.permission === 'granted') {
-      new Notification(title, options);
-    } else {
+      const notification = new Notification(title, { ...options, icon: 's-logo.png' });
+      notification.onclick = () => window.focus()
+    }
+     else {
       console.warn('Permesso per le notifiche non concesso');
     }
   }
-
 }

@@ -9,7 +9,7 @@
     "registerHere": "Register here",
     "emailOrUsername": "Email or Username"
   },
-  "home":{
+  "home": {
     "deadlines": "Deadlines",
     "today": "Today",
     "noTodayEvents": "No events recorded today",
@@ -126,7 +126,7 @@
     "breakFinished": "Break finished",
     "breakDesc": "Time to work!"
   },
-  "note":{
+  "note": {
     "newFolder": "New Folder",
     "newNote": "New Note",
     "folderSelected": "You have selected a folder!"
@@ -215,6 +215,7 @@
   "expire": "Expiration",
   "status": "Status",
   "actions": "Actions",
-  "delete": "Delete"
-
+  "delete": "Delete",
+  "actualTime": "Actual date",
+  "back": "Back"
 }

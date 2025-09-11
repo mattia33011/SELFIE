@@ -14,17 +14,17 @@
         />
       </a>
 
-      <span class="text-center text-sm md:text-base text-nowrap">
-        {{ timeMachine.today()?.toLocaleDateString() }}
-        <i class="pi pi-calendar text-sm md:text-base"></i>
-      </span>
       <p-button
         (onClick)="toggleDialog()"
-        icon="pi pi-clock"
         [rounded]="true"
         variant="text"
         size="large"
-      />
+      >
+        <span class="text-center text-sm md:text-base text-nowrap">
+          {{ timeMachine.today()?.toLocaleDateString() }}
+          <i class="pi pi-calendar text-sm md:text-base"></i>
+        </span>
+      </p-button>
     </div>
   </ng-template>
   <ng-template #item let-item let-root="root">
@@ -87,7 +87,7 @@
     <h3 class="text-xl">Time Machine</h3>
   </ng-template>
   <div class="flex flex-col justify-center gap-3">
-    <label for="picker">Actual time</label>
+    <label for="picker">{{ "actualTime" | translate }}</label>
     <p-date-picker
       id="picker"
       fluid="true"
@@ -98,15 +98,15 @@
     <div
       class="w-full flex md:flex-row md:justify-end flex-col-reverse justify-center gap-3"
     >
-      <p-button severity="secondary" fluid="true" (onClick)="toggleDialog()"
-        >Back</p-button
-      >
+      <p-button severity="secondary" fluid="true" (onClick)="toggleDialog()">{{
+        "back" | translate
+      }}</p-button>
       <p-button severity="danger" fluid="true" (onClick)="resetTime()"
         >Reset</p-button
       >
-      <p-button severity="primary" fluid="true" (onClick)="setTime()"
-        >Save</p-button
-      >
+      <p-button severity="primary" fluid="true" (onClick)="setTime()">{{
+        "save" | translate
+      }}</p-button>
     </div>
   </div>
 </p-dialog>

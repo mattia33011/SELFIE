@@ -218,5 +218,7 @@
   "actions": "Azioni",
   "delete": "Elimina",
   "deleteProjectDialog": "Vuoi davvero eliminare questo progetto ?",
-  "deleteProject": "Elimina progetto"
+  "deleteProject": "Elimina progetto",
+  "actualTime": "Data effettiva",
+  "back": "Back"
 }

@@ -10,10 +10,11 @@ import { MessageService } from 'primeng/api';
 import { onMessageSubject } from './service/toast.service';
 import { TimeMachineService } from './service/time-machine.service';
 import { NotificationService } from './service/notification.service';
+import { DynamicDialogModule } from 'primeng/dynamicdialog';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NavbarComponent, FooterComponent, ToastModule],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, ToastModule, DynamicDialogModule],
   providers: [MessageService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',

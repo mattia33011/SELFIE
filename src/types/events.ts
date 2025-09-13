@@ -13,7 +13,7 @@ export type Note = {
     expanded: boolean;
     content: string;
     icon: string;
-    children: string[];
+    children: string[] | Object[];
     type: 'note' | 'folder';
     parent: string | null;
     droppableNode: boolean;

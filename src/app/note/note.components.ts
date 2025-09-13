@@ -170,7 +170,7 @@ addFolder(parentNode: any = null) {
                 this.selectedNote.children.push(newFolder._id);
                 this.updateNote(this.selectedNote);
             }
-            
+            this.syncronizeNote();
         },
         error: (error) => console.error(error)
     });
@@ -208,6 +208,7 @@ duplicateNote(note: Note) {
         next: (response: any) => {  // Usa 'any' per la risposta
             if (response?.[0]?._id) {
                 duplicatedNote._id = response[0]._id;
+                this.syncronizeNote();
                 
             }
         },
@@ -254,15 +255,31 @@ duplicateNote(note: Note) {
                     this.selectedNote.children.push(newNote._id);
                     this.updateNote(this.selectedNote);
                 }
-                
-
+                this.syncronizeNote();
             },
             error: (error) => { 
                 console.log(error);
             },
         });
+
+
         this.value = ''; // Clear the input field after adding
+
     }
+    syncronizeNote(){
+        this.apiService.getNotes(
+            this.sessionService.getSession()!.user.username!,
+            this.sessionService.getSession()!.token!).subscribe({
+            next: (apiNotes: any[]) => {
+                this.files = apiNotes;
+                console.log('Notes loaded:', this.files);
+            },
+            error: (error) => {
+                console.error('Error loading notes:', error);
+        }});
+    }
+
+
     updateNote(noteUpdates: Note){
         this.apiService.pushNote(this.sessionService.getSession()!.user.username!, [noteUpdates], this.sessionService.getSession()!.token!).subscribe({
             next: (response) => {
@@ -286,7 +303,7 @@ saveNote() {
 
     this.apiService.pushNote(
         this.sessionService.getSession()!.user.username!, 
-        [this.selectedNote], 
+        [this.selectedNote._id], 
         this.sessionService.getSession()!.token!
     ).subscribe({
         next: (response) => console.log('Note saved', response),
@@ -427,17 +444,24 @@ private removeNoteFromStructure(note: Note) {
         }
         return null;
     }
-// Update the onNodeDrop method
-onNodeDrop(event: any): void {
-    if (!event.dragNode || !event.dropNode) return;
 
-    // Update parent reference
-    event.dragNode.parent = event.dropNode.type === 'folder' ? event.dropNode._id : null;
-    
+
+onNodeDrop(event: any): void {
+
+    if (!event.dragNode || !event.dropNode) return;
+    //event.dragNode.parent = event.dropNode;
+    if (!event.dropNode.children.includes(event.dragNode)) {
+        event.dropNode.children.push(event.dragNode);
+    }
+    event.dragNode.parent = event.dropNode._id;
+    console.log('Node dropped', event.dropNode);
+
+
     // Save the updated note
-    this.apiService.pushNote(
+    this.apiService.patchNote(
         this.sessionService.getSession()!.user.username!,
-        [event.dragNode],
+        event.dragNode._id,
+        event.dropNode._id,
         this.sessionService.getSession()!.token!
     ).subscribe({
         next: (response) => {

@@ -117,6 +117,14 @@ export class ApiService {
     });
   }
 
+  patchNote(userID: string, noteId: string, folderId: string, token: string) { 
+    return this.http.patch(
+      `${this.baseUrl}/users/${userID}/notes/${folderId}/${noteId}`, {},{
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
+  }
+
   getRecentNotes(userID: string, token: string) {
     return this.http
       .get<Notes>(`${this.baseUrl}/users/${userID}/notes/recent`, {
@@ -137,6 +145,24 @@ export class ApiService {
       headers: { authorization: this.resolveBearerToken(token) },
     });
   }
+
+  updateNote(userID: string, note: any, token: string) {
+  return this.http.put(
+    `${this.baseUrl}/users/${userID}/notes/${note._id}`,
+    {
+      label: note.label,
+      parent: note.parent,
+      content: note.content,
+      icon: note.icon,
+      children: note.children?.map((c: any) => ({ ...c, parent: c.parent })),
+      type: note.type,
+      expanded: note.expanded,
+      lastEdit: new Date().toISOString()
+    },
+    { headers: { authorization: this.resolveBearerToken(token) } }
+  );
+}
+
 
   //api per le sessioni e pomodoro
 

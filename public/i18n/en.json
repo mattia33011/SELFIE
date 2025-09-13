@@ -217,5 +217,10 @@
   "actions": "Actions",
   "delete": "Delete",
   "actualTime": "Actual date",
-  "back": "Back"
+  "back": "Back",
+  "remindLater": "Remind me later",
+  "expiresToday": "This event expires today",
+  "tomatoTimer": "Tomato timer",
+  "notes": "Notes",
+  "projects": "Projects"
 }

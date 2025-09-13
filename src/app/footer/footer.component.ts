@@ -6,47 +6,55 @@ import { SpeedDialModule } from 'primeng/speeddial';
 import { TooltipModule } from 'primeng/tooltip';
 @Component({
   selector: 'app-footer',
-  imports: [ButtonModule, SpeedDialModule, RouterModule, TooltipModule, TranslatePipe],
+  imports: [
+    ButtonModule,
+    SpeedDialModule,
+    RouterModule,
+    TooltipModule,
+    TranslatePipe,
+  ],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css',
 })
 export class FooterComponent {
-  noteItems: {id: string, icon: string, desc:string, callback: () => any}[]
   items: any[];
-  isSpeedDialVisible = false
+  isSpeedDialVisible = false;
 
-  constructor(private readonly translateService: TranslateService, router: Router) {
+  constructor(
+    private readonly translateService: TranslateService,
+    router: Router
+  ) {
     this.items = [
-      { 
+      {
+        type: 'home',
+        label: 'footer.home',
+        icon: 'pi pi-home',
+        route: '/home',
+        desc: "Home"
+      },
+      {
         type: 'tomato',
         label: 'footer.tomato',
         img: 'tomato.png',
-        icon: "pi pi-stopwatch",
+        icon: 'pi pi-stopwatch',
         route: '/timer',
+        desc: "tomatoTimer"
       },
-      
+
       {
-        type: 'event',
+        type: 'project',
         label: 'footer.event',
-        icon: 'pi pi-plus',
-        route: '/event',
+        icon: 'pi pi-sitemap',
+        route: '/project',
+        desc: "project-view"
       },
       {
         type: 'note',
         label: 'Note',
         icon: 'pi pi-pen-to-square',
-        route: '/notes'
+        route: '/notes',
+        desc: "notes"
       },
     ];
-
-    this.noteItems = [
-      {id: 'add', icon: 'pi pi-plus', desc: "add-event", callback: () => undefined},
-      {id: 'add-project', icon: 'pi pi-calendar-plus', desc: "add-project", callback: () => undefined},
-      {id: 'new-project', icon: 'pi pi-sitemap',desc: "project-view", callback: () => {
-        this.isSpeedDialVisible=false
-        router.navigate(["project"])
-      }},
-    ]
   }
-
 }

@@ -217,5 +217,8 @@
   "actions": "Actions",
   "delete": "Delete",
   "actualTime": "Actual date",
-  "back": "Back"
+  "back": "Back",
+  "enterNoteName": "Enter the name of note/folder",
+  "filterNotes": "Filter notes",
+  "lastEdit": "last edit"
 }

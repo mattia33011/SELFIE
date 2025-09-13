@@ -220,5 +220,8 @@
   "deleteProjectDialog": "Vuoi davvero eliminare questo progetto ?",
   "deleteProject": "Elimina progetto",
   "actualTime": "Data effettiva",
-  "back": "Back"
+  "back": "Back",
+  "enterNoteName": "Inserisci il nome della nota/cartella",
+  "filterNotes": "Filtra note",
+  "lastEdit": "ultima modifica"
 }

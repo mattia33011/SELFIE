@@ -229,5 +229,10 @@
   "deleteProjectDialog": "Vuoi davvero eliminare questo progetto ?",
   "deleteProject": "Elimina progetto",
   "actualTime": "Data effettiva",
-  "back": "Back"
+  "back": "Back",
+  "remindLater": "Ricordamelo più tardi",
+  "expiresToday": "Questo evento scade oggi",
+  "tomatoTimer": "Timer pomodoro",
+  "notes": "Note",
+  "projects": "Progetti"
 }

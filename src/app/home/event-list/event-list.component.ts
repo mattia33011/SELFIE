@@ -35,7 +35,7 @@ export class EventListComponent {
       return {
         title: e.label,
         date: e.lastEdit,
-        subtitle: e.content.length > 30 ? e.label.slice(0, 30) + '...' : e.content
+        subtitle: e.content?.length > 30 ? e.label.slice(0, 30) + '...' : e.content
       }
     }
   }

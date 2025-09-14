@@ -4,15 +4,16 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Events, Notes } from '../../types/events';
+import { Event, Events, Notes } from '../../types/events';
 import { EventListComponent } from './event-list/event-list.component';
-import { DatePickerModule } from 'primeng/datepicker';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ApiService } from '../service/api.service';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { stringToDate } from '../../utils/timeConverter';
 import { TimeMachineService } from '../service/time-machine.service';
 import { NotificationService } from '../service/notification.service';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { Dialog } from 'primeng/dialog';
 
 @Component({
   selector: 'app-home',
@@ -23,18 +24,28 @@ import { NotificationService } from '../service/notification.service';
     TranslatePipe,
     EventListComponent,
     CalendarComponent,
-  ], // calendar
+    Dialog,
+  ],
+  providers: [DialogService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent {
   recentNotes: Notes = [];
+  ref: DynamicDialogRef | undefined;
+  notificationDialog?: {
+    title: string;
+    description?: string;
+    onclose: () => void;
+    onsnooze: () => void
+  };
 
   constructor(
     protected readonly sessionService: SessionService,
     private readonly apiService: ApiService,
-    private readonly timeMachine: TimeMachineService, 
-    private readonly notificationService: NotificationService
+    private readonly timeMachine: TimeMachineService,
+    private readonly notificationService: NotificationService,
+    private readonly cd: ChangeDetectorRef
   ) {
     effect(() => {
       const today = timeMachine.today();
@@ -70,13 +81,39 @@ export class HomeComponent {
         },
       ];
 
-      this.todayEvents.forEach(it => {
-        setTimeout(() => {
-          notificationService.showNotification(it.title, {body: `Scade oggi ${it.description ?? ''}` })
-        }, 1000)
-      })
+      this.todayEvents.forEach((it) => {
+        this.showNotification(it)
+      });
     });
     this.todayEvents = [];
+  }
+
+isNotificationVisible = false
+  showNotification(event: Event, delay?: number){
+
+    setTimeout(() => {
+      const options = { body: `Scade oggi ${event.description ?? ''}` };
+
+      this.notificationService.showNotification(
+        event.title,
+        () => {
+          window.focus();
+          this.notificationDialog = {
+            title: event.title,
+            description: event.description,
+            onclose: () => (this.notificationDialog = undefined),
+            onsnooze: () => {
+              this.notificationDialog = undefined
+              this.isNotificationVisible = false
+              this.showNotification(event, 5 * 60 * 1000)
+            }
+          };
+          this.isNotificationVisible = true
+          this.cd.detectChanges();
+        },
+        options
+      );
+    }, delay ?? 1000);
   }
 
   ngOnInit() {
@@ -97,6 +134,8 @@ export class HomeComponent {
             lastEdit: stringToDate(it.lastEdit.toString()),
           }))
         );
+        console.log(this.recentNotes);
+
         this.deadlineEvents.push(
           ...response[0].map((it) => ({
             ...it,

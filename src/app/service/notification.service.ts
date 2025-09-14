@@ -8,6 +8,9 @@ export class NotificationService {
     this.requestPermission();
   }
 
+  private readonly defaultOptions: NotificationOptions = {
+    icon: 's-logo.png',
+  };
   requestPermission(): Promise<NotificationPermission> {
     if (!('Notification' in window)) {
       return Promise.reject('Questo browser non supporta le notifiche');
@@ -15,18 +18,20 @@ export class NotificationService {
     return Notification.requestPermission();
   }
 
-  showNotification(title: string, options?: NotificationOptions): void {
+  showNotification(title: string, callbackOnClick: () => void, options?: NotificationOptions): void {
     if (!('Notification' in window)) {
       console.warn('Notifiche non supportate');
       return;
     }
-
-    if (Notification.permission === 'granted') {
-      const notification = new Notification(title, { ...options, icon: 's-logo.png' });
-      notification.onclick = () => window.focus()
-    }
-     else {
+    if (Notification.permission !== 'granted') {
       console.warn('Permesso per le notifiche non concesso');
+      return;
     }
+
+    const notification = new Notification(title, {
+      ...this.defaultOptions,
+      ...options,
+    });
+    notification.onclick = callbackOnClick
   }
 }

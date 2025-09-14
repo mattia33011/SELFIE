@@ -134,7 +134,12 @@
     "type": "Tipo",
     "duration": "Durata",
     "noModify": "Non puoi modificare le impostazioni del timer mentre stai usando un ciclo di studio",
-    "closeStudy": "Chiudi ciclo di studio"
+    "closeStudy": "Chiudi ciclo di studio",
+    "openStudy": "Apri i cicli di studio",
+    "finishedCycle": "Ciclo finito",
+    "cycleDesc": "Per oggi hai finito il ciclo di studio!",
+    "infoCycle": "Errors",
+    "infoCycleDesc":"Non puoi aggiungere un nuovo ciclo di studi se i giorni che hai selezionato sono già occupati"
   },
   "note": {
     "newFolder": "Nuova cartella",

@@ -2,8 +2,12 @@
     <div class="w-full flex flex-wrap md:flex-nowrap items-center justify-center gap-2 py-51" [ngClass]="{'flex-col': screenWidth < 1089, 'flex-row': screenWidth >= 1090}">
         <div class="w-full md:w-5/12 flex flex-col items-center justify-center gap-2">
             <div class="flex items-end gap-5 ml-auto md:ml-0 md:self-end">
+            <div *ngIf="!studyCicle">
+                <p-button (click)="this.studyCicle=true" [style]="{ height: '1.5rem' }"> {{ "pomodoro.openStudy" | translate}} </p-button>
+            </div>
                 <p-button (click)="showDialog()" icon="pi pi-cog" ></p-button>
                 <p-button (click)="showCicles()" icon="pi pi-calendar"></p-button>
+  
             </div>
             <p-dialog header="SETTINGS" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
                 <div class="flex flex-col items-top justify-center gap-3">
@@ -29,6 +33,7 @@
                     </div>
                     <p-button label="{{'pomodoro.save' | translate }}" (click)="saveSettings()"></p-button>
                     <p-button label="{{'pomodoro.resetTimer' | translate }}" (click)="resetTimer()"></p-button>
+                    
                 </div>
             </p-dialog>
 
@@ -65,9 +70,12 @@
                     <p-button label="{{'pomodoro.save' | translate }}" (click)="saveCicles()"></p-button>
 
                 </div>
-            </p-dialog>        
+
+            </p-dialog>      
+
             <div class="grid grid-cols-2 gap-4">  
-            <div *ngIf="studyCicle">
+
+            <div *ngIf="studyCicle ">
                 <div ><p> {{ "pomodoro.todayStudy" | translate}} </p> <p-button (click)="this.studyCicle=false" [style]="{ height: '1.5rem' }"> {{ "pomodoro.closeStudy" | translate}} </p-button> </div>
                     <p-table [value]="steps" [paginator]="false" class="w-full" size="small" scrollHeight="20rem" id="stepsTable" [paginator]="true" [rows]="7" >
                         
@@ -79,7 +87,7 @@
                                 <th>  </th>
                             </tr>
                         </ng-template>
-                        <ng-template pTemplate="body" let-step let-rowIndex="rowIndex">
+                        <ng-template  pTemplate="body" let-step let-rowIndex="rowIndex">
                             <tr>
                                 <td>
                                     <span class="flex items-center gap-2">
@@ -90,7 +98,7 @@
                                                 ? 'error' 
                                                 : (step.type === 'shortBreak' ? 'info' : 'warn')
                                             " 
-                                            [variant]="rowIndex < currentStepIndex ? undefined : 'outlined'"
+                                            [variant]="rowIndex < plan.days[dayIndex].step ? undefined : 'outlined'"
                                             [text]="step.type"
                                             styleClass="thin-message">
                                             </p-message>
@@ -99,7 +107,7 @@
                                 </td>
                                 <td>{{ step.duration }}</td>
                                 <td>
-                                    <ng-container *ngIf="rowIndex < currentStepIndex; else hourglass">
+                                    <ng-container *ngIf="(plan?.days?.[dayIndex]?.step ?? 0) > rowIndex; else hourglass">
                                         <i class="pi pi-check" ></i>
                                     </ng-container>
                                     <ng-template #hourglass>

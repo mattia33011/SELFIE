@@ -43,11 +43,15 @@ export type StudyStep={
   duration: number
 }
 
+export type dayInfo={
+  day: Date;
+  step: number;
+}
+
 export type StudyPlan={
   settings: Pomodoro,
-  step: number,
   plan: StudyStep[],
   totalTime: number;
-  days: Date[],
+  days: dayInfo[],
   _id?: string,
 }

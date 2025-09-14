@@ -9,7 +9,7 @@ import { Session, User } from '../../types/session';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Events, Note, Notes } from '../../types/events';
-import { Pomodoro, StudySession, Task, TaskDTO } from '../../types/pomodoro';
+import { Pomodoro, StudyPlan, StudySession, Task, TaskDTO } from '../../types/pomodoro';
 import { _ } from '@ngx-translate/core';
 import { Project, TaskStatus } from '../../types/project';
 
@@ -267,9 +267,9 @@ export class ApiService {
     );
   }
 
-  putStudyPlans(userID: string, planId: string, token: string) {
+  putStudyPlans(userID: string, plan: StudyPlan, token: string) {
     return this.http.put(
-      `${this.baseUrl}/users/${userID}/pomodoro/studyplan`, planId,
+      `${this.baseUrl}/users/${userID}/pomodoro/studyplan`, plan,
       {
         headers: { authorization: this.resolveBearerToken(token) },
       }

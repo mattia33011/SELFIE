@@ -133,7 +133,13 @@
     "type": "Type",
     "duration": "Duration",
     "noModify": "You can't modify the timer settings while you are using a study cycle",
-    "closeStudy": "Close study cycle"
+    "closeStudy": "Close study cycle",
+    "openStudy": "Open study cycle",
+    "finishedCycle": "Cycle finished",
+    "cycleDesc": "You have finished your study cycle for today!",
+    "infoCycle": "Error",
+    "infoCycleDesc":"You can't add a new cycle if the days you choose are already occupied"
+
   },
   "note": {
     "newFolder": "New Folder",

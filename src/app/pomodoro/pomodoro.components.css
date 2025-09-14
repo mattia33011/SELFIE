@@ -17,4 +17,25 @@
       opacity: 1;
     }
   }
-  
+:host ::ng-deep .day-btn {
+  width: 2.6rem !important;
+  height: 2.6rem !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  text-align: center;
+  justify-content: center;
+}
+
+/* Target del corpo scrollabile della p-table */
+:host ::ng-deep #stepsTable .p-datatable-scrollable-body {
+  scrollbar-width: thin;          /* Firefox */
+  scrollbar-color: #bbb transparent; /* Firefox */
+}
+
+
+::ng-deep .p-message .p-message-content {
+  padding: 0.10rem 0.01rem !important;
+  padding-left: 0.8rem !important;
+  text-align: left !important;
+}
+

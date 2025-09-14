@@ -3,10 +3,13 @@
         <div class="w-full md:w-5/12 flex flex-col items-center justify-center gap-2">
             <div class="flex items-end gap-5 ml-auto md:ml-0 md:self-end">
                 <p-button (click)="showDialog()" icon="pi pi-cog" ></p-button>
+                <p-button (click)="showCicles()" icon="pi pi-calendar"></p-button>
             </div>
             <p-dialog header="SETTINGS" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
                 <div class="flex flex-col items-top justify-center gap-3">
-                    <p>{{"pomodoro.settings" | translate }}</p>
+                    <p>{{"pomodoro.settings" | translate }}</p> <br>
+                    <p *ngIf="studyCicle === true"> {{"pomodoro.noModify" | translate}} </p>
+
                     <div class="flex items-center gap-4 mb-4">
                         <label for="shortBreak" class="font-semibold w-24">Pomodoro</label>
                         <p-inputNumber id="pomodoro" [(ngModel)]="pomodoroVisuale" [min]="1" [max]="120"></p-inputNumber>
@@ -28,8 +31,88 @@
                     <p-button label="{{'pomodoro.resetTimer' | translate }}" (click)="resetTimer()"></p-button>
                 </div>
             </p-dialog>
-            <div class="flex flex-col items-center justify-center" [formGroup]="formGroup">
 
+            <p-dialog header="{{'pomodoro.cicles' | translate}}" [modal]="true" [(visible)]="visibleCicle" [style]="{ width: '25rem'}">
+                <div class="flex flex-col items-top justify-center gap-3">
+                    <div class="flex items-center gap-4 mb-4">
+                        <label class="font-semibold w-24">{{ "pomodoro.howManyHours" | translate}}</label>
+                        <p-inputNumber id="ciclesInput" [min]="1" [max]="20" placeholder="2" [(ngModel)]="ciclesInput" (onInput)="ciclesInput = ciclesInput > 20 ? 20 : ciclesInput"></p-inputNumber>
+                    </div>
+                    <div class="flex items-center gap-4 mb-4">
+                        <label class="font-semibold w-24">{{ "pomodoro.repeat" | translate}}</label> <br>
+                        <label for="yes" class="font-semibold">{{ 'pomodoro.yes' | translate}}</label>
+                        <p-radiobutton value="yes" [(ngModel)]="ripeti" inputId="yes"></p-radiobutton>
+                        <label for="no" class="font-semibold">No</label>
+                        <p-radiobutton value="no" [(ngModel)]="ripeti" inputId="no"></p-radiobutton>
+                    </div>
+                    <div *ngIf="ripeti === 'yes'" >
+                        <div class="flex flex-wrap gap-2 mb-4">
+                    <p-button *ngFor="let day of days"
+                                [label]="day"
+                                (click)="toggleDay(day)"
+                                [styleClass]="selectedDays.includes(day) ? 'p-button-primary day-btn' : 'p-button-outlined day-btn'">
+                    </p-button>
+                    </div>
+                    <div class="form-group">
+                    <p-iftalabel>
+                        <p-datepicker [(ngModel)]="endDate" inputId="end_date" showIcon iconDisplay="input" />
+                        <label for="end_date">{{ 'event.enddate' | translate }}</label>
+                    </p-iftalabel>
+                
+                    </div>
+                    </div>
+
+                    <p-button label="{{'pomodoro.save' | translate }}" (click)="saveCicles()"></p-button>
+
+                </div>
+            </p-dialog>        
+            <div class="grid grid-cols-2 gap-4">  
+            <div *ngIf="studyCicle">
+                <div ><p> {{ "pomodoro.todayStudy" | translate}} </p> <p-button (click)="this.studyCicle=false" [style]="{ height: '1.5rem' }"> {{ "pomodoro.closeStudy" | translate}} </p-button> </div>
+                    <p-table [value]="steps" [paginator]="false" class="w-full" size="small" scrollHeight="20rem" id="stepsTable" [paginator]="true" [rows]="7" >
+                        
+                        <ng-template #header>
+                            
+                            <tr>
+                                <th>{{ "pomodoro.type" | translate}}</th>
+                                <th>{{ "pomodoro.duration" | translate}}</th>
+                                <th>  </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-step let-rowIndex="rowIndex">
+                            <tr>
+                                <td>
+                                    <span class="flex items-center gap-2">
+                                        <p-message 
+                                            *ngIf="step"
+                                            [severity]="
+                                                step.type === 'pomodoro' 
+                                                ? 'error' 
+                                                : (step.type === 'shortBreak' ? 'info' : 'warn')
+                                            " 
+                                            [variant]="rowIndex < currentStepIndex ? undefined : 'outlined'"
+                                            [text]="step.type"
+                                            styleClass="thin-message">
+                                            </p-message>
+
+                                    </span>
+                                </td>
+                                <td>{{ step.duration }}</td>
+                                <td>
+                                    <ng-container *ngIf="rowIndex < currentStepIndex; else hourglass">
+                                        <i class="pi pi-check" ></i>
+                                    </ng-container>
+                                    <ng-template #hourglass>
+                                        <i class="pi pi-hourglass"></i>
+                                    </ng-template>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>  
+            <div class="flex flex-col items-center justify-center" [formGroup]="formGroup">
+        
+        
                 <div class="animated-text" style="margin-bottom: 1rem;">
                     <p *ngIf="pomodoro.pomodoroType === 'pomodoro'" 
                        [@fadeInOut] 
@@ -53,13 +136,14 @@
 
                 <p-toast/>
 
-                <!-- Manteniamo valueTemplate per il formato -->
+
                 <p-knob formControlName="timer" [readonly]="true" [max]="knobTIME" [valueTemplate]="formattedTimer" />
                 <p>#{{ pomodoro.pomodoroNumber }}</p>
                 <div class="flex items-center gap-2">
                     <p-button [label]="startStop" [style]="{ height: '2.5rem' }" (click)="clickButton()" />
                     <p-button icon="pi pi-play" [style]="{ height: '2.5rem' }" (click)="skipTimer()"></p-button>
                 </div></div>
+                </div>
             
             <p-button label="{{'pomodoro.endSession' | translate}}" [style]="{ height: '2.5rem', marginTop: '3rem' }" (click)="endSession()"></p-button>
             

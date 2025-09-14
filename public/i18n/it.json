@@ -125,7 +125,16 @@
     "pomodoroFinished": "Pomodoro finito",
     "pomodoroDesc": "Tempo di rilassarsi!",
     "breakFinished": "Pausa finita",
-    "breakDesc": "Tempo di lavorare!"
+    "breakDesc": "Tempo di lavorare!",
+    "cicles": "Pianifica i tuoi cicli di studio",
+    "howManyHours": "Quante ore devi studiare?",
+    "repeat": "Ciclo di studio ripetuto",
+    "yes": "Sì",
+    "todayStudy": "Le tue sessioni di studio di oggi",
+    "type": "Tipo",
+    "duration": "Durata",
+    "noModify": "Non puoi modificare le impostazioni del timer mentre stai usando un ciclo di studio",
+    "closeStudy": "Chiudi ciclo di studio"
   },
   "note": {
     "newFolder": "Nuova cartella",

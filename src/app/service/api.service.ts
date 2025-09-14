@@ -258,6 +258,24 @@ export class ApiService {
     );
   }
 
+  getStudyPlans(userID: string, token: string) {
+    return this.http.get(
+      `${this.baseUrl}/users/${userID}/pomodoro/studyplan`,
+      {
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
+  }
+
+  putStudyPlans(userID: string, planId: string, token: string) {
+    return this.http.put(
+      `${this.baseUrl}/users/${userID}/pomodoro/studyplan`, planId,
+      {
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
+  }
+
   getEvents(userID: string, token: string) {
     return this.http.get<Events>(`${this.baseUrl}/users/${userID}/events`, {
       headers: { authorization: this.resolveBearerToken(token) },

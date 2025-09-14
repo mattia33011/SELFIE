@@ -124,7 +124,16 @@
     "pomodoroFinished": "Pomodoro finished",
     "pomodoroDesc": "Time to rest!",
     "breakFinished": "Break finished",
-    "breakDesc": "Time to work!"
+    "breakDesc": "Time to work!",
+    "cicles": "Plan your study cicles",
+    "howManyHours": "How many hours do you have to study?",
+    "repeat": "Repeated study cycle",
+    "yes": "Yes",
+    "todayStudy": "Your study sessions for today",
+    "type": "Type",
+    "duration": "Duration",
+    "noModify": "You can't modify the timer settings while you are using a study cycle",
+    "closeStudy": "Close study cycle"
   },
   "note": {
     "newFolder": "New Folder",

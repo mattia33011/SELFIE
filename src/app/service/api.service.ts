@@ -276,6 +276,16 @@ export class ApiService {
     );
   }
 
+  deleteStudyPlan(userID:string, planid: string, token: string){
+    return this.http.delete(
+      `${this.baseUrl}/users/${userID}/pomodoro/studyplan/${planid}`,
+      {
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
+
+  }
+
   getEvents(userID: string, token: string) {
     return this.http.get<Events>(`${this.baseUrl}/users/${userID}/events`, {
       headers: { authorization: this.resolveBearerToken(token) },

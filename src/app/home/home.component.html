@@ -3,24 +3,47 @@
   <!--qui-->
 </div>
 <div class="mx-3 flex flex-col gap-5 mt-4">
-  <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-2 items-stretch">
+    
+    <!-- Today -->
     <div class="w-full">
       <app-event-list
         [title]="'home.today' | translate"
         [loading]="loading"
         [emptyLabel]="'home.noTodayEvents' | translate"
         [content]="todayEvents"
+        class="h-full"
       />
     </div>
-    <div class="w-full">
-      <app-event-list
-        [title]="'home.deadlines' | translate"
-        [loading]="loading"
-        [emptyLabel]="'home.noEvents' | translate"
-        [content]="deadlineEvents"
-        dateFormat="date"
-      />
-    </div>
+
+    <!-- Pomodoro -->
+    <app-event-list
+      [title]="'home.pomodoroToday' | translate" [emptyLabel]="''"
+      class="h-full"
+    >
+      <div class="h-full flex flex-col justify-center items-center gap-3">
+        <ng-container *ngIf="!planToDo; else withPlan">
+          <div class="text-center">
+            {{ 'home.noPomodoro' | translate }}
+          </div>
+        </ng-container>
+
+        <ng-template #withPlan>
+          <p>{{ "home.planToDo" | translate }}</p>
+          <p-knob
+            [(ngModel)]="planDone"
+            valueTemplate="{value}%"
+            [readonly]="true"
+          ></p-knob>
+          <p>{{"home.done"| translate}}</p>
+          <p-button routerLink="/pomodoro">
+            {{ "home.goPomodoro" | translate }}
+          </p-button>
+        </ng-template>
+      </div>
+    </app-event-list>
+
+    <!-- Notes -->
     <div class="col-span-2 md:col-span-1">
       <app-event-list
         [title]="'home.notes' | translate"
@@ -28,8 +51,10 @@
         [emptyLabel]="'home.noNotes' | translate"
         [content]="recentNotes"
         dateFormat="date"
+        class="h-full"
       />
     </div>
+
   </div>
 </div>
 

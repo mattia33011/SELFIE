@@ -14,6 +14,14 @@ import { TimeMachineService } from '../service/time-machine.service';
 import { NotificationService } from '../service/notification.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { Dialog } from 'primeng/dialog';
+import { StudyPlan } from '../../types/pomodoro';
+import { KnobModule } from 'primeng/knob';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Knob } from 'primeng/knob';
+import { Router, RouterLink, RouterModule } from '@angular/router';
+import { CardModule } from 'primeng/card';
+
 
 @Component({
   selector: 'app-home',
@@ -25,6 +33,12 @@ import { Dialog } from 'primeng/dialog';
     EventListComponent,
     CalendarComponent,
     Dialog,
+    KnobModule,
+    CommonModule,
+    FormsModule,
+    Knob,
+    RouterModule,
+    CardModule
   ],
   providers: [DialogService],
   templateUrl: './home.component.html',
@@ -45,7 +59,8 @@ export class HomeComponent {
     private readonly apiService: ApiService,
     private readonly timeMachine: TimeMachineService,
     private readonly notificationService: NotificationService,
-    private readonly cd: ChangeDetectorRef
+    private readonly cd: ChangeDetectorRef,
+    router: Router
   ) {
     effect(() => {
       const today = timeMachine.today();
@@ -152,6 +167,75 @@ isNotificationVisible = false
         console.log(error);
       },
     });
+    this.loadPlan();
+  }
+
+  planDone: number=0;
+  fullPlans: StudyPlan[]=[];
+  todayPlan: StudyPlan = {
+    settings: {  pomodoroNumber: 0,
+                pomodoroType: "",
+                pomodoroDuration: 0,
+                shortBreakDuration: 0,
+                longBreakDuration: 0,
+                longBreakInterval: 0,
+                id: ""
+              },
+    plan: [],
+    totalTime: 0,
+    days: []
+  };
+  planToDo: boolean=false;
+  
+  loadPlan() {
+    this.apiService
+      .getStudyPlans(
+        this.sessionService.getSession()!.user.username!,
+        this.sessionService.getSession()!.token!
+      )
+      .subscribe({
+        next: (response) => {
+          this.fullPlans = response as StudyPlan[];
+          const today = this.timeMachine.today();
+          if (!today) return;
+          today.setHours(0, 0, 0, 0);
+  
+          const normalizeDate = (d: Date): number => {
+            const date = new Date(d);
+            date.setHours(0, 0, 0, 0);
+            return date.getTime();
+          };
+  
+          const matchingPlan = this.fullPlans.find((plan) =>
+            plan.days.some((d) => normalizeDate(d.day) === today.getTime())
+          );
+  
+          if (matchingPlan) {
+            const dayIndex = matchingPlan.days.findIndex(
+            (d) => normalizeDate(d.day) === today.getTime()
+            );
+            
+              this.todayPlan = matchingPlan;
+              const completedStepIndex = this.todayPlan.days[dayIndex].step;
+              if (completedStepIndex < 0) return;
+
+              // somma le durate degli step completati
+              const doneMinutes = this.todayPlan.plan
+                .slice(0, completedStepIndex + 1)
+                .reduce((sum, step) => sum + step.duration, 0);
+
+              // percentuale rispetto al totale
+              this.planDone= Math.round((doneMinutes / this.todayPlan.totalTime) * 100);
+              this.planToDo=true;
+            
+
+          } else {
+            //NON ho un piano per oggi
+            this.planToDo=false;
+          }
+        },
+        error: (err) => console.error("Errore nel caricamento piani:", err),
+      });
   }
 
   todayEvents: Events;

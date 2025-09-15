@@ -15,12 +15,16 @@
     "event": "Eventi"
   },
   "home": {
-    "deadlines": "Scadenze",
+    "pomodoroToday": "Ciclo di studio di oggi",
     "today": "Oggi",
     "noTodayEvents": "Nessun evento registrato oggi",
     "notes": "Note",
     "noNotes": "Non hai nessuna nota salvata",
-    "noEvents": "Non hai nessun evento programmato"
+    "noPomodoro": "Non hai nessun ciclo di studio programmato oggi",
+    "planToDo": "Il tuo ciclo di studio per oggi",
+    "goPomodoro": "Vai al pomodoro",
+    "done": "% del tuo lavoro fatto"
+
   },
   "register": {
     "email": "Email",
@@ -139,7 +143,11 @@
     "finishedCycle": "Ciclo finito",
     "cycleDesc": "Per oggi hai finito il ciclo di studio!",
     "infoCycle": "Errors",
-    "infoCycleDesc":"Non puoi aggiungere un nuovo ciclo di studi se i giorni che hai selezionato sono già occupati"
+    "infoCycleDesc":"Non puoi aggiungere un nuovo ciclo di studi se i giorni che hai selezionato sono già occupati",
+    "handleCycle": "Impostazioni dei cicli",
+    "day": "Giorno",
+    "minutes": "minuti",
+    "noPlannedDays": "Non hai cicli di studio programmati"
   },
   "note": {
     "newFolder": "Nuova cartella",

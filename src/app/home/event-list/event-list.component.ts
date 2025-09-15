@@ -14,7 +14,7 @@ import { DatePipe } from '@angular/common';
   styleUrl: './event-list.component.css'
 })
 export class EventListComponent {
-  @Input() content!: Events | Notes
+@Input() content: Events | Notes = [];
   @Input() loading?: boolean
   @Input() title!: string
   @Input() emptyLabel: string = 'home.noEvents'

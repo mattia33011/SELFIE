@@ -37,7 +37,7 @@
                 </div>
             </p-dialog>
 
-            <p-dialog header="{{'pomodoro.cicles' | translate}}" [modal]="true" [(visible)]="visibleCicle" [style]="{ width: '25rem'}">
+            <p-dialog header="{{'pomodoro.cicles' | translate}}" [modal]="true" [(visible)]="visibleCicle" >
                 <div class="flex flex-col items-top justify-center gap-3">
                     <div class="flex items-center gap-4 mb-4">
                         <label class="font-semibold w-24">{{ "pomodoro.howManyHours" | translate}}</label>
@@ -47,8 +47,7 @@
                         <label class="font-semibold w-24">{{ "pomodoro.repeat" | translate}}</label> <br>
                         <label for="yes" class="font-semibold">{{ 'pomodoro.yes' | translate}}</label>
                         <p-radiobutton value="yes" [(ngModel)]="ripeti" inputId="yes"></p-radiobutton>
-                        <label for="no" class="font-semibold">No</label>
-                        <p-radiobutton value="no" [(ngModel)]="ripeti" inputId="no"></p-radiobutton>
+
                     </div>
                     <div *ngIf="ripeti === 'yes'" >
                         <div class="flex flex-wrap gap-2 mb-4">
@@ -66,12 +65,42 @@
                 
                     </div>
                     </div>
-
                     <p-button label="{{'pomodoro.save' | translate }}" (click)="saveCicles()"></p-button>
+                    <p-button label="{{'pomodoro.handleCycle' | translate}}" (click)="openCycleSettings()"></p-button>
 
                 </div>
 
             </p-dialog>      
+
+            <p-dialog  header="{{'pomodoro.handleCycle' | translate}}" [modal]="true" [(visible)]="visibleCycleSettings" >
+                <p-table [value]="allDays" *ngIf="allDays?.length">
+                <ng-template pTemplate="header">
+                    <tr>
+                    <th>{{ 'pomodoro.day' | translate }}</th>
+                    <th>{{ 'pomodoro.duration' | translate }}</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-row let-i="rowIndex">
+                    <tr>
+                    <td>{{ row.day | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ row.totalTime }} {{ "pomodoro.minutes" | translate }}</td>
+                    <td>
+                        <button pbutton icon="pi pi-trash"
+                                class="trash-button"
+                                [style]="{ height: '2.6rem', width: '2.6rem', 'margin-left':'0.6rem'}"
+                                (click)="removeCycle(i)">
+                        <a class="pi pi-trash"></a></button>
+                    </td>
+                    </tr>
+                </ng-template>
+                </p-table>
+
+                <p *ngIf="!fullPlans?.length">{{ 'pomodoro.noPlannedDays' | translate }}</p>
+
+            </p-dialog>
+        
+
 
             <div class="grid grid-cols-2 gap-4">  
 

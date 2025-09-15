@@ -10,12 +10,15 @@
     "emailOrUsername": "Email or Username"
   },
   "home": {
-    "deadlines": "Deadlines",
+    "pomodoroToday": "Today's study cycle",
     "today": "Today",
     "noTodayEvents": "No events recorded today",
     "notes": "Notes",
     "noNotes": "No notes saved",
-    "noEvents": "No events planned"
+    "noPomodoro": "No study cicle today!",
+    "planToDo": "Your study cycle today",
+    "goPomodoro": "Go to pomodoro",
+    "done": "% of your work done"
   },
   "register": {
     "email": "Email",
@@ -138,7 +141,12 @@
     "finishedCycle": "Cycle finished",
     "cycleDesc": "You have finished your study cycle for today!",
     "infoCycle": "Error",
-    "infoCycleDesc":"You can't add a new cycle if the days you choose are already occupied"
+    "infoCycleDesc":"You can't add a new cycle if the days you choose are already occupied",
+    "handleCycle": "Cycles settings",
+    "day": "Day",
+    "minutes": "minutes",
+    "noPlannedDays": "You don't have any study cycle programmed"
+
 
   },
   "note": {

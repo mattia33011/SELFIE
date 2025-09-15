@@ -112,3 +112,30 @@ background: var(--p-primary-500) !important;
   }
   
 }
+
+
+
+.study-session-icon {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  cursor: pointer;
+  font-size: 12px;
+  background-color: #99ff63;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  transition: transform 0.2s;
+}
+
+.study-session-icon:hover {
+  transform: scale(1.2);
+}
+
+.fc-day:hover .study-session-icon {
+  background-color: #77dd44;
+}

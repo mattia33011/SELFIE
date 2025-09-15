@@ -823,5 +823,86 @@ generateStudyPlan(hours: number) {
     });
     console.log(this.plan._id);
 }
+  visibleCycleSettings: boolean= false;
+  openCycleSettings(){
+    this.visibleCycleSettings=true;
+    this.visibleCicle=false;
+  }
+
+
+get allDays() {
+  const today = this.timeMachine.today();
+  if (!today) return [];
+
+  // Imposta l'orario a mezzanotte per confronto solo su giorno/mese/anno
+  today.setHours(0, 0, 0, 0);
+
+  return this.fullPlans
+    .flatMap(plan =>
+      plan.days
+        .filter(dayInfo => {
+          const day = new Date(dayInfo.day);
+          day.setHours(0, 0, 0, 0);
+          return day.getTime() >= today.getTime(); // solo giorni >= oggi
+        })
+        .map(dayInfo => ({
+          day: dayInfo.day,
+          totalTime: plan.totalTime,
+          planId: plan._id
+        }))
+    );
+}
+
+
+
+  removeCycle(index: number) {
+    const dayToRemove = this.allDays[index];
+    console.log("prova");
+    if (!dayToRemove) return;
+
+    const { day, planId } = dayToRemove;
+
+    // Trova il piano corrispondente
+    const planIndex = this.fullPlans.findIndex(p => p._id === planId);
+    if (planIndex === -1) return;
+
+    const plan = this.fullPlans[planIndex];
+
+    // Rimuovi il giorno da quel piano
+    plan.days = plan.days.filter(d =>
+      new Date(d.day).toLocaleDateString('it-IT') !== new Date(day).toLocaleDateString('it-IT')
+    );
+
+    if (plan.days.length === 0) {
+      this.apiService
+        .deleteStudyPlan(
+          this.sessionService.getSession()!.user.username!,
+          plan._id!,
+          this.sessionService.getSession()!.token!,
+        )
+        .subscribe({
+          next: () => {
+            this.fullPlans.splice(planIndex, 1); // rimuovi tutto il piano localmente
+            console.log(`Piano ${plan._id} eliminato`);
+          },
+          error: (error) => console.log(error),
+        });
+    } else {
+      this.apiService
+        .putStudyPlans(
+          this.sessionService.getSession()!.user.username!,
+          plan,
+          this.sessionService.getSession()!.token!
+        )
+        .subscribe({
+          next: (updated) => {
+            console.log(`Piano ${plan._id} aggiornato`, updated);
+          },
+          error: (error) => console.log(error),
+        });
+    }
+  }
+
+
 }
 

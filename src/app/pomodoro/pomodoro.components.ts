@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, effect } from '@angular/core';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -116,6 +116,10 @@ export class PomodoroComponent implements OnInit {
     protected readonly timeMachine: TimeMachineService,
   ) {
     this.remaningTime = this.pomodoro.pomodoroDuration;
+     effect(() => {
+          const date = timeMachine.today();
+          this.loadPlan(date);
+        });
   }
 
   ngOnInit() {
@@ -123,7 +127,7 @@ export class PomodoroComponent implements OnInit {
       timer: this.pomodoro.pomodoroDuration,
     });
 
-    this.loadPlan();
+    this.loadPlan(null);
     this.loadTasks();
     this.loadPomodoro();
     this.loadSessions();
@@ -131,7 +135,7 @@ export class PomodoroComponent implements OnInit {
 
 dayIndex: number = 0;
 
-loadPlan() {
+loadPlan(ifDate: any) {
   this.apiService
     .getStudyPlans(
       this.sessionService.getSession()!.user.username!,
@@ -140,7 +144,10 @@ loadPlan() {
     .subscribe({
       next: (response) => {
         this.fullPlans = response as StudyPlan[];
-        const today = this.timeMachine.today();
+        let today= new Date;
+        if(ifDate){ today=ifDate}
+        else{today=this.timeMachine.today() as Date}
+       
         if (!today) return;
         today.setHours(0, 0, 0, 0);
 

@@ -65,6 +65,7 @@ export class HomeComponent {
     effect(() => {
       const today = timeMachine.today();
       if (!today) return;
+      this.loadPlan(today);
 
       this.todayEvents = [
         {
@@ -100,6 +101,7 @@ export class HomeComponent {
         this.showNotification(it)
       });
     });
+
     this.todayEvents = [];
   }
 
@@ -167,7 +169,7 @@ isNotificationVisible = false
         console.log(error);
       },
     });
-    this.loadPlan();
+    this.loadPlan(null);
   }
 
   planDone: number=0;
@@ -187,7 +189,7 @@ isNotificationVisible = false
   };
   planToDo: boolean=false;
   
-  loadPlan() {
+  loadPlan(ifToday: any) {
     this.apiService
       .getStudyPlans(
         this.sessionService.getSession()!.user.username!,
@@ -196,7 +198,10 @@ isNotificationVisible = false
       .subscribe({
         next: (response) => {
           this.fullPlans = response as StudyPlan[];
-          const today = this.timeMachine.today();
+          let today=new Date;
+          if(ifToday) {today=ifToday;}
+          else {today = this.timeMachine.today() as Date;}
+          
           if (!today) return;
           today.setHours(0, 0, 0, 0);
   

@@ -12,6 +12,7 @@ import { Events, Note, Notes } from '../../types/events';
 import { Pomodoro, StudySession, Task, TaskDTO } from '../../types/pomodoro';
 import { _ } from '@ngx-translate/core';
 import { Project, TaskStatus } from '../../types/project';
+import { mapNote } from '../../utils/converter';
 
 @Injectable({
   providedIn: 'root',
@@ -74,6 +75,12 @@ export class ApiService {
     });
   }
 
+  saveNote(userID: string, noteID: string, text: string, token: string){
+    return this.http.patch(`${this.baseUrl}/users/${userID}/notes/${noteID}`, {text: text}, {
+      headers: { authorization: this.resolveBearerToken(token) },
+    })
+  }
+
   getNotes(userID: string, token: string) {
     return this.http
       .get<any>(`${this.baseUrl}/users/${userID}/notes`, {
@@ -84,18 +91,8 @@ export class ApiService {
           const notesArray = Array.isArray(response)
             ? response
             : Object.values(response);
-
-          return notesArray.map((note: any) => ({
-            label: note.label,
-            parent: note.parent,
-            data: note.content,
-            icon: note.icon,
-            children: note.children,
-            type: note.type,
-            expanded: note.expanded,
-            _id: note._id,
-            lastEdit: note.lastEdit,
-          }));
+          
+          return notesArray.map(mapNote);
         })
       );
   }
@@ -117,9 +114,11 @@ export class ApiService {
     });
   }
 
-  patchNote(userID: string, noteId: string, folderId: string, token: string) { 
+  patchNote(userID: string, noteId: string, folderId: string, token: string) {
     return this.http.patch(
-      `${this.baseUrl}/users/${userID}/notes/${folderId}/${noteId}`, {},{
+      `${this.baseUrl}/users/${userID}/notes/${folderId}/${noteId}`,
+      {},
+      {
         headers: { authorization: this.resolveBearerToken(token) },
       }
     );
@@ -147,22 +146,21 @@ export class ApiService {
   }
 
   updateNote(userID: string, note: any, token: string) {
-  return this.http.put(
-    `${this.baseUrl}/users/${userID}/notes/${note._id}`,
-    {
-      label: note.label,
-      parent: note.parent,
-      content: note.content,
-      icon: note.icon,
-      children: note.children?.map((c: any) => ({ ...c, parent: c.parent })),
-      type: note.type,
-      expanded: note.expanded,
-      lastEdit: new Date().toISOString()
-    },
-    { headers: { authorization: this.resolveBearerToken(token) } }
-  );
-}
-
+    return this.http.put(
+      `${this.baseUrl}/users/${userID}/notes/${note._id}`,
+      {
+        label: note.label,
+        parent: note.parent,
+        content: note.content,
+        icon: note.icon,
+        children: note.children?.map((c: any) => ({ ...c, parent: c.parent })),
+        type: note.type,
+        expanded: note.expanded,
+        lastEdit: new Date().toISOString(),
+      },
+      { headers: { authorization: this.resolveBearerToken(token) } }
+    );
+  }
 
   //api per le sessioni e pomodoro
 
@@ -384,7 +382,7 @@ export class ApiService {
     return this.http.post<void>(`${this.baseUrl}/time/reset`, {});
   }
   getToday() {
-    return this.http.get<{today: Date}>(`${this.baseUrl}/time`);
+    return this.http.get<{ today: Date }>(`${this.baseUrl}/time`);
   }
 
   mapProjectObservable() {

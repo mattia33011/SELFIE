@@ -17,6 +17,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { stringToDate } from '../../utils/timeConverter';
 import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
 import { TimeMachineService } from '../service/time-machine.service';
+import { mapNote } from '../../utils/converter';
 
 @Component({
   selector: 'notes',
@@ -75,9 +76,8 @@ export class NoteComponent {
       )
       .subscribe({
         next: (apiNotes: any[]) => {
-          this.files = apiNotes.map(it => {
-            if(it.lastEdit)
-                it.lastEdit = new Date(it.lastEdit)
+          this.files = apiNotes.map((it) => {
+            if (it.lastEdit) it.lastEdit = new Date(it.lastEdit);
             return it;
           });
           console.log('Notes loaded:', this.files);
@@ -122,18 +122,36 @@ export class NoteComponent {
     dropNode: any,
     dragNodeScope: any
   ): boolean {
-    if (!dropNode) {
-      return true;
-    }
-    return dropNode.type === 'folder';
+    // Blocca sempre le folder
+    if (dragNode?.type === 'folder') return false;
+
+    // Consenti drop solo dentro folder
+    return dropNode?.type === 'folder';
   }
 
   openNote(event: any) {
-    if (event.node.type === 'note') {
-      this.selectedNote = event.node;
-      this.text = this.selectedNote.content;
-    }
+    let note: Note | undefined;
+
+    const findChildNote = this.findChildNote(event.node._id);
+
+    this.files.forEach((it) => {
+      if (note) return;
+      note = findChildNote(it);
+    });
+    this.selectedNote = note;
+
+    this.text =
+      this.selectedNote.type != 'folder' ? this.selectedNote.content : '';
   }
+
+  findChildNote = (idToFind: any) => (note: any) => {
+    if (note._id == idToFind) return note;
+
+    if (note.children && note.children.length > 0)
+      return note.children.find(this.findChildNote(idToFind));
+
+    return undefined;
+  };
   /*
     onContextMenu(event: any, Note: Note) {
         this.selectedNote = Note;
@@ -147,11 +165,8 @@ export class NoteComponent {
 
   addFolder(parentNode: any = null) {
     if (!this.value || this.value.trim() === '') {
-      alert('name cannot be empty');
+      alert('Il nome non può essere vuoto');
       return;
-    }
-    if (this.selectedNote && this.selectedNote.type == 'folder') {
-      parentNode = this.selectedNote;
     }
 
     const newFolder: Note = {
@@ -161,13 +176,14 @@ export class NoteComponent {
       type: 'folder',
       icon: 'pi pi-folder',
       children: [],
-      parent: parentNode ? parentNode._id : null,
+      parent: null,
       droppableNode: true,
+      draggableNode: false,
       lastEdit: this.timeMachine.today() ?? new Date(),
     };
 
     // Add to the appropriate parent or root
-    const targetArray = parentNode ? parentNode.children : this.files;
+    const targetArray = this.files;
     targetArray.push(newFolder);
 
     this.apiService
@@ -238,7 +254,7 @@ export class NoteComponent {
       return;
     }
     if (this.selectedNote && this.selectedNote.type == 'folder') {
-      parentNode = this.selectedNote;
+      parentNode = this.selectedNote._id;
     }
     const newNote: Note = {
       label: this.value,
@@ -247,8 +263,8 @@ export class NoteComponent {
       type: 'note',
       icon: 'pi pi-clipboard',
       children: [],
-      parent: parentNode ? parentNode._id : null,
-      droppableNode: false,
+      parent: parentNode ? parentNode : null,
+      droppableNode: true,
       lastEdit: this.timeMachine.today() ?? new Date(),
     };
     if (this.selectedNote && this.selectedNote.type === 'folder') {
@@ -291,7 +307,11 @@ export class NoteComponent {
       )
       .subscribe({
         next: (apiNotes: any[]) => {
-          this.files = apiNotes;
+          this.files = apiNotes.map((it) => {
+            if (it.type == 'folder') return { ...it, draggableNode: false };
+
+            return it;
+          });
           console.log('Notes loaded:', this.files);
         },
         error: (error) => {
@@ -318,7 +338,7 @@ export class NoteComponent {
   }
 
   saveNote() {
-    if (!this.selectedNote) return;
+    if (!this.selectedNote || this.selectedNote.type == 'folder') return;
 
     this.selectedNote.content = this.text;
     this.selectedNote.lastEdit = this.timeMachine.today();
@@ -328,14 +348,21 @@ export class NoteComponent {
     }
 
     this.apiService
-      .pushNote(
+      .saveNote(
         this.sessionService.getSession()!.user.username!,
-        [this.selectedNote._id],
+        this.selectedNote._id,
+        this.selectedNote.content,
         this.sessionService.getSession()!.token!
       )
       .subscribe({
-        next: (response) => console.log('Note saved', response),
-        error: (error) => console.error('Save error', error),
+        next: (response) => {
+          console.log('Note saved', response);
+          this.syncronizeNote();
+        },
+        error: (error) => {
+          this.syncronizeNote();
+          console.error('Save error', error);
+        },
       });
   }
 
@@ -373,7 +400,7 @@ export class NoteComponent {
         .subscribe({
           next: (response) => {
             // Remove from frontend structure
-            this.removeNoteFromStructure(noteToDelete);
+            this.syncronizeNote();
             this.selectedNote = null;
             this.text = '';
             this.messageService.add({
@@ -475,16 +502,22 @@ export class NoteComponent {
     }
     return null;
   }
-
   onNodeDrop(event: any): void {
-    if (!event.dragNode || !event.dropNode) return;
+    const dragNode = event.dragNode;
+    const dropNode = event.dropNode;
+    if (!dragNode || !dropNode) return;
     //event.dragNode.parent = event.dropNode;
+    const isSameFile = dragNode._id == dropNode._id;
+    console.log('draggable', event);
+    console.log('folder', dropNode);
+    if (dragNode.parent == undefined) console.log('si');
+    console.log('event.dragNode.parent', dragNode.parent);
+    console.log('found same', event.dropNode.children.includes(event.dragNode));
     if (!event.dropNode.children.includes(event.dragNode)) {
       event.dropNode.children.push(event.dragNode);
     }
-    event.dragNode.parent = event.dropNode._id;
-    console.log('Node dropped', event.dropNode);
 
+    if (event.dragNode.type == 'folder') return;
     // Save the updated note
     this.apiService
       .patchNote(

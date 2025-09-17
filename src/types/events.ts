@@ -17,6 +17,7 @@ export type Note = {
     type: 'note' | 'folder';
     parent: string | null;
     droppableNode: boolean;
+    draggableNode?: boolean
     lastEdit: Date;
     _id?: string;
     data?: string;

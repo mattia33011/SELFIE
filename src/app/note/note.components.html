@@ -46,8 +46,11 @@
       </div>
       <div class="flex flex-col gap-2 w-full">
         <span class="text-lg font-bold">
-          {{selectedNote?.label}} @if(selectedNote?.lastEdit){ - {{'lastEdit' |
-          translate}}: {{selectedNote.lastEdit.toLocaleDateString()}} }
+          @if(selectedNote?.type === 'note'){
+            {{selectedNote?.label}} @if(selectedNote?.lastEdit){ - {{'lastEdit' |
+            translate}}: {{selectedNote.lastEdit.toLocaleDateString()}} }
+          }
+          
         </span>
         @if(selectedNote?.type === 'note'){
         <p-editor

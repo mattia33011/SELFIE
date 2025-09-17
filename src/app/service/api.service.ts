@@ -42,11 +42,11 @@ export class ApiService {
 
   putProfilePicture(formData: FormData, session: Session) {
     return this.http.put(
-      `${this.baseUrl}/users/${session.user.username}/profile-picture`,
-      formData,
-      {
+        `${this.baseUrl}/users/${session.user.username}/profile-picture`,
+        formData,
+        {
         headers: { authorization: this.resolveBearerToken(session.token) },
-      }
+        }
     );
   }
 
@@ -288,10 +288,32 @@ export class ApiService {
 
   getEvents(userID: string, token: string) {
     return this.http.get<Events>(`${this.baseUrl}/users/${userID}/events`, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+  createEvent(userID: string, event: Event, token: string) {
+    return this.http.post(`${this.baseUrl}/users/${userID}/events`, event, {
+      headers: { authorization: this.resolveBearerToken(token) },
+    });
+  }
+ updateEvent(userID: string, eventId: string, event: Event, token: string) {
+    return this.http.put(`${this.baseUrl}/users/${userID}/events/${eventId}`, event, {
       headers: { authorization: this.resolveBearerToken(token) },
     });
   }
 
+  deleteEvent(userID: string, eventId: string, token: string) {
+    return this.http.delete(`${this.baseUrl}/users/${userID}/events/${eventId}`, {
+      headers: { authorization: this.resolveBearerToken(token) },
+    });
+  }
+
+  pushEvent(userID: string, event: any, token: string) {
+    return this.http.post(`${this.baseUrl}/users/${userID}/events`, event, {
+      headers: { authorization: this.resolveBearerToken(token) },
+    });
+  }
+  
   saveProject(
     project: Omit<Project, 'id' | 'author'>,
     userID: string,

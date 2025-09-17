@@ -77,7 +77,6 @@ export class CalendarComponent implements OnInit, AfterViewInit{
   repeatInterval: number = 1; // ogni tot giorni/settimane/mesi
   // repeatCount: number = 1; // per "Ripeti per N volte"
   repeatWeekDays: string[] = []; // es: ['mo', 'we', 'fr']
-  weekDays = [
   weekDays = [ 
     //così che rrule lo accetti
     { label: 'Lunedì', value: 'MO' },

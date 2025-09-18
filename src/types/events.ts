@@ -19,18 +19,19 @@ export type Events = CalendarEvent[];
 export type Notes = Note[]
 
 export type Note = {
-    label: string, 
-    expanded: boolean,
-    content: string,
-    type: string,
-    icon: string,
-    children: Notes,
-    parent: Note,
-    droppableNode: boolean,
-    lastEdit: Date,
-}
-
-
+    label: string;
+    expanded: boolean;
+    content: string;
+    icon: string;
+    children: string[] | Object[];
+    type: 'note' | 'folder';
+    parent: string | null;
+    droppableNode: boolean;
+    draggableNode?: boolean
+    lastEdit: Date;
+    _id?: string;
+    data?: string;
+};
 export function isEvent(e: CalendarEvent | Note): e is CalendarEvent{
     if(!e)
       return false

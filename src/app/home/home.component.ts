@@ -250,4 +250,5 @@ todayEvents: CalendarEvent[] = [];
   loading = false
 
 */
+loading = false
 }

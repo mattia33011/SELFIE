@@ -1,42 +1,73 @@
 <p-card>
-    <div class="flex items-center justify-center" [ngClass]="{'flex-col': screenWidth < 1023, 'flex-row': screenWidth >= 1024}">
-        <div class="container" style="flex: 0 0 30rem; align-self: flex-start;">
-            <p-tree 
-                [value]="files" 
-                selectionMode="single" 
-                styleClass="md:w-[30rem]" 
-                [filter]="true" 
-                filterPlaceholder="Lenient Filter" 
-                [(selection)]="selectedFiles" 
-                [draggableNodes]="true" 
-                [droppableNodes]="true" 
-                draggableScope="self" 
-                droppableScope="self" 
-                (onNodeSelect)="openNote($event)"
-                (onNodeDrop)="onNodeDrop($event)"
-                (contextmenu)="onContextMenu($event, selectedNote)">
-                
-            
-            </p-tree>
-            <p-contextMenu #cm [model]="items" (onHide)="onHide()"></p-contextMenu>
+  <div class="flex flex-col gap-2">
+    <div
+      class="flex items-center justify-center"
+      [ngClass]="{'flex-col': screenWidth < 1023, 'flex-row': screenWidth >= 1024}"
+    >
+      <div class="container" style="flex: 0 0 30rem; align-self: flex-start">
+        <p-tree
+          [value]="files"
+          selectionMode="single"
+          styleClass="md:w-[30rem]"
+          [filter]="true"
+          [filterPlaceholder]="'filterNotes' | translate"
+          [(selection)]="selectedFiles"
+          [draggableNodes]="true"
+          [droppableNodes]="true"
+          draggableScope="self"
+          droppableScope="self"
+          (onNodeSelect)="openNote($event)"
+          (onNodeDrop)="onNodeDrop($event)"
+          (contextmenu)="onContextMenu($event, selectedNote)"
+        >
+        </p-tree>
+        <p-contextMenu #cm [model]="items" (onHide)="onHide()"></p-contextMenu>
 
-            <div class="flex flex-col items-center justify-center">
-                <input type="text" pInputText [(ngModel)]="value">    
-                <p-buttongroup [style]="{'margin': '1rem', 'height': '2.6rem'}">
-                    <p-button label="{{'note.newFolder' | translate}}" (click)="addFolder()"></p-button>
-                    <p-button label="{{'note.newNote' | translate}}" (click)="addNote()"></p-button>
-                    <p-button icon="pi pi-trash" (click)="deleteNote()"></p-button>
-                </p-buttongroup>
-            </div>
-        
-
+        <div class="flex flex-col items-center justify-center">
+          <input
+            class="md:w-5/6"
+            type="text"
+            pInputText
+            [placeholder]="'enterNoteName' | translate"
+            [(ngModel)]="value"
+          />
+          <p-buttongroup [style]="{'margin': '1rem', 'height': '2.6rem'}">
+            <p-button
+              label="{{'note.newFolder' | translate}}"
+              (click)="addFolder()"
+            ></p-button>
+            <p-button
+              label="{{'note.newNote' | translate}}"
+              (click)="addNote()"
+            ></p-button>
+            <p-button icon="pi pi-trash" (click)="deleteNote()"></p-button>
+          </p-buttongroup>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2 w-full">
+        <span class="text-lg font-bold">
+          @if(selectedNote?.type === 'note'){
+            {{selectedNote?.label}} @if(selectedNote?.lastEdit){ - {{'lastEdit' |
+            translate}}: {{selectedNote.lastEdit.toLocaleDateString()}} }
+          }
+          
+        </span>
+        @if(selectedNote?.type === 'note'){
+        <p-editor
+          [(ngModel)]="text"
+          [style]="{ height: '50vh', width: '100%' }"
+          [readonly]="false"
+        />
+        }@else {
+            <p-editor
+          [style]="{ height: '50vh', width: '100%' }"
+          [readonly]="true"
+        />
+        }
+      </div>
     </div>
-    <div class="container">
-        <p-editor [(ngModel)]="text" [style]="{ height: '50vh' }" *ngIf="selectedNote?.type !== 'folder'" [readonly]="false"></p-editor>
-        <p-editor [ngModel]="'note.folderSelected' | translate" [style]="{ height: '50vh' }" *ngIf="selectedNote?.type === 'folder' " [readonly]="true"></p-editor>
-
-        <p-button label="Salva" (click)="saveNote()"></p-button>
+    <div class="flex flex-col lg:flex-row justify-end w-full">
+      <p-button fluid="true" label="Salva" (click)="saveNote()"></p-button>
     </div>
-    </div>
-
+  </div>
 </p-card>

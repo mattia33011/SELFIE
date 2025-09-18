@@ -14,7 +14,7 @@ export class SessionService {
   ) {}
 
   isLogged() {
-    return this.getSession() != null;
+    return this.getSession() != undefined && this.getSession() != null;
   }
 
   setToken(session: Session, rememberMe?: boolean) {
@@ -37,7 +37,7 @@ export class SessionService {
         user: { ...session.user, birthDate: new Date(session.user.birthDate) },
       };
       
-    const expiration = new Date(session.loggedAt.getTime() + (10 * 60 * 60 * 1000)); // 10 ore
+    const expiration = new Date((new Date(session.loggedAt)).getTime() + (10 * 60 * 60 * 1000)); // 10 ore
     
     if(expiration < session.loggedAt){
       this.signOut()

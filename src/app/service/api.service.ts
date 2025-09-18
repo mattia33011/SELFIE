@@ -397,7 +397,9 @@ export class ApiService {
       )
       .pipe(
         map((it) => {
-          it.splice(it.indexOf(userID), 1);
+          if(it.find(f => f == userID))
+            it.splice(it.indexOf(userID), 1);
+          
           return it;
         })
       );

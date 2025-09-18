@@ -9,7 +9,7 @@ import { Session, User } from '../../types/session';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Events, Note, Notes } from '../../types/events';
-import { Pomodoro, StudySession, Task, TaskDTO } from '../../types/pomodoro';
+import { Pomodoro, StudyPlan, StudySession, Task, TaskDTO } from '../../types/pomodoro';
 import { _ } from '@ngx-translate/core';
 import { Project, TaskStatus } from '../../types/project';
 import { mapNote } from '../../utils/converter';
@@ -280,6 +280,34 @@ export class ApiService {
         headers: { authorization: this.resolveBearerToken(token) },
       }
     );
+  }
+
+  getStudyPlans(userID: string, token: string) {
+    return this.http.get(
+      `${this.baseUrl}/users/${userID}/pomodoro/studyplan`,
+      {
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
+  }
+
+  putStudyPlans(userID: string, plan: StudyPlan, token: string) {
+    return this.http.put(
+      `${this.baseUrl}/users/${userID}/pomodoro/studyplan`, plan,
+      {
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
+  }
+
+  deleteStudyPlan(userID:string, planid: string, token: string){
+    return this.http.delete(
+      `${this.baseUrl}/users/${userID}/pomodoro/studyplan/${planid}`,
+      {
+        headers: { authorization: this.resolveBearerToken(token) },
+      }
+    );
+
   }
 
   getEvents(userID: string, token: string) {

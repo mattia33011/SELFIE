@@ -10,12 +10,15 @@
     "emailOrUsername": "Email or Username"
   },
   "home": {
-    "deadlines": "Deadlines",
+    "pomodoroToday": "Today's study cycle",
     "today": "Today",
     "noTodayEvents": "No events recorded today",
     "notes": "Notes",
     "noNotes": "No notes saved",
-    "noEvents": "No events planned"
+    "noPomodoro": "No study cicle today!",
+    "planToDo": "Your study cycle today",
+    "goPomodoro": "Go to pomodoro",
+    "done": "% of your work done"
   },
   "register": {
     "email": "Email",
@@ -124,7 +127,27 @@
     "pomodoroFinished": "Pomodoro finished",
     "pomodoroDesc": "Time to rest!",
     "breakFinished": "Break finished",
-    "breakDesc": "Time to work!"
+    "breakDesc": "Time to work!",
+    "cicles": "Plan your study cicles",
+    "howManyHours": "How many hours do you have to study?",
+    "repeat": "Repeated study cycle",
+    "yes": "Yes",
+    "todayStudy": "Your study sessions for today",
+    "type": "Type",
+    "duration": "Duration",
+    "noModify": "You can't modify the timer settings while you are using a study cycle",
+    "closeStudy": "Close study cycle",
+    "openStudy": "Open study cycle",
+    "finishedCycle": "Cycle finished",
+    "cycleDesc": "You have finished your study cycle for today!",
+    "infoCycle": "Error",
+    "infoCycleDesc":"You can't add a new cycle if the days you choose are already occupied",
+    "handleCycle": "Cycles settings",
+    "day": "Day",
+    "minutes": "minutes",
+    "noPlannedDays": "You don't have any study cycle programmed"
+
+
   },
   "note": {
     "newFolder": "New Folder",
@@ -220,5 +243,10 @@
   "back": "Back",
   "enterNoteName": "Enter the name of note/folder",
   "filterNotes": "Filter notes",
-  "lastEdit": "last edit"
+  "lastEdit": "last edit",
+  "remindLater": "Remind me later",
+  "expiresToday": "This event expires today",
+  "tomatoTimer": "Tomato timer",
+  "notes": "Notes",
+  "projects": "Projects"
 }

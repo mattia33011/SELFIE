@@ -1,4 +1,4 @@
-import { Component, ViewChild, effect } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, effect } from '@angular/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core';
@@ -21,6 +21,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { CheckboxModule } from 'primeng/checkbox'; // Importa il modulo Checkbox
 import { TimeMachineService } from '../../service/time-machine.service';
+import { ApiService } from '../../service/api.service';
+import { SessionService } from '../../service/session.service';
+import { StudyPlan } from '../../../types/pomodoro';
 //import { RouterOutlet } from '@angular/router';
 
 // COMANDO npm install @fullcalendar/rrule rrule
@@ -51,7 +54,7 @@ import { TimeMachineService } from '../../service/time-machine.service';
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
 })
-export class CalendarComponent {
+export class CalendarComponent implements OnInit, AfterViewInit{
   @ViewChild('fullcalendar') calendarComponent!: FullCalendarComponent; // Riferimento al calendario
 
   eventName: string = ''; // nome evento
@@ -107,12 +110,121 @@ export class CalendarComponent {
     events: [], // Inizialmente vuoto
 
     eventClick: this.handleEventClick.bind(this),
+
+  dayCellDidMount: (info) => {
+        const cellDate = info.date;
+        
+        // Normalizza la data (rimuove ore, minuti, secondi)
+        const normalizeDate = (date: Date) => {
+          return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        };
+        
+        const normalizedCellDate = normalizeDate(cellDate);
+        
+        // Controlla se ci sono piani di studio per questa data
+        const hasPlan = this.fullPlans && this.fullPlans.some(plan => 
+          plan.days.some(planDay => {
+            const planDate = new Date(planDay.day);
+            const normalizedPlanDate = normalizeDate(planDate);
+            return normalizedPlanDate.getTime() === normalizedCellDate.getTime();
+          })
+        );
+        
+        if (hasPlan) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.innerHTML = '<i class="pi pi-stopwatch"></i>';
+          button.classList.add('study-session-button');
+          button.title = 'Sessione di studio programmata';
+
+          // Stile inline per posizionamento (puoi spostarlo in CSS)
+          button.style.position = 'absolute';
+          button.style.bottom = '4px';
+          button.style.right = '4px';
+          button.style.padding = '2px';
+          button.style.fontSize = '1.2rem';
+
+          info.el.style.position = 'relative'; // necessario per il posizionamento assoluto
+          info.el.appendChild(button);
+        }
+      }
   };
+
+  fullPlans: StudyPlan[]=[];
+
+  hasStudyPlanOn(date: Date): boolean {
+    if (!this.fullPlans) return false;
+    const normalize = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    return this.fullPlans.some(plan =>
+      plan.days.some(day => normalize(day.day) === normalize(date))
+    );
+  }
+
+
+  loadPlan() {
+    this.apiService
+      .getStudyPlans(
+        this.sessionService.getSession()!.user.username!,
+        this.sessionService.getSession()!.token!
+      )
+      .subscribe({
+        next: (response) => {
+          this.fullPlans = response as StudyPlan[];
+
+          this.updateStudyIcons();
+
+        },
+        error: (err) => {
+          console.error("Errore nel caricamento piani:", err);
+          
+        }
+      });
+      
+  }
+
+  updateStudyIcons() {
+  if (!this.calendarComponent || !this.fullPlans) return;
+
+  const calendarApi = this.calendarComponent.getApi();
+  const allCells = document.querySelectorAll('.fc-daygrid-day'); // tutte le celle giorno
+
+  allCells.forEach((cell: any) => {
+    const cellDateStr = cell.getAttribute('data-date');
+    if (!cellDateStr) return;
+    const cellDate = new Date(cellDateStr);
+
+    const normalize = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const hasPlan = this.fullPlans.some(plan =>
+      plan.days.some(day => normalize(new Date(day.day)) === normalize(cellDate))
+    );
+
+    
+
+    if (hasPlan && !cell.querySelector('.study-session-button')) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.innerHTML = '<i class="pi pi-stopwatch"></i>';
+      button.classList.add('study-session-button');
+      button.title = 'Sessione di studio programmata';
+      button.style.position = 'absolute';
+      button.style.bottom = '4px';
+      button.style.right = '4px';
+      button.style.fontSize = '1.2rem';
+
+
+      cell.style.position = 'relative';
+      cell.appendChild(button);
+    }
+  });
+}
+
   taskStatuses: any[] = [];
   repeatOptions: any[] = [];
   constructor(
     private translate: TranslateService,
-    protected readonly timeMachine: TimeMachineService
+    protected readonly timeMachine: TimeMachineService,
+    private readonly apiService: ApiService,
+    protected readonly sessionService: SessionService
   ) {
     effect(() => {
       const date = timeMachine.today();
@@ -126,6 +238,16 @@ export class CalendarComponent {
       this.calendarComponent.getApi().gotoDate(dateString);
     });
   }
+ngAfterViewInit() {
+    
+    // Forza un primo render
+    setTimeout(() => {
+      if (this.calendarComponent) {
+        this.calendarComponent.getApi().render();
+      }
+    }, 100);
+  }
+
   ngOnInit() {
     this.translate
       .get([
@@ -162,7 +284,12 @@ export class CalendarComponent {
             ];
           });
       });
+      this.loadPlan();
+      this.calendarComponent.getApi().render(); 
   }
+
+  
+
   toggleWeekday(event: any) {
     const day = event.target.value;
     if (event.target.checked) {
@@ -174,7 +301,6 @@ export class CalendarComponent {
     }
   }
   selectedEvent: any = null;
-
   openPopup(arg: any) {
     this.theDate = arg.date; // Salva la data selezionata
     this.visible = true; // Mostra il popup
@@ -286,6 +412,14 @@ export class CalendarComponent {
 
   handleEventClick(clickInfo: any) {
     const event = clickInfo.event;
+
+    // Controlla se il click è avvenuto sul pulsante timer
+    if (clickInfo.jsEvent.target.classList.contains('study-session-button') || 
+        clickInfo.jsEvent.target.closest('.study-session-button')) {
+      // Se è stato cliccato il timer, non fare nulla (già gestito dal timer stesso)
+      return;
+    }
+
     this.selectedEvent = event;
 
     this.eventName = event.title || '';

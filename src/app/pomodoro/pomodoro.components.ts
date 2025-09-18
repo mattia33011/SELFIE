@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, effect } from '@angular/core';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -18,14 +18,17 @@ import { TableModule } from 'primeng/table';
 import { DividerModule } from 'primeng/divider';
 import { DialogModule } from 'primeng/dialog';
 import { timer } from 'rxjs';
-import { Task, Pomodoro, TaskDTO, StudySessionDTO, StudySession } from '../../types/pomodoro';
+import { Task, Pomodoro, TaskDTO, StudySessionDTO, StudySession, StudyPlan, StudyStep, dayInfo } from '../../types/pomodoro';
 import { SessionService } from '../service/session.service';
 import { forkJoin, Observable } from 'rxjs';
 import { ApiService } from '../service/api.service';
 import { stringToDate } from '../../utils/timeConverter';
 import { ToastModule } from 'primeng/toast';
 import { TimeMachineService } from '../service/time-machine.service';
-
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { MessageModule } from 'primeng/message';
+import { IftaLabelModule } from 'primeng/iftalabel';
+import { DatePickerModule } from 'primeng/datepicker';
 
 @Component({
   selector: 'app-timer',
@@ -46,7 +49,12 @@ import { TimeMachineService } from '../service/time-machine.service';
     TableModule,
     DividerModule,
     DialogModule,
-    ToastModule
+    ToastModule,
+    RadioButtonModule,
+    MessageModule,
+    IftaLabelModule,
+    DatePickerModule
+
   ],
   templateUrl: './pomodoro.components.html',
   styleUrl: './pomodoro.components.css',
@@ -105,9 +113,13 @@ export class PomodoroComponent implements OnInit {
     private readonly themeService: ThemeService,
     private readonly apiService: ApiService,
     protected readonly sessionService: SessionService,
-    protected readonly timeMachine: TimeMachineService
+    protected readonly timeMachine: TimeMachineService,
   ) {
     this.remaningTime = this.pomodoro.pomodoroDuration;
+     effect(() => {
+          const date = timeMachine.today();
+          this.loadPlan(date);
+        });
   }
 
   ngOnInit() {
@@ -115,10 +127,64 @@ export class PomodoroComponent implements OnInit {
       timer: this.pomodoro.pomodoroDuration,
     });
 
+    this.loadPlan(null);
     this.loadTasks();
     this.loadPomodoro();
     this.loadSessions();
   }
+
+dayIndex: number = 0;
+
+loadPlan(ifDate: any) {
+  this.apiService
+    .getStudyPlans(
+      this.sessionService.getSession()!.user.username!,
+      this.sessionService.getSession()!.token!
+    )
+    .subscribe({
+      next: (response) => {
+        this.fullPlans = response as StudyPlan[];
+        let today= new Date;
+        if(ifDate){ today=ifDate}
+        else{today=this.timeMachine.today() as Date}
+       
+        if (!today) return;
+        today.setHours(0, 0, 0, 0);
+
+        const normalizeDate = (d: Date): number => {
+          const date = new Date(d);
+          date.setHours(0, 0, 0, 0);
+          return date.getTime();
+        };
+
+        const matchingPlan = this.fullPlans.find((plan) =>
+          plan.days.some((d) => normalizeDate(d.day) === today.getTime())
+        );
+
+        if (matchingPlan) {
+          const todayIndex = matchingPlan.days.findIndex(
+          (d) => normalizeDate(d.day) === today.getTime()
+          );
+          if(matchingPlan.days[todayIndex].step>=matchingPlan.plan.length){
+            this.studyCicle = false;
+            this.dayIndex = 0;
+          }else{          
+            this.dayIndex = todayIndex !== -1 ? todayIndex : 0;
+            this.studyCicle = true;
+            this.plan = matchingPlan;
+            this.steps = matchingPlan.plan;}
+
+
+ 
+        } else {
+          this.studyCicle = false;
+          this.dayIndex = 0;
+        }
+      },
+      error: (err) => console.error("Errore nel caricamento piani:", err),
+    });
+}
+
 
   loadTasks(){
      this.apiService.getTasks(
@@ -150,6 +216,9 @@ export class PomodoroComponent implements OnInit {
         let aggiunta = response as Pomodoro;
           if(aggiunta != null && aggiunta.pomodoroNumber != null && aggiunta.pomodoroType!= null){
             this.pomodoro  = response as Pomodoro;
+            this.pomodoroVisuale = this.pomodoro.pomodoroDuration / 60;
+            this.shortBreakVisuale = this.pomodoro.shortBreakDuration / 60;
+            this.longBreakVisuale = this.pomodoro.longBreakDuration / 60;
             this.updateKnobTime();
           }else{
             this.pomodoro = {
@@ -234,10 +303,14 @@ showNotification(type: string) {
   showDialog() {
     //funzione per mostrare la finestra per le impostazioni del timer
     this.visible = true;
-    console.log(this.pomodoroVisuale)
   }
 
   saveSettings() {
+    if(this.studyCicle){
+      this.visible=false;
+      this.startTimer();
+      return;
+    }
     this.pomodoro.pomodoroDuration = (this.pomodoroVisuale ?? 0) * 60;
     this.pomodoro.shortBreakDuration = (this.shortBreakVisuale ?? 0) * 60;
     this.pomodoro.longBreakDuration = (this.longBreakVisuale ?? 0) * 60;
@@ -276,17 +349,73 @@ showNotification(type: string) {
   }
 
   setUpTimer() {
+    if(this.studyCicle){
+      this.visible=false;
+      this.startTimer();
+      return;
+    }
     this.remaningTime = this.pomodoro.pomodoroDuration;
+    this.pomodoro.pomodoroType = "pomodoro";
+    
+    
     this.stopTimer();
     this.startStop = 'START';
     this.pause = false;
-    this.pomodoro.pomodoroType = "pomodoro";
+
     this.updateKnobTime();
     this.chiamataPomodoro();
   }
 
+
+chiamataPlan() {
+  if (!this.plan._id) {
+    console.warn("Plan non ha _id, verrà creato un nuovo piano");
+  }
+
+  this.apiService.putStudyPlans(
+    this.sessionService.getSession()!.user.username!,
+    this.plan,
+    this.sessionService.getSession()!.token!
+  ).subscribe({
+    next: (response) => {
+      const toUpdate=response as StudyPlan;
+      // Aggiorna il piano locale con l'_id restituito dal backend se non esiste
+      if (!this.plan._id && toUpdate && toUpdate._id) {
+        this.plan._id = toUpdate._id;
+      }
+      console.log("Piano aggiornato correttamente", response);
+    },
+    error: (error) => console.log(error),
+  });
+}
+
+
   pauses() {
-    if (!this.pause) {
+    if (this.studyCicle && this.plan) {
+      this.remaningTime = this.plan.plan[this.plan.days[this.dayIndex].step].duration * 60;
+      this.pomodoro.pomodoroType = this.plan.plan[this.plan.days[this.dayIndex].step].type;
+      this.plan.days[this.dayIndex].step ++;
+      this.chiamataPlan();
+      this.showNotification(this.pomodoro.pomodoroType);
+
+      
+      if(this.plan.days[this.dayIndex].step>=this.plan.plan.length) {
+        console.log("entro!");
+        this.studyCicle=false;
+        this.plan={settings: this.pomodoro, plan: [], totalTime: 0, days: []}
+        const key=["pomodoro.finishedCycle", "pomodoro.cycleDesc"]
+
+        this.translateService.get(key).subscribe(translations => {
+          this.messageService.add({
+            severity: 'success',
+            summary: translations[key[0]],
+            detail: translations[key[1]],
+            life: 3000
+          });
+        });
+      }
+
+    }else if (!this.pause) {
       if (this.pomodoro.pomodoroNumber % this.pomodoro.longBreakInterval == 0) {
         this.remaningTime = this.pomodoro.longBreakDuration;
         this.knobTIME = this.pomodoro.longBreakDuration;
@@ -334,6 +463,11 @@ showNotification(type: string) {
 
   resetTimer() {
     this.stopTimer();
+    if(this.studyCicle){
+      this.visible=false;
+      this.startTimer();
+      return;
+    }
     this.pomodoro.pomodoroDuration = 25 * 60;
     this.pomodoro.shortBreakDuration = 5 * 60;
     this.pomodoro.longBreakDuration = 15 * 60;
@@ -350,7 +484,13 @@ showNotification(type: string) {
   }
 
   updateKnobTime() {
-    
+    if(this.studyCicle && this.plan){
+      const currentStep = this.plan.plan[this.plan.days[this.dayIndex].step];
+      this.pomodoro.pomodoroType = currentStep.type;
+      this.knobTIME = currentStep.duration * 60;
+      this.formGroup.get('timer')?.setValue(currentStep.duration * 60);
+      return;
+    }
     if (this.pomodoro.pomodoroType == 'pomodoro') {
       this.knobTIME = this.pomodoro.pomodoroDuration;
       this.formGroup.get('timer')?.setValue(this.pomodoro.pomodoroDuration);
@@ -532,8 +672,244 @@ showNotification(type: string) {
       });
   }
   //PARTE DEI CICLI!
+  visibleCicle: boolean = false;
+  ripeti!: string;
+  days: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  selectedDays: string[] = [];
+  ciclesInput!: number;
+  steps: StudyStep[] = [];
+  plan: StudyPlan = {
+    settings: this.pomodoro,
+    plan: [],
+    totalTime: 0,
+    days: []
+  };
+  currentStepIndex: number = 0;
+  studyCicle: boolean = false;
+  endDate: Date | null = null;
+  fullPlans: StudyPlan[]=[];
 
-  //to-do: programmare dei cicli di studio
-  //input: quante ore devi studiare? (te lo fa in multipli di 5) e ti da un output con 2 diverse opzioni? cicli da 20-5-10 oppure da 30-10-15
+  toggleDay(day: string) {
+    const i = this.selectedDays.indexOf(day);
+    if (i > -1) {
+      // Deseleziona
+      this.selectedDays.splice(i, 1);
+    } else {
+      // Seleziona
+      this.selectedDays.push(day);
+    }
+  }
+
+  showCicles(){
+    this.visibleCicle = true;
+  }
+
+  saveCicles(){
+    console.log('Selected days:', this.selectedDays);
+    this.studyCicle = true;
+    this.generateStudyPlan(this.ciclesInput);
+    this.visibleCicle = false;
+    this.selectedDays = [];
+    this.ripeti = '';
+    
+  }
+
+  
+generateStudyPlan(hours: number) {
+  if(hours==0 || hours==null) hours=1;
+  const totaltimeMinutes = hours * 60; // ore in minuti
+  const pomodoroDurationMin = this.pomodoro.pomodoroDuration / 60;
+  const shortBreakDurationMin = this.pomodoro.shortBreakDuration / 60;
+  const longBreakDurationMin = this.pomodoro.longBreakDuration / 60;
+
+  const pomNumber = Math.floor(totaltimeMinutes / pomodoroDurationMin);
+  const timeleft = totaltimeMinutes % pomodoroDurationMin;
+  this.steps = [];
+
+  let totalPlannedMinutes = 0;
+
+  for (let i = 0; i < pomNumber; i++) {
+    this.steps.push({ step: i + 1, type: 'pomodoro', duration: pomodoroDurationMin });
+    totalPlannedMinutes += pomodoroDurationMin;
+
+    if ((i + 1) % this.pomodoro.longBreakInterval === 0 && (i + 1) !== pomNumber) {
+      this.steps.push({ step: i + 1, type: 'longBreak', duration: longBreakDurationMin });
+      totalPlannedMinutes += longBreakDurationMin;
+    } else if ((i + 1) !== pomNumber) {
+      this.steps.push({ step: i + 1, type: 'shortBreak', duration: shortBreakDurationMin });
+      totalPlannedMinutes += shortBreakDurationMin;
+    }
+  }
+
+  if (timeleft > 0) {
+    this.steps.push({ step: pomNumber + 1, type: 'pomodoro', duration: timeleft });
+    totalPlannedMinutes += timeleft;
+  }
+
+  const toAdd: StudyPlan = {
+    settings: this.pomodoro,
+    plan: this.steps,
+    totalTime: totalPlannedMinutes,
+    days: (() => {
+      const days: dayInfo[] = [];
+
+      // Giorni già esistenti in tutti i piani salvati
+      const allExistingDays = this.fullPlans
+        .flatMap(p => p.days.map(d => new Date(d.day).toLocaleDateString('it-IT')));
+
+      const dayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      let startDate = this.timeMachine.today();
+      if(!startDate) startDate=new Date();
+      startDate.setHours(0, 0, 0, 0);
+
+      const end = this.endDate ? new Date(this.endDate) : startDate;
+      end.setHours(0, 0, 0, 0);
+
+      // Se non ci sono giorni selezionati, aggiungi oggi
+      if (this.selectedDays.length === 0) {
+        const todayStr = startDate.toLocaleDateString('it-IT');
+        if (!allExistingDays.includes(todayStr)) {
+          days.push({ day: new Date(startDate), step: 0 });
+        }
+      } else {
+        let current = new Date(startDate);
+        while (current <= end) {
+          const dayName = dayMap[current.getDay()];
+          if (this.selectedDays.includes(dayName)) {
+            const onlyDate = new Date(current);
+            onlyDate.setHours(0, 0, 0, 0);
+
+            const dateStr = onlyDate.toLocaleDateString('it-IT');
+            if (!allExistingDays.includes(dateStr)) {
+              days.push({ day: onlyDate, step: 0 });
+            }
+          }
+          current.setDate(current.getDate() + 1);
+        }
+      }
+
+      return days;
+    })(),
+  };
+
+  if (toAdd.days.length === 0) {
+    this.steps=[];
+
+    const key=["pomodoro.infoCycle", "pomodoro.infoCycleDesc"]
+        this.translateService.get(key).subscribe(translations => {
+          this.messageService.add({
+            severity: 'success',
+            summary: translations[key[0]],
+            detail: translations[key[1]],
+            life: 3000
+          });
+        });
+        this.studyCicle=false;
+    return;
+  }
+
+  this.plan = toAdd;
+  this.fullPlans.push(this.plan);
+
+  // Salvataggio sul backend
+  this.apiService
+    .putStudyPlans(
+      this.sessionService.getSession()!.user.username!,
+      this.plan,
+      this.sessionService.getSession()!.token!
+    )
+    .subscribe({
+      next: (response) => {
+        const toGetID=response as StudyPlan;
+        if (response && toGetID._id) {
+          this.plan._id = toGetID._id;
+        }
+        console.log(response)
+      },
+      error: (error) => console.log(error),
+    });
+    console.log(this.plan._id);
+}
+  visibleCycleSettings: boolean= false;
+  openCycleSettings(){
+    this.visibleCycleSettings=true;
+    this.visibleCicle=false;
+  }
+
+
+get allDays() {
+  const today = this.timeMachine.today();
+  if (!today) return [];
+
+  // Imposta l'orario a mezzanotte per confronto solo su giorno/mese/anno
+  today.setHours(0, 0, 0, 0);
+
+  return this.fullPlans
+    .flatMap(plan =>
+      plan.days
+        .filter(dayInfo => {
+          const day = new Date(dayInfo.day);
+          day.setHours(0, 0, 0, 0);
+          return day.getTime() >= today.getTime(); // solo giorni >= oggi
+        })
+        .map(dayInfo => ({
+          day: dayInfo.day,
+          totalTime: plan.totalTime,
+          planId: plan._id
+        }))
+    );
+}
+
+
+
+  removeCycle(index: number) {
+    const dayToRemove = this.allDays[index];
+    console.log("prova");
+    if (!dayToRemove) return;
+
+    const { day, planId } = dayToRemove;
+
+    // Trova il piano corrispondente
+    const planIndex = this.fullPlans.findIndex(p => p._id === planId);
+    if (planIndex === -1) return;
+
+    const plan = this.fullPlans[planIndex];
+
+    // Rimuovi il giorno da quel piano
+    plan.days = plan.days.filter(d =>
+      new Date(d.day).toLocaleDateString('it-IT') !== new Date(day).toLocaleDateString('it-IT')
+    );
+
+    if (plan.days.length === 0) {
+      this.apiService
+        .deleteStudyPlan(
+          this.sessionService.getSession()!.user.username!,
+          plan._id!,
+          this.sessionService.getSession()!.token!,
+        )
+        .subscribe({
+          next: () => {
+            this.fullPlans.splice(planIndex, 1); // rimuovi tutto il piano localmente
+            console.log(`Piano ${plan._id} eliminato`);
+          },
+          error: (error) => console.log(error),
+        });
+    } else {
+      this.apiService
+        .putStudyPlans(
+          this.sessionService.getSession()!.user.username!,
+          plan,
+          this.sessionService.getSession()!.token!
+        )
+        .subscribe({
+          next: (updated) => {
+            console.log(`Piano ${plan._id} aggiornato`, updated);
+          },
+          error: (error) => console.log(error),
+        });
+    }
+  }
+
 
 }
+

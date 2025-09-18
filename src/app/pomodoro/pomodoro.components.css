@@ -17,4 +17,53 @@
       opacity: 1;
     }
   }
-  
+:host ::ng-deep .day-btn {
+  width: 2.6rem !important;
+  height: 2.6rem !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  text-align: center;
+  justify-content: center;
+}
+
+/* Target del corpo scrollabile della p-table */
+:host ::ng-deep #stepsTable .p-datatable-scrollable-body {
+  scrollbar-width: thin;          /* Firefox */
+  scrollbar-color: #bbb transparent; /* Firefox */
+}
+
+
+::ng-deep .p-message .p-message-content {
+  padding: 0.10rem 0.01rem !important;
+  padding-left: 0.8rem !important;
+  text-align: left !important;
+}
+
+.trash-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  padding: 0.5rem; /* simile a p-button */
+  font-size: 1rem;
+  border-radius: 10%; /* rotondo come p-button-rounded */
+  background-color: #f44336; /* colore rosso per danger */
+  color: white;
+  width: 2.6rem;   /* dimensione simile al tuo p-button */
+  height: 2.6rem;  /* dimensione simile al tuo p-button */
+  transition: background-color 0.2s ease;
+}
+
+.trash-button:hover {
+  background-color: #d32f2f; /* leggermente più scuro al passaggio del mouse */
+}
+
+.trash-button:active {
+  background-color: #b71c1c; /* colore più scuro al click */
+}
+
+.trash-button i {
+  font-size: 1.2rem; /* icona leggermente più grande */
+}

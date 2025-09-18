@@ -36,3 +36,22 @@ export type Pomodoro = {
   longBreakInterval: number;
   id: string;
 };
+
+export type StudyStep={
+  step: number,
+  type: 'pomodoro' | 'shortBreak' | 'longBreak',
+  duration: number
+}
+
+export type dayInfo={
+  day: Date;
+  step: number;
+}
+
+export type StudyPlan={
+  settings: Pomodoro,
+  plan: StudyStep[],
+  totalTime: number;
+  days: dayInfo[],
+  _id?: string,
+}

@@ -15,12 +15,16 @@
     "event": "Eventi"
   },
   "home": {
-    "deadlines": "Scadenze",
+    "pomodoroToday": "Ciclo di studio di oggi",
     "today": "Oggi",
     "noTodayEvents": "Nessun evento registrato oggi",
     "notes": "Note",
     "noNotes": "Non hai nessuna nota salvata",
-    "noEvents": "Non hai nessun evento programmato"
+    "noPomodoro": "Non hai nessun ciclo di studio programmato oggi",
+    "planToDo": "Il tuo ciclo di studio per oggi",
+    "goPomodoro": "Vai al pomodoro",
+    "done": "% del tuo lavoro fatto"
+
   },
   "register": {
     "email": "Email",
@@ -125,7 +129,25 @@
     "pomodoroFinished": "Pomodoro finito",
     "pomodoroDesc": "Tempo di rilassarsi!",
     "breakFinished": "Pausa finita",
-    "breakDesc": "Tempo di lavorare!"
+    "breakDesc": "Tempo di lavorare!",
+    "cicles": "Pianifica i tuoi cicli di studio",
+    "howManyHours": "Quante ore devi studiare?",
+    "repeat": "Ciclo di studio ripetuto",
+    "yes": "Sì",
+    "todayStudy": "Le tue sessioni di studio di oggi",
+    "type": "Tipo",
+    "duration": "Durata",
+    "noModify": "Non puoi modificare le impostazioni del timer mentre stai usando un ciclo di studio",
+    "closeStudy": "Chiudi ciclo di studio",
+    "openStudy": "Apri i cicli di studio",
+    "finishedCycle": "Ciclo finito",
+    "cycleDesc": "Per oggi hai finito il ciclo di studio!",
+    "infoCycle": "Errors",
+    "infoCycleDesc":"Non puoi aggiungere un nuovo ciclo di studi se i giorni che hai selezionato sono già occupati",
+    "handleCycle": "Impostazioni dei cicli",
+    "day": "Giorno",
+    "minutes": "minuti",
+    "noPlannedDays": "Non hai cicli di studio programmati"
   },
   "note": {
     "newFolder": "Nuova cartella",
@@ -223,5 +245,10 @@
   "back": "Back",
   "enterNoteName": "Inserisci il nome della nota/cartella",
   "filterNotes": "Filtra note",
-  "lastEdit": "ultima modifica"
+  "lastEdit": "ultima modifica",
+  "remindLater": "Ricordamelo più tardi",
+  "expiresToday": "Questo evento scade oggi",
+  "tomatoTimer": "Timer pomodoro",
+  "notes": "Note",
+  "projects": "Progetti"
 }

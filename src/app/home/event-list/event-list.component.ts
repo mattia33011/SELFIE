@@ -14,7 +14,7 @@ import { DatePipe } from '@angular/common';
   styleUrl: './event-list.component.css'
 })
 export class EventListComponent {
-  @Input() content!: Events | Notes
+@Input() content: Events | Notes = [];
   @Input() loading?: boolean
   @Input() title!: string
   @Input() emptyLabel: string = 'home.noEvents'
@@ -35,7 +35,7 @@ export class EventListComponent {
       return {
         title: e.label,
         date: e.lastEdit,
-        subtitle: e.content.length > 30 ? e.label.slice(0, 30) + '...' : e.content
+        subtitle: e.content?.length > 30 ? e.label.slice(0, 30) + '...' : e.content
       }
     }
   }

@@ -15,6 +15,7 @@ import { TRANSLATIONS } from '../types/translations';
 import { Observable, of } from 'rxjs';
 import { TimeMachineService } from './service/time-machine.service';
 import { provideServiceWorker } from '@angular/service-worker';
+import { DialogService } from 'primeng/dynamicdialog';
 
 export class CustomTranslateLoader implements TranslateLoader {
   constructor() {}
@@ -44,7 +45,7 @@ export const appConfig: ApplicationConfig = {
           darkModeSelector: '.selfie-dark',
         },
       },
-    }), provideServiceWorker('ngsw-worker.js', {
+    }), provideServiceWorker('sw-custom.js', {
             enabled: !isDevMode(),
             registrationStrategy: 'registerWhenStable:30000'
           }),

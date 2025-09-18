@@ -22,7 +22,6 @@ import { Knob } from 'primeng/knob';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CardModule } from 'primeng/card';
 
-
 @Component({
   selector: 'app-home',
   imports: [
@@ -38,11 +37,11 @@ import { CardModule } from 'primeng/card';
     FormsModule,
     Knob,
     RouterModule,
-    CardModule
+    CardModule,
   ],
   providers: [DialogService],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrl: './home.component.css',
 })
 export class HomeComponent {
   recentNotes: Notes = [];
@@ -51,7 +50,7 @@ export class HomeComponent {
     title: string;
     description?: string;
     onclose: () => void;
-    onsnooze: () => void
+    onsnooze: () => void;
   };
 
   constructor(
@@ -64,23 +63,19 @@ export class HomeComponent {
   ) {
     effect(() => {
       const today = timeMachine.today();
+
+      this._setup(today ?? null);
+
       if (!today) return;
-      this.loadPlan(today);
 
-      this.todayEvents = [
-      ];
-
-      this.todayEvents.forEach((it) => {
-        this.showNotification(it)
-      });
+      this.todayEvents = [];
     });
 
     this.todayEvents = [];
   }
 
-isNotificationVisible = false
-  showNotification(event: CalendarEvent, delay?: number){
-
+  isNotificationVisible = false;
+  showNotification(event: CalendarEvent, delay?: number) {
     setTimeout(() => {
       const options = { body: `Scade oggi ${event.title ?? ''}` }; //non ha desccription
 
@@ -93,12 +88,12 @@ isNotificationVisible = false
             //description: event.description,
             onclose: () => (this.notificationDialog = undefined),
             onsnooze: () => {
-              this.notificationDialog = undefined
-              this.isNotificationVisible = false
-              this.showNotification(event, 5 * 60 * 1000)
-            }
+              this.notificationDialog = undefined;
+              this.isNotificationVisible = false;
+              this.showNotification(event, 5 * 60 * 1000);
+            },
           };
-          this.isNotificationVisible = true
+          this.isNotificationVisible = true;
           this.cd.detectChanges();
         },
         options
@@ -106,53 +101,74 @@ isNotificationVisible = false
     }, delay ?? 1000);
   }
 
-  ngOnInit() {
+  private _setup(today: Date | null = null) {
     forkJoin([
-      this.apiService.getEvents(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!),
-      this.apiService.getRecentNotes(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!)
+      this.apiService.getEventsToday(
+        this.sessionService.getSession()!.user.username!,
+        this.sessionService.getSession()!.token!
+      ),
+      this.apiService.getRecentNotes(
+        this.sessionService.getSession()!.user.username!,
+        this.sessionService.getSession()!.token!
+      ),
     ]).subscribe({
       next: (response) => {
+        this.recentNotes = []
         this.recentNotes.push(
           ...response[1].map((it) => ({
-          ...it,
-          lastEdit: stringToDate(it.lastEdit.toString())
-        }))
-        )
-        console.log(this.recentNotes);
-
-        this.deadlineEvents.push(...response[0]
-          .filter(it => it.end !== undefined)
-          .map(it => ({ ...it, end: stringToDate(it.end!.toString()) }))
+            ...it,
+            lastEdit: stringToDate(it.lastEdit.toString()),
+          }))
         );
-        this.todayEvents = this.deadlineEvents.filter(event => {
-          const format = (date: Date) => `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-          return event.end instanceof Date && format(event.end) === format(new Date());
+        this.recentNotes.splice(5)
+        console.log(this.recentNotes);
+        this.deadlineEvents = [];
+        this.deadlineEvents.push(
+          ...response[0]
+            .filter((it) => it.end !== undefined)
+            .map((it) => ({ ...it, end: stringToDate(it.end!.toString()) }))
+        );
+
+        this.todayEvents = this.deadlineEvents.filter((event) => {
+          const format = (date: Date) =>
+            `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+
+
+          this.todayEvents.forEach((it) => {
+            this.showNotification(it);
+          });
+          this.todayEvents.splice(5)
+          return (
+            event.end instanceof Date &&
+            format(event.end) === format(new Date())
+          );
         });
       },
       error: (error) => {
         console.log(error);
       },
     });
-    this.loadPlan(null);
+    this.loadPlan(today);
   }
 
-  planDone: number=0;
-  fullPlans: StudyPlan[]=[];
+  planDone: number = 0;
+  fullPlans: StudyPlan[] = [];
   todayPlan: StudyPlan = {
-    settings: {  pomodoroNumber: 0,
-                pomodoroType: "",
-                pomodoroDuration: 0,
-                shortBreakDuration: 0,
-                longBreakDuration: 0,
-                longBreakInterval: 0,
-                id: ""
-              },
+    settings: {
+      pomodoroNumber: 0,
+      pomodoroType: '',
+      pomodoroDuration: 0,
+      shortBreakDuration: 0,
+      longBreakDuration: 0,
+      longBreakInterval: 0,
+      id: '',
+    },
     plan: [],
     totalTime: 0,
-    days: []
+    days: [],
   };
-  planToDo: boolean=false;
-  
+  planToDo: boolean = false;
+
   loadPlan(ifToday: any) {
     this.apiService
       .getStudyPlans(
@@ -162,56 +178,58 @@ isNotificationVisible = false
       .subscribe({
         next: (response) => {
           this.fullPlans = response as StudyPlan[];
-          let today=new Date;
-          if(ifToday) {today=ifToday;}
-          else {today = this.timeMachine.today() as Date;}
-          
+          let today = new Date();
+          if (ifToday) {
+            today = ifToday;
+          } else {
+            today = this.timeMachine.today() as Date;
+          }
+
           if (!today) return;
           today.setHours(0, 0, 0, 0);
-  
+
           const normalizeDate = (d: Date): number => {
             const date = new Date(d);
             date.setHours(0, 0, 0, 0);
             return date.getTime();
           };
-  
+
           const matchingPlan = this.fullPlans.find((plan) =>
             plan.days.some((d) => normalizeDate(d.day) === today.getTime())
           );
-  
+
           if (matchingPlan) {
             const dayIndex = matchingPlan.days.findIndex(
-            (d) => normalizeDate(d.day) === today.getTime()
+              (d) => normalizeDate(d.day) === today.getTime()
             );
-            
-              this.todayPlan = matchingPlan;
-              const completedStepIndex = this.todayPlan.days[dayIndex].step;
-              if (completedStepIndex < 0) return;
 
-              // somma le durate degli step completati
-              const doneMinutes = this.todayPlan.plan
-                .slice(0, completedStepIndex + 1)
-                .reduce((sum, step) => sum + step.duration, 0);
+            this.todayPlan = matchingPlan;
+            const completedStepIndex = this.todayPlan.days[dayIndex].step;
+            if (completedStepIndex < 0) return;
 
-              // percentuale rispetto al totale
-              this.planDone= Math.round((doneMinutes / this.todayPlan.totalTime) * 100);
-              this.planToDo=true;
-            
+            // somma le durate degli step completati
+            const doneMinutes = this.todayPlan.plan
+              .slice(0, completedStepIndex + 1)
+              .reduce((sum, step) => sum + step.duration, 0);
 
+            // percentuale rispetto al totale
+            this.planDone = Math.round(
+              (doneMinutes / this.todayPlan.totalTime) * 100
+            );
+            this.planToDo = true;
           } else {
             //NON ho un piano per oggi
-            this.planToDo=false;
+            this.planToDo = false;
           }
         },
-        error: (err) => console.error("Errore nel caricamento piani:", err),
+        error: (err) => console.error('Errore nel caricamento piani:', err),
       });
   }
 
+  deadlineEvents: CalendarEvent[] = [];
+  todayEvents: CalendarEvent[] = [];
 
-deadlineEvents: CalendarEvent[] = [];
-todayEvents: CalendarEvent[] = [];
-
-/*
+  /*
   
   todayEvents: Events = [{
     title: 'Palestra',
@@ -250,5 +268,5 @@ todayEvents: CalendarEvent[] = [];
   loading = false
 
 */
-loading = false
+  loading = false;
 }

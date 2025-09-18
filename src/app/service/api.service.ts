@@ -315,6 +315,12 @@ export class ApiService {
       headers: {authorization: this.resolveBearerToken(token)},
     });
   }
+  getEventsToday(userID: string, token: string) {
+    return this.http.get<Events>(`${this.baseUrl}/users/${userID}/events/today`, {
+      headers: {authorization: this.resolveBearerToken(token)},
+    });
+  }
+
   createEvent(userID: string, event: Event, token: string) {
     return this.http.post(`${this.baseUrl}/users/${userID}/events`, event, {
       headers: { authorization: this.resolveBearerToken(token) },

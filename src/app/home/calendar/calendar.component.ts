@@ -183,7 +183,6 @@ export class CalendarComponent implements OnInit, AfterViewInit{
   updateStudyIcons() {
   if (!this.calendarComponent || !this.fullPlans) return;
 
-  const calendarApi = this.calendarComponent.getApi();
   const allCells = document.querySelectorAll('.fc-daygrid-day'); // tutte le celle giorno
 
   allCells.forEach((cell: any) => {
@@ -296,8 +295,6 @@ ngAfterViewInit() {
     });
   });
   this.loadPlan();
-  this.calendarComponent.getApi().render(); 
-
   }
 
 
@@ -329,7 +326,6 @@ addEvent() {
     return;
   }
 
-  const calendarApi = this.calendarComponent.getApi();
 
   // Calcolo startDateTime con o senza orario
   let startDateTime: Date;

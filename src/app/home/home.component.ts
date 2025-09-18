@@ -4,7 +4,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Event, Events, Notes } from '../../types/events';
+import { Events, Notes, CalendarEvent } from '../../types/events';
 import { EventListComponent } from './event-list/event-list.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ApiService } from '../service/api.service';
@@ -42,7 +42,7 @@ import { CardModule } from 'primeng/card';
   ],
   providers: [DialogService],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css',
+  styleUrl: './home.component.css'
 })
 export class HomeComponent {
   recentNotes: Notes = [];
@@ -68,33 +68,6 @@ export class HomeComponent {
       this.loadPlan(today);
 
       this.todayEvents = [
-        {
-          title: 'Palestra',
-          description: 'FitActive Creti',
-          expireDate: today,
-        },
-        {
-          title: 'TW Laboratorio',
-          description: 'Laboratorio Ercolani Seminterrato',
-          expireDate: today,
-          color: 'help',
-        },
-        {
-          title: 'Calcolo numerico',
-          description: 'Aula Ercolani 1',
-          expireDate: today,
-          color: 'danger',
-        },
-        {
-          title: "Tiro con l'arco",
-          expireDate: today,
-          color: 'info',
-        },
-        {
-          title: 'TW Laboratorio',
-          expireDate: today,
-          color: 'warn',
-        },
       ];
 
       this.todayEvents.forEach((it) => {
@@ -106,10 +79,10 @@ export class HomeComponent {
   }
 
 isNotificationVisible = false
-  showNotification(event: Event, delay?: number){
+  showNotification(event: CalendarEvent, delay?: number){
 
     setTimeout(() => {
-      const options = { body: `Scade oggi ${event.description ?? ''}` };
+      const options = { body: `Scade oggi ${event.title ?? ''}` }; //non ha desccription
 
       this.notificationService.showNotification(
         event.title,
@@ -117,7 +90,7 @@ isNotificationVisible = false
           window.focus();
           this.notificationDialog = {
             title: event.title,
-            description: event.description,
+            //description: event.description,
             onclose: () => (this.notificationDialog = undefined),
             onsnooze: () => {
               this.notificationDialog = undefined
@@ -135,34 +108,25 @@ isNotificationVisible = false
 
   ngOnInit() {
     forkJoin([
-      this.apiService.getEvents(
-        this.sessionService.getSession()!.user.username!,
-        this.sessionService.getSession()!.token!
-      ),
-      this.apiService.getRecentNotes(
-        this.sessionService.getSession()!.user.username!,
-        this.sessionService.getSession()!.token!
-      ),
+      this.apiService.getEvents(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!),
+      this.apiService.getRecentNotes(this.sessionService.getSession()!.user.username!, this.sessionService.getSession()!.token!)
     ]).subscribe({
       next: (response) => {
         this.recentNotes.push(
           ...response[1].map((it) => ({
-            ...it,
-            lastEdit: stringToDate(it.lastEdit.toString()),
-          }))
-        );
+          ...it,
+          lastEdit: stringToDate(it.lastEdit.toString())
+        }))
+        )
         console.log(this.recentNotes);
 
-        this.deadlineEvents.push(
-          ...response[0].map((it) => ({
-            ...it,
-            expireDate: stringToDate(it.expireDate.toString()),
-          }))
+        this.deadlineEvents.push(...response[0]
+          .filter(it => it.end !== undefined)
+          .map(it => ({ ...it, end: stringToDate(it.end!.toString()) }))
         );
-        this.todayEvents = this.deadlineEvents.filter((event) => {
-          const format = (date: Date) =>
-            `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-          return format(event.expireDate) == format(this.timeMachine.today()!);
+        this.todayEvents = this.deadlineEvents.filter(event => {
+          const format = (date: Date) => `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+          return event.end instanceof Date && format(event.end) === format(new Date());
         });
       },
       error: (error) => {
@@ -243,9 +207,47 @@ isNotificationVisible = false
       });
   }
 
-  todayEvents: Events;
 
-  deadlineEvents: Events = [];
+deadlineEvents: CalendarEvent[] = [];
+todayEvents: CalendarEvent[] = [];
 
-  loading = false;
+/*
+  
+  todayEvents: Events = [{
+    title: 'Palestra',
+    description: 'FitActive Creti',
+    'expireDate': new Date()
+  },
+    {
+      title: 'TW Laboratorio',
+      description: 'Laboratorio Ercolani Seminterrato',
+      expireDate: new Date(),
+      color: 'help'
+    },
+    {
+      title: 'Calcolo numerico',
+      description: 'Aula Ercolani 1',
+      'expireDate': new Date(),
+      color: 'danger'
+    },
+    {
+      title: 'Tiro con l\'arco',
+      'expireDate': new Date(),
+      color: 'info'
+    },
+    {
+      title: 'TW Laboratorio',
+      'expireDate': new Date(),
+      color: 'warn'
+
+    }
+  ]
+
+  deadlineEvents: Events = []
+
+
+
+  loading = false
+
+*/
 }

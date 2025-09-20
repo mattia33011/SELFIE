@@ -14,7 +14,7 @@ import { ButtonModule } from 'primeng/button';
 import rrulePlugin from '@fullcalendar/rrule';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectButton } from 'primeng/selectbutton';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
@@ -47,7 +47,7 @@ import { StudyPlan } from '../../../types/pomodoro';
     ButtonModule,
     DatePickerModule,
     TranslatePipe,
-    DropdownModule,
+    SelectButton,
     FloatLabelModule,
     ColorPickerModule,
     InputTextModule,
@@ -288,9 +288,9 @@ ngAfterViewInit() {
     ])
           .subscribe((translations) => {
       this.taskStatuses = [
-        { label: translations['taskStatus.da_fare'], value: 'da_fare' },
-        { label: translations['taskStatus.in_corso'], value: 'in_corso' },
-        { label: translations['taskStatus.completata'], value: 'completata' }
+          { label: this.translate.instant('taskStatus.da_fare'), value: 'da_fare' },
+          { label: this.translate.instant('taskStatus.in_corso'), value: 'in_corso' },
+          { label: this.translate.instant('taskStatus.completata'), value: 'completata' }
       ];
     });
   });
@@ -298,19 +298,19 @@ ngAfterViewInit() {
   }
 
 
-  toggleWeekday(event: any) {
-    const day = event.target.value;
-    if (event.target.checked) {
-      if (!this.repeatWeekDays.includes(day)) {
-        this.repeatWeekDays.push(day);
-      }
-    } else {
-      this.repeatWeekDays = this.repeatWeekDays.filter(d => d !== day);
+  toggleWeekday(event: any, value: string) {
+  if (event.checked) {
+    if (!this.repeatWeekDays.includes(value)) {
+      this.repeatWeekDays.push(value);
     }
+  } else {
+    this.repeatWeekDays = this.repeatWeekDays.filter(d => d !== value);
   }
+}
   selectedEvent: any = null;
  
   openPopup(arg: any) {
+    this.resetForm();
     this.theDate = arg.date; // Salva la data selezionata
     this.visible = true; // Mostra il popup
     //this.isEditMode = false; 
@@ -326,86 +326,62 @@ addEvent() {
     return;
   }
 
+  // Calcolo startDateTime (solo data se allDay)
+  const isAllDay = this.isTask || !this.eventTime;
+  const startDateTime = new Date(this.theDate);
 
-  // Calcolo startDateTime con o senza orario
-  let startDateTime: Date;
-  if (!this.eventTime || this.isTask) {
-    // Se è attività o non c'è orario => data solo con ore 0
-    startDateTime = new Date(
-      this.theDate.getFullYear(),
-      this.theDate.getMonth(),
-      this.theDate.getDate(),
-      0, 0, 0, 0
-    );
-  } else {
-    startDateTime = new Date(
-      this.theDate.getFullYear(),
-      this.theDate.getMonth(),
-      this.theDate.getDate(),
-      this.eventTime.getHours(),
-      this.eventTime.getMinutes(),
-        0,
-        0
-    );
-  }
-
-  let newEvent: any = {
+  // Base event
+  const newEvent: any = {
     title: this.eventName,
     color: this.eventColor,
-    extendedProps: { 
+    extendedProps: {
       luogo: this.eventLocation,
       tipo: this.isTask ? 'attività' : 'evento',
-        stato: this.taskStatus,
+      stato: this.taskStatus
     },
-      allDay: this.isTask || !this.eventTime, // allDay se attività o senza orario
+    allDay: isAllDay
   };
 
-  if (!this.isTask && this.repeatType && this.repeatType !== 'none') {
-    // Se NON è attività e c'è ripetizione
-    const freqMap: any = {
-      daily: 'DAILY',
-      weekly: 'WEEKLY',
-      biweekly: 'WEEKLY',
-      monthly: 'MONTHLY',
-      yearly: 'YEARLY'
-    };
+  // Mappa ripetizioni
+  const freqMap: any = {
+    daily: 'DAILY',
+    weekly: 'WEEKLY',
+    biweekly: 'WEEKLY',
+    monthly: 'MONTHLY',
+    yearly: 'YEARLY'
+  };
 
-    newEvent.rrule = {
+  // Se evento NON è task e ha ripetizione valida
+  if (!this.isTask && this.repeatType && freqMap[this.repeatType]) {
+      newEvent.rrule = {
       freq: freqMap[this.repeatType],
       dtstart: startDateTime,
-      interval: this.repeatInterval || 1,
+      interval: this.repeatType === 'biweekly' ? 2 : (this.repeatInterval || 1),
       until: this.repeatUntil || undefined,
       byweekday: this.repeatWeekDays.length ? this.repeatWeekDays : undefined
     };
 
-    if (this.eventTime && this.eventEndTime) {
+    if (!isAllDay && this.eventTime && this.eventEndTime) {
       newEvent.duration = this.getDuration(this.eventTime, this.eventEndTime);
     }
   } else {
-    // Eventi singoli o attività (senza rrule)
+    // Eventi singoli o attività
     newEvent.start = startDateTime;
 
-    if (!this.isTask && this.eventEndTime) {
-      // Se evento (non attività) con orario di fine
-      const endDateTime = new Date(
-        this.theDate.getFullYear(),
-        this.theDate.getMonth(),
-        this.theDate.getDate(),
-        this.eventEndTime.getHours(),
-        this.eventEndTime.getMinutes(),
-        0, 0
-      );
-      newEvent.end = endDateTime;
-    } else if (!this.isTask && this.eventEndDate) {
-      // Se evento (non attività) con data di fine
-      newEvent.end = new Date(
-        this.eventEndDate.getFullYear(),
-        this.eventEndDate.getMonth(),
-        this.eventEndDate.getDate(),
-        0, 0, 0, 0
-      );
+    if (!isAllDay) {
+      if (this.eventTime) {
+        newEvent.start = new Date(this.eventTime);
+      }
+      if (this.eventEndTime) {
+        newEvent.end = new Date(this.eventEndTime);
+      } else if (this.eventEndDate) {
+        newEvent.end = new Date(this.eventEndDate);
+      }
     }
-  } //controlla
+  }
+
+  console.log("Nuovo evento creato:", newEvent.rrule); // Debug
+
   const username = this.sessionService.getSession()!.user.username!;
   const token = this.sessionService.getSession()!.token!;
 
@@ -448,13 +424,7 @@ addEvent() {
     this.theDate = start ? new Date(start) : null;
     this.eventTime = start ? new Date(start) : null;
     
-    if (event.allDay && end) {
-      const adjustedEnd = new Date(end);
-      adjustedEnd.setDate(adjustedEnd.getDate() - 1); // correzione per allDay end
-      this.eventEndDate = adjustedEnd;
-    } else {
-      this.eventEndDate = end ? new Date(end) : null;
-    }
+    this.eventEndDate = end ? new Date(end) : null; //cambiato post fusorario
 
     this.eventEndTime = end && !event.allDay ? new Date(end) : null;
 
@@ -504,12 +474,7 @@ updateEvent() {
 
   const startDate = this.theDate;
   let endDate: Date | null = this.eventEndDate;
-
-  if (isAllDay && endDate) { //da togliere day extra credo
-    // Per eventi allDay la fine è esclusiva quindi aggiungiamo un giorno
-    endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1);
-  }
-
+//tolto post fusorario
   let newEvent: any = {
     title: this.eventName,
     color: this.eventColor,
@@ -547,41 +512,17 @@ updateEvent() {
   } else {
     // start
     if (!isAllDay && this.eventTime) {
-      newEvent.start = new Date(
-        startDate.getFullYear(),
-        startDate.getMonth(),
-        startDate.getDate(),
-        this.eventTime.getHours(),
-        this.eventTime.getMinutes(),
-        0, 0
-      );
+      newEvent.start = new Date(this.theDate);
     } else {
-      newEvent.start = new Date(
-        startDate.getFullYear(),
-        startDate.getMonth(),
-        startDate.getDate(),
-        0, 0, 0, 0
-      );
+      newEvent.start = new Date(this.theDate);
     }
 
     // end (solo per eventi normali)
     if (!this.isTask && endDate) {
       if (!isAllDay && this.eventEndTime) {
-        newEvent.end = new Date(
-          endDate.getFullYear(),
-          endDate.getMonth(),
-          endDate.getDate(),
-          this.eventEndTime.getHours(),
-          this.eventEndTime.getMinutes(),
-          0, 0
-        );
+        newEvent.end = new Date(this.theDate);
       } else {
-        newEvent.end = new Date(
-          endDate.getFullYear(),
-          endDate.getMonth(),
-          endDate.getDate(),
-          0, 0, 0, 0
-        );
+        newEvent.end = new Date(this.theDate);
       }
     }
   }
@@ -681,8 +622,8 @@ getDuration(startTime: Date, endTime: Date): string {
     this.repeatUntil = null; // Reset della data di fine ripetizione
     this.repeatInterval = 1; // Reset dell'intervallo di ripetizione
     this.repeatWeekDays = []; // Reset dei giorni della settimana 
-    this.selectedEvent = null;
-    this.selectedEvent.eventname = '';
+    this.selectedEvent = null; 
+    //tolti selectedevent DA TOGLIERE COMMENTO SE VA TUTTO BENE
     this.isTask = false;
     this.taskStatus = 'da_fare';
 

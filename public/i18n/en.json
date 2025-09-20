@@ -175,7 +175,13 @@
     "add": "Add event",
     "update": "Update event",
     "delete": "Delete event",
-    "task": "Task"
+    "task": "Task",
+    "isTask": "Is it a Task"
+  },
+  "taskStatus": {
+    "da_fare": "To do",
+    "in_corso": "Doing",
+    "completata": "Done"
   },
   "add-event": "Add event",
   "add-project": "Add project",

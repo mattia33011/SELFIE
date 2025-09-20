@@ -9,90 +9,100 @@
     </full-calendar>
 }
 
-<p-dialog header="Evento" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' , height: '50rem' }" (onHide)="resetForm()">
+<p-dialog header="CAMBIAMI" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' , height: '50rem' }" (onHide)="resetForm()">
     <div class="popup" *ngIf="visible"> <!--dai indicazioni a form-group su css-->
-        <div class="form-group">
-            <label for="isTask">{{ 'event.isTask' | translate }}</label>
-            <p-checkbox label="È un'attività" [(ngModel)]="isTask" binary="true" (onChange)="onIsTaskChange()" aria-label="Seleziona se è un'attività"></p-checkbox>
-            <p-dropdown *ngIf="isTask" [options]="taskStatuses" [(ngModel)]="taskStatus" aria-placeholder="Seleziona uno stato"></p-dropdown>
-        </div>
-
-        <div class="form-group">
-            <p-floatlabel variant="in">
-                <input pInputText id="in_label" [(ngModel)]="eventName" pSize="small" autocomplete="off" />
-                <label for="in_label">{{ 'event.name' | translate }}</label>
-            </p-floatlabel>
-        </div>
-        
-        <div class="form-group">
-            <p-iftalabel>
-                <p-datepicker [(ngModel)]="theDate" inputId="date" showIcon iconDisplay="input" />
-                <label for="date">{{ 'event.theDate' | translate }}</label>
-            </p-iftalabel>
-        </div>
-        <div class="form-group">
-            <label for="eventColor">{{"event.color" | translate }}</label>
-            <div>
-                <p-colorpicker [(ngModel)]="eventColor" />
+        <div class="popup-container">
+            <div class="flex-row">
+                <div class="flex-item">
+                    <label for="isTask">{{ 'event.isTask' | translate }}</label>
+                </div>
+                <div class="flex-item">
+                    <p-checkbox label="È un'attività" [(ngModel)]="isTask" binary="true" (onChange)="onIsTaskChange()" aria-label="is Task"></p-checkbox>
+                </div>
+                <div class="flex-item">
+                    <p-select-button *ngIf="isTask" [options]="taskStatuses" [(ngModel)]="taskStatus" aria-placeholder="Seleziona uno stato"></p-select-button>
+                </div>
             </div>
-        </div>
-        
-        <!--impo-->    
-        <div *ngIf="!isTask">
-        
-        <div class="form-group">
-            <p-iftalabel>
-                <p-datepicker [(ngModel)]="eventEndDate" inputId="end_date" showIcon iconDisplay="input" />
-                <label for="end_date">{{ 'event.enddate' | translate }}</label>
-            </p-iftalabel>
-        </div>
-        
-        <div class="form-group">
-                <p-iftalabel>
-                    <p-datepicker inputId="eventTime" [(ngModel)]="eventTime" [timeOnly]="true" [stepMinute]="15" />
-                    <label for="eventTime">{{"event.start" | translate }}</label>
-                </p-iftalabel>
+            <div class="flex-row">
+                <div class="flex-item">
+                    <p-floatlabel variant="in">
+                        <input pInputText id="in_label" [(ngModel)]="eventName" pSize="small" autocomplete="off" />
+                        <label for="in_label">{{ 'event.name' | translate }}</label>
+                    </p-floatlabel>
+                </div>
+                <div class="flex-item">
+                    <label for="eventColor">{{"event.color" | translate }}</label>
+                    <p-colorpicker [(ngModel)]="eventColor" />
+                </div>
             </div>
-            <div class="form-group">
-                <p-iftalabel>
-                    <p-datepicker inputId="endTime" [(ngModel)]="eventEndTime" [timeOnly]="true" [stepMinute]="15" />
-                    <label for="eventEndTime">{{"event.endtime" | translate }}</label>
-                </p-iftalabel>
+            <div class="flex-row">
+                <div class="flex-item">
+                    <p-iftalabel>
+                        <p-datepicker [(ngModel)]="theDate" inputId="date" showIcon iconDisplay="input" />
+                        <label for="date">{{ 'event.theDate' | translate }}</label>
+                    </p-iftalabel>
+                </div>
+                <div *ngIf="!isTask">
+                    <div *ngIf="!repeatUntil && (!repeatType || repeatType === 'once')" class="flex-item">
+                        <div class="flex-item">
+                            <p-iftalabel>
+                                <p-datepicker [(ngModel)]="eventEndDate" inputId="end_date" showIcon iconDisplay="input" />
+                                <label for="end_date">{{ 'event.enddate' | translate }}</label>
+                            </p-iftalabel>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="form-group">
-                <p-iftalabel>
-                    <label for="eventLocation">{{"event.location" | translate }}</label>
-                    <input type="eventLocation" pInputText [(ngModel)]="eventLocation" />
-                </p-iftalabel>
-            </div>
+            <div *ngIf="!isTask">
+                <div class="flex-row">
+                    <div class="flex-item">
+                        <p-iftalabel>
+                            <p-datepicker inputId="eventTime" [(ngModel)]="eventTime" [timeOnly]="true" [stepMinute]="15" />
+                            <label for="eventTime">{{"event.start" | translate }}</label>
+                        </p-iftalabel>
+                    </div>
+                    <div class="flex-item">
+                        <p-iftalabel>
+                            <p-datepicker inputId="endTime" [(ngModel)]="eventEndTime" [timeOnly]="true" [stepMinute]="15" />
+                            <label for="eventEndTime">{{"event.endtime" | translate }}</label>
+                        </p-iftalabel>
+                    </div>
+                </div>
+                <div class="flex-row">
+                    <div class="flex-item">
+                        <p-iftalabel>
+                            <label for="eventLocation">{{"event.location" | translate }}</label>
+                            <input type="eventLocation" pInputText [(ngModel)]="eventLocation" />
+                        </p-iftalabel>
+                    </div>
+                </div>
 
 
         <!-- Per la ripetizione -->
             <div class="flex-col items-left">
                 <p-floatlabel class="w-full md:w-56" variant="in">
-                    <p-dropdown  [(ngModel)]="repeatType"  [options]="repeatOptions"  optionLabel="label" placeholder="{{'event.none' | translate }}"></p-dropdown>
-                    <label for="repeatType">{{ "event.repeat" | translate }}</label>
+                    <div class="repeat-grid">
+                        <button *ngFor="let option of repeatOptions" type="button" (click)="repeatType = option.value; onRepeatTypeChange()" [class.selected]="repeatType === option.value">
+                        {{ option.label }}
+                        </button>
+                    </div>
                 </p-floatlabel>
+
             </div>
             
             <!-- Se settimanale o bi-settimanale: mostra i giorni della settimana -->
             <div *ngIf="repeatType === 'weekly' || repeatType === 'biweekly'" class="giorni-ripetizione">
-                <label *ngFor="let day of weekDays" style="margin-right: 10px;">
-                <input
-                    type="checkbox"
-                    [value]="day.value"
-                    (change)="toggleWeekday($event)"
-                    [checked]="repeatWeekDays.includes(day.value)"
-                />
-                {{ day.label }}
-                </label>
+                <div class="weekday-checkbox" *ngFor="let day of weekDays">
+                    <p-checkbox [binary]="true" [inputId]="day.value" [ngModel]="repeatWeekDays.includes(day.value)" (onChange)="toggleWeekday($event, day.value)"> </p-checkbox>
+                    <label [for]="day.value">{{ day.label }}</label>
+                </div>
             </div>
+
             
             <!-- Data fine ripetizione -->
             <div *ngIf="repeatType && repeatType !== 'custom'" class="flex-col items-left">
                 <label for="repeatUntil">{{ 'event.repeatUntil' | translate }}</label>
-                <input id="repeatUntil" [(ngModel)]="repeatUntil" type="date" />
+                <p-datepicker [(ngModel)]="repeatUntil" inputId="dateuntil" showIcon iconDisplay="input" />
             </div>
             
             <!-- 
@@ -104,5 +114,6 @@
                 <p-button *ngIf="selectedEvent" label="{{ 'event.update' | translate }}" (click)="updateEvent()"></p-button>
                 <p-button *ngIf="selectedEvent" label="{{ 'event.delete' | translate }}" class="p-button-danger" (click)="deleteEvent()"></p-button>
             </div>
+        </div>
     </div>
 </p-dialog>

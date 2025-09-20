@@ -178,6 +178,11 @@
     "isTask": "È un task?",
     "task": "Task"
   },
+    "taskStatus": {
+    "da_fare": "Da fare",
+    "in_corso": "In corso",
+    "completata": "Completata"
+  },
   "add-event": "Aggiungi evento",
   "add-project": "Aggiungi progetto",
   "project-view": "Guarda i progetti",

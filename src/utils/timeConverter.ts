@@ -12,8 +12,8 @@ export class TimePipe implements PipeTransform {
 
 @Pipe({name: 'localDate'})
 export class LocalDatePipe implements PipeTransform {
-    transform(value: Date | string) {
-        return `${new Date(value).toLocaleDateString()}`
+    transform(value: Date) {
+        return `${convertTimeToString(value)} ${value.toLocaleDateString()}`
     }
 }
 

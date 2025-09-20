@@ -365,7 +365,7 @@ export class DetailsComponent {
 
   confirmLoading = false;
   async addTask() {
-    console.log(this.taskFormGroup.value);
+    console.log(JSON.stringify(this.taskFormGroup.value));
     const task: Task = {
       id: (this.tasks.length + 1).toString(),
       linkedTask: this.taskFormGroup.value.linkedTask!,

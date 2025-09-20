@@ -60,7 +60,7 @@ import { StudyPlan } from '../../../types/pomodoro';
 export class CalendarComponent implements OnInit, AfterViewInit{
   @ViewChild('fullcalendar') calendarComponent!: FullCalendarComponent; // Riferimento al calendario
 
-  today: Date
+  today = new Date()
   eventName: string = ''; // nome evento
   theDate: Date | null = null;
   eventEndDate: Date | null = null;
@@ -225,11 +225,10 @@ export class CalendarComponent implements OnInit, AfterViewInit{
     private readonly sessionService: SessionService
 
 ) {
-    this.today = new Date()
     effect(() => {
       const date = timeMachine.today();
       if (!date) return;
-      this.today = date;
+
       const dateString = `${date.getFullYear()}-${
         date.getMonth() + 1 <= 9
           ? `0${date.getMonth() + 1}`

@@ -4,12 +4,12 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Events, Notes, CalendarEvent, isEvent } from '../../types/events';
+import { Events, Notes, CalendarEvent } from '../../types/events';
 import { EventListComponent } from './event-list/event-list.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ApiService } from '../service/api.service';
 import { forkJoin } from 'rxjs';
-import { LocalDatePipe, stringToDate } from '../../utils/timeConverter';
+import { stringToDate } from '../../utils/timeConverter';
 import { TimeMachineService } from '../service/time-machine.service';
 import { NotificationService } from '../service/notification.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -21,18 +21,10 @@ import { FormsModule } from '@angular/forms';
 import { Knob } from 'primeng/knob';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CardModule } from 'primeng/card';
-import { InputText } from 'primeng/inputtext';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputGroupModule } from 'primeng/inputgroup';
-import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 
 @Component({
   selector: 'app-home',
   imports: [
-    LocalDatePipe,
-    InputGroupModule,
-InputGroupAddonModule,
     PanelModule,
     SkeletonModule,
     ButtonModule,
@@ -46,7 +38,6 @@ InputGroupAddonModule,
     Knob,
     RouterModule,
     CardModule,
-    InputText,
   ],
   providers: [DialogService],
   templateUrl: './home.component.html',
@@ -61,18 +52,14 @@ export class HomeComponent {
     onclose: () => void;
     onsnooze: () => void;
   };
-  eventDialog?: {
-    title: string;
-    event: CalendarEvent;
-    onclose: () => void;
-  };
+
   constructor(
     protected readonly sessionService: SessionService,
     private readonly apiService: ApiService,
     private readonly timeMachine: TimeMachineService,
     private readonly notificationService: NotificationService,
     private readonly cd: ChangeDetectorRef,
-    private readonly router: Router
+    router: Router
   ) {
     effect(() => {
       const today = timeMachine.today();
@@ -85,22 +72,8 @@ export class HomeComponent {
     });
 
     this.todayEvents = [];
-    this._setup(null);
   }
 
-  isEventDialogVisible = false;
-  showEvent(event: any) {
-    if (!isEvent(event)) return;
-    if(!event.extendedProps?.luogo) return;
-    this.eventDialog = {
-      title: event.title,
-      event: event,
-      //description: event.description,
-      onclose: () => (this.eventDialog = undefined),
-    };
-    this.isEventDialogVisible = true;
-    this.cd.detectChanges();
-  }
   isNotificationVisible = false;
   showNotification(event: CalendarEvent, delay?: number) {
     setTimeout(() => {
@@ -140,14 +113,14 @@ export class HomeComponent {
       ),
     ]).subscribe({
       next: (response) => {
-        this.recentNotes = [];
+        this.recentNotes = []
         this.recentNotes.push(
           ...response[1].map((it) => ({
             ...it,
             lastEdit: stringToDate(it.lastEdit.toString()),
           }))
         );
-        this.recentNotes.splice(5);
+        this.recentNotes.splice(5)
         console.log(this.recentNotes);
         this.deadlineEvents = [];
         this.deadlineEvents.push(
@@ -156,14 +129,19 @@ export class HomeComponent {
             .map((it) => ({ ...it, end: stringToDate(it.end!.toString()) }))
         );
 
-        this.todayEvents = response[0].map((it) => ({
-          ...it,
-          end: it.end ? stringToDate(it.end.toString()) : undefined,
-        }));
-        this.todayEvents.splice(5);
+        this.todayEvents = this.deadlineEvents.filter((event) => {
+          const format = (date: Date) =>
+            `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 
-        this.todayEvents.forEach((it) => {
-          this.showNotification(it);
+
+          this.todayEvents.forEach((it) => {
+            this.showNotification(it);
+          });
+          this.todayEvents.splice(5)
+          return (
+            event.end instanceof Date &&
+            format(event.end) === format(new Date())
+          );
         });
       },
       error: (error) => {
@@ -248,12 +226,6 @@ export class HomeComponent {
       });
   }
 
-  generateLink(place: string) {
-    return `https://www.google.com/maps/search/?api=1&query=${place.replace(
-      ' ',
-      '+'
-    )}`;
-  }
   deadlineEvents: CalendarEvent[] = [];
   todayEvents: CalendarEvent[] = [];
 
@@ -296,6 +268,5 @@ export class HomeComponent {
   loading = false
 
 */
-
   loading = false;
 }

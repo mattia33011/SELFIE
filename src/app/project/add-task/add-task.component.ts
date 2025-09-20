@@ -31,5 +31,6 @@ export class AddTaskComponent {
   @Input() tasks!: Task[];
   @Input() loading!: boolean;
   @Output() confirmAction = new EventEmitter<void>();
+
   constructor(protected readonly timeMachine: TimeMachineService) {}
 }

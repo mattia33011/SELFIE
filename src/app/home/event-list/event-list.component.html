@@ -1,36 +1,33 @@
 <p-panel styleClass="!h-full !w-full">
-  <ng-template #header>
-    <div class="w-100 text-xl !text-center font-semibold">
-      {{ title }}
+    <ng-template #header>
+        <div class="w-100 text-xl !text-center font-semibold">
+            {{title}}
+        </div>
+    </ng-template>
+    <div class="!h-full pb-3 md:px-3  flex flex-col columns-1 gap-2 overflow-hidden">
+        @if (loading) {
+            <p-skeleton width="100%" height="4rem" />
+            <p-skeleton width="100%" height="4rem" />
+            <p-skeleton width="100%" height="4rem" />
+        }
+        @else {
+            @for (event of _content; track $index ; let i = $index) {
+                <p-button styleClass="!px-0 !justify-start rounded-none md:!rounded-xm" size="large"  fluid="true">
+
+                    <span class="w-full !text-left px-2 !text-nowrap">
+                        <h3 class="font-semibold  text-xl truncate">{{event.title}} </h3>
+                        <p class="truncate">{{event.subtitle}}</p>
+                        <small class="text-sm font-semibold">{{dateFormat=='time' ? (event.date | time) : (event.date | localDate) }}</small>
+                    </span>
+                </p-button>
+            }
+            @empty {
+                <div class="text-sm">
+                    {{emptyLabel | translate}}
+                </div>
+            }
+        }
+
+
     </div>
-  </ng-template>
-  <div
-    class="!h-full pb-3 md:px-3 flex flex-col columns-1 gap-2 overflow-hidden"
-  >
-    @if (loading) {
-    <p-skeleton width="100%" height="4rem" />
-    <p-skeleton width="100%" height="4rem" />
-    <p-skeleton width="100%" height="4rem" />
-    } @else { @for (event of _content; track $index ; let i = $index) {
-    <p-button
-        (onClick)="onItemClick.emit(getEventFromContent(event))"
-      [routerLink]="redirect ?? ''"
-      styleClass="!px-0 !justify-start rounded-none md:!rounded-xm"
-      size="large"
-      fluid="true"
-    >
-      <span class="w-full !text-left px-2 !text-nowrap">
-        <h3 class="font-semibold text-xl truncate">{{ event.title }}</h3>
-        <p class="truncate">{{ event.subtitle }}</p>
-        <small class="text-sm font-semibold">{{
-          dateFormat == "time" ? (event.date | time) : (event.date | localDate)
-        }}</small>
-      </span>
-    </p-button>
-    } @empty {
-    <div class="text-sm">
-      {{ emptyLabel | translate }}
-    </div>
-    } }
-  </div>
 </p-panel>

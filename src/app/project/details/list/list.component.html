@@ -26,7 +26,7 @@
       @for (col of columns; track $index) {
       <td>
         @switch (col.field) { @default {
-        <span>{{ rowData[col.field] | translate }}</span>
+        {{ rowData[col.field] | translate }}
         } @case ("status") {
         <p-select
           #status

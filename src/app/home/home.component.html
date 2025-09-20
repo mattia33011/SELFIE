@@ -8,6 +8,7 @@
     <div class="w-full">
       <app-event-list
         [title]="'home.today' | translate"
+        (onItemClick)="showEvent($event)"
         [loading]="loading"
         [emptyLabel]="'home.noTodayEvents' | translate"
         [content]="todayEvents"
@@ -91,5 +92,41 @@
       }}</p-button>
     </div>
   </ng-template>
+</p-dialog>
+} @if(eventDialog){
+<p-dialog
+  [modal]="true"
+  [(visible)]="isEventDialogVisible"
+  [closeIconTemplate]=""
+  [header]="eventDialog.title"
+  [title]="eventDialog!.title"
+  (onHide)="eventDialog.onclose()"
+  draggable="false"
+  [style]="{ width: '25rem' }"
+>
+  <div class="flex flex-col justify-center gap-3 text-center">
+    @if(eventDialog.event.extendedProps?.luogo){
+    <a
+      [href]="generateLink(eventDialog.event.extendedProps!.luogo!)"
+      target="_blank"
+      class="flex flex-row gap-2 align-center"
+      style="cursor: pointer;"
+    >
+      <p-inputgroup>
+        <p-inputgroup-addon>
+          <i class="pi pi-map-marker"></i>
+        </p-inputgroup-addon>
+        <input
+        style="cursor: pointer;"
+        type="text"
+          pInputText
+          readonly
+          [value]="eventDialog.event.extendedProps?.luogo"
+        />
+      </p-inputgroup>
+    </a>
+    }
+    {{ eventDialog.event.start! | localDate }}
+  </div>
 </p-dialog>
 }

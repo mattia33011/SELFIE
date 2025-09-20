@@ -85,7 +85,7 @@ export class ListComponent {
       data: {
         ...task,
         expire: task.expire.toLocaleDateString(),
-        start: task.expire.toLocaleDateString(),
+        start: task.start.toLocaleDateString(),
         isMilestone: task.isMilestone ? 'yes' : 'no',
         status: taskStatusToString(task.status),
       },

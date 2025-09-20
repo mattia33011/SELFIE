@@ -12,6 +12,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { PanelModule } from 'primeng/panel';
 import { LocalDatePipe, TimePipe } from '../../../utils/timeConverter';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-event-list',
@@ -22,7 +23,8 @@ import { DatePipe } from '@angular/common';
     TranslatePipe,
     TimePipe,
     LocalDatePipe,
-  ],
+    RouterLink
+],
   templateUrl: './event-list.component.html',
   styleUrl: './event-list.component.css',
 })
@@ -32,6 +34,7 @@ export class EventListComponent {
   @Input() title!: string;
   @Input() emptyLabel: string = 'home.noEvents';
   @Input() dateFormat: 'time' | 'date' = 'time';
+  @Input() redirect?: string
   get _content(): Content[] {
     return this.content?.map(this.castContent);
   }

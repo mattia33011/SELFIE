@@ -59,7 +59,7 @@ export class HomeComponent {
     private readonly timeMachine: TimeMachineService,
     private readonly notificationService: NotificationService,
     private readonly cd: ChangeDetectorRef,
-    router: Router
+    private readonly router: Router
   ) {
     effect(() => {
       const today = timeMachine.today();
@@ -72,6 +72,7 @@ export class HomeComponent {
     });
 
     this.todayEvents = [];
+    this._setup(null);
   }
 
   isNotificationVisible = false;
@@ -113,14 +114,14 @@ export class HomeComponent {
       ),
     ]).subscribe({
       next: (response) => {
-        this.recentNotes = []
+        this.recentNotes = [];
         this.recentNotes.push(
           ...response[1].map((it) => ({
             ...it,
             lastEdit: stringToDate(it.lastEdit.toString()),
           }))
         );
-        this.recentNotes.splice(5)
+        this.recentNotes.splice(5);
         console.log(this.recentNotes);
         this.deadlineEvents = [];
         this.deadlineEvents.push(
@@ -128,20 +129,12 @@ export class HomeComponent {
             .filter((it) => it.end !== undefined)
             .map((it) => ({ ...it, end: stringToDate(it.end!.toString()) }))
         );
+        
+        this.todayEvents = response[0].map((it) => ({ ...it, end: it.end ? stringToDate(it.end.toString()) : undefined }))
+        this.todayEvents.splice(5);
 
-        this.todayEvents = this.deadlineEvents.filter((event) => {
-          const format = (date: Date) =>
-            `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-
-
-          this.todayEvents.forEach((it) => {
-            this.showNotification(it);
-          });
-          this.todayEvents.splice(5)
-          return (
-            event.end instanceof Date &&
-            format(event.end) === format(new Date())
-          );
+        this.todayEvents.forEach((it) => {
+          this.showNotification(it);
         });
       },
       error: (error) => {

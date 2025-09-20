@@ -4,7 +4,6 @@
 </div>
 <div class="mx-3 flex flex-col gap-5 mt-4">
   <div class="grid grid-cols-2 md:grid-cols-3 gap-2 items-stretch">
-    
     <!-- Today -->
     <div class="w-full">
       <app-event-list
@@ -12,19 +11,21 @@
         [loading]="loading"
         [emptyLabel]="'home.noTodayEvents' | translate"
         [content]="todayEvents"
+        dateFormat="date"
         class="h-full"
       />
     </div>
 
     <!-- Pomodoro -->
     <app-event-list
-      [title]="'home.pomodoroToday' | translate" [emptyLabel]="''"
+      [title]="'home.pomodoroToday' | translate"
+      [emptyLabel]="''"
       class="h-full"
     >
       <div class="h-full flex flex-col justify-center items-center gap-3">
         <ng-container *ngIf="!planToDo; else withPlan">
           <div class="text-center">
-            {{ 'home.noPomodoro' | translate }}
+            {{ "home.noPomodoro" | translate }}
           </div>
         </ng-container>
 
@@ -35,7 +36,7 @@
             valueTemplate="{value}%"
             [readonly]="true"
           ></p-knob>
-          <p>{{"home.done"| translate}}</p>
+          <p>{{ "home.done" | translate }}</p>
           <p-button routerLink="/pomodoro">
             {{ "home.goPomodoro" | translate }}
           </p-button>
@@ -46,6 +47,7 @@
     <!-- Notes -->
     <div class="col-span-2 md:col-span-1">
       <app-event-list
+        redirect="/note"
         [title]="'home.notes' | translate"
         [loading]="loading"
         [emptyLabel]="'home.noNotes' | translate"
@@ -54,7 +56,6 @@
         class="h-full"
       />
     </div>
-
   </div>
 </div>
 
@@ -70,9 +71,7 @@
   [style]="{ width: '25rem' }"
 >
   <div class="flex flex-col gap-2">
-    <span class="text-center"
-      >{{'expiresToday' | translate}}</span
-    >
+    <span class="text-center">{{ "expiresToday" | translate }}</span>
     @if (notificationDialog.description) {
 
     <span class="text-center">{{ notificationDialog.description }}</span>
@@ -81,8 +80,15 @@
 
   <ng-template #footer>
     <div class="flex flex-row gap-2 justify-end">
-      <p-button text severity="danger" (onClick)="isNotificationVisible = false">{{'close' | translate}}</p-button>
-      <p-button text (onClick)="notificationDialog.onsnooze()">{{'remindLater' | translate}}</p-button>
+      <p-button
+        text
+        severity="danger"
+        (onClick)="isNotificationVisible = false"
+        >{{ "close" | translate }}</p-button
+      >
+      <p-button text (onClick)="notificationDialog.onsnooze()">{{
+        "remindLater" | translate
+      }}</p-button>
     </div>
   </ng-template>
 </p-dialog>

@@ -159,7 +159,7 @@ export class CalendarComponent implements OnInit, AfterViewInit{
   }
 
 
-  loadPlan() {
+  loadPlan(ifToday: any) {
     this.apiService
       .getStudyPlans(
         this.sessionService.getSession()!.user.username!,
@@ -169,7 +169,9 @@ export class CalendarComponent implements OnInit, AfterViewInit{
         next: (response) => {
           this.fullPlans = response as StudyPlan[];
 
-          this.updateStudyIcons();
+          let today=new Date;
+          if(ifToday) {today=ifToday;}
+          else {today = this.timeMachine.today() as Date;};
 
         },
         error: (err) => {
@@ -228,6 +230,7 @@ export class CalendarComponent implements OnInit, AfterViewInit{
     effect(() => {
       const date = timeMachine.today();
       if (!date) return;
+      this.loadPlan(date);
 
       const dateString = `${date.getFullYear()}-${
         date.getMonth() + 1 <= 9
@@ -294,7 +297,8 @@ ngAfterViewInit() {
       ];
     });
   });
-  this.loadPlan();
+  this.loadPlan(null);
+  this.calendarComponent.getApi().render(); 
   }
 
 
@@ -404,13 +408,6 @@ addEvent() {
 
   handleEventClick(clickInfo: any) {
     const event = clickInfo.event;
-
-    // Controlla se il click è avvenuto sul pulsante timer
-    if (clickInfo.jsEvent.target.classList.contains('study-session-button') || 
-        clickInfo.jsEvent.target.closest('.study-session-button')) {
-      // Se è stato cliccato il timer, non fare nulla (già gestito dal timer stesso)
-      return;
-    }
 
     this.selectedEvent = event;
 

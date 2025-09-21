@@ -178,45 +178,42 @@ export class HomeComponent {
       .subscribe({
         next: (response) => {
           this.fullPlans = response as StudyPlan[];
-          let today = new Date();
-          if (ifToday) {
-            today = ifToday;
-          } else {
-            today = this.timeMachine.today() as Date;
-          }
-
+          const today = this.timeMachine.today();
           if (!today) return;
           today.setHours(0, 0, 0, 0);
-
+  
           const normalizeDate = (d: Date): number => {
             const date = new Date(d);
             date.setHours(0, 0, 0, 0);
             return date.getTime();
           };
-
+  
           const matchingPlan = this.fullPlans.find((plan) =>
             plan.days.some((d) => normalizeDate(d.day) === today.getTime())
           );
-
+  
           if (matchingPlan) {
             const dayIndex = matchingPlan.days.findIndex(
-              (d) => normalizeDate(d.day) === today.getTime()
+            (d) => normalizeDate(d.day) === today.getTime()
             );
+            
+              this.todayPlan = matchingPlan;
+              const completedStepIndex = this.todayPlan.days[dayIndex].step;
+              if (completedStepIndex < 0) return;
+              if(completedStepIndex==0){
+                this.planDone=0;
+                this.planToDo=true;
+                return
+              }
 
-            this.todayPlan = matchingPlan;
-            const completedStepIndex = this.todayPlan.days[dayIndex].step;
-            if (completedStepIndex < 0) return;
-
-            // somma le durate degli step completati
-            const doneMinutes = this.todayPlan.plan
-              .slice(0, completedStepIndex + 1)
-              .reduce((sum, step) => sum + step.duration, 0);
-
-            // percentuale rispetto al totale
-            this.planDone = Math.round(
-              (doneMinutes / this.todayPlan.totalTime) * 100
-            );
-            this.planToDo = true;
+              // somma le durate degli step completati
+              const doneMinutes = this.todayPlan.plan
+                .slice(0, completedStepIndex + 1)
+                .reduce((sum, step) => sum + step.duration, 0);
+              
+              // percentuale rispetto al totale
+              this.planDone= Math.round((doneMinutes / this.todayPlan.totalTime) * 100);
+              this.planToDo=true;
           } else {
             //NON ho un piano per oggi
             this.planToDo = false;

@@ -22,10 +22,14 @@
                 </p-button>
             }
             @empty {
+        <!-- fallback standard -->
                 <div class="text-sm">
-                    {{emptyLabel | translate}}
+                {{ emptyLabel | translate }}
                 </div>
-            }
+
+                <!-- slot per contenuti custom -->
+                <ng-content></ng-content>
+                    }
         }
 
 

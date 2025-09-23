@@ -67,7 +67,7 @@ export class HomeComponent {
   constructor(
     protected readonly sessionService: SessionService,
     private readonly apiService: ApiService,
-    private readonly timeMachine: TimeMachineService,
+    protected readonly timeMachine: TimeMachineService,
     private readonly notificationService: NotificationService,
     private readonly cd: ChangeDetectorRef,
     private readonly router: Router
@@ -126,7 +126,11 @@ export class HomeComponent {
     }, delay ?? 1000);
   }
 
-  private _setup(today: Date | null = null) {
+  ngAfterViewInit(){
+    
+  }
+
+  protected _setup(today: Date | null = null) {
     forkJoin([
       this.apiService.getEventsToday(
         this.sessionService.getSession()!.user.username!,

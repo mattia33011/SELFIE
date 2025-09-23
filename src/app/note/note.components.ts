@@ -60,9 +60,13 @@ export class NoteComponent {
       command: () => this.deleteNote(),
     },
     {
+
       label: 'duplicate Note',
       icon: 'pi pi-copy',
       command: () => {
+        if(this.selectedNote.type=="folder"){
+          return;
+        }
         this.duplicateNote(this.selectedNote);
       },
     },

@@ -21,7 +21,7 @@
           (contextmenu)="onContextMenu($event, selectedNote)"
         >
         </p-tree>
-        <p-contextMenu #cm [model]="items" (onHide)="onHide()"></p-contextMenu>
+        <p-contextMenu #cm [model]="selectedNote?.type=='folder'? [items[0]]:items" (onHide)="onHide()"></p-contextMenu>
 
         <div class="flex flex-col items-center justify-center">
           <input

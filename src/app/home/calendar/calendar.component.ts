@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild, effect } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnInit, Output, ViewChild, effect } from '@angular/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core';
@@ -88,6 +88,8 @@ export class CalendarComponent implements OnInit, AfterViewInit{
     { label: 'Sabato', value: 'SA' },
     { label: 'Domenica', value: 'SU' },
   ];
+
+  @Output ( ) refetchEvent: EventEmitter<any> = new EventEmitter();
     
   calendarOptions: CalendarOptions = {
     selectable: true,
@@ -109,6 +111,7 @@ export class CalendarComponent implements OnInit, AfterViewInit{
     events: [], // Inizialmente vuoto
     
     eventClick: this.handleEventClick.bind(this),
+  
 
   dayCellDidMount: (info) => {
         const cellDate = info.date;
@@ -226,9 +229,7 @@ export class CalendarComponent implements OnInit, AfterViewInit{
     private readonly apiService: ApiService,
     private readonly translateService: TranslateService,
     private readonly sessionService: SessionService,
-
 ) {
-  
     effect(() => {
       const date = timeMachine.today();
       if (!date) return;
@@ -239,7 +240,7 @@ export class CalendarComponent implements OnInit, AfterViewInit{
           ? `0${date.getMonth() + 1}`
           : date.getMonth() + 1
       }-${date.getDate() <= 9 ? `0${date.getDate()}` : date.getDate()}`;
-      this.calendarComponent.getApi().gotoDate(dateString);
+      this.calendarComponent?.getApi().gotoDate(dateString);
     });
   }
   
@@ -253,7 +254,15 @@ ngAfterViewInit() {
 
       }
     }, 100);
-    this.calendarComponent.getApi().render();
+    this.calendarComponent?.getApi().render();
+    const date= this.timeMachine.today();
+    if(!date) return;
+    const dateString = `${date.getFullYear()}-${
+      date.getMonth() + 1 <= 9
+        ? `0${date.getMonth() + 1}`
+        : date.getMonth() + 1
+    }-${date.getDate() <= 9 ? `0${date.getDate()}` : date.getDate()}`;
+    this.calendarComponent?.getApi().gotoDate(dateString);
     
   }
 
@@ -305,7 +314,7 @@ ngAfterViewInit() {
     });
   });
   this.loadPlan(null);
-  this.calendarComponent.getApi().render(); 
+  this.calendarComponent?.getApi().render(); 
   }
 
 
@@ -398,7 +407,7 @@ addEvent() {
 
   this.apiService.createEvent(username, newEvent, token).subscribe({
     next: (savedEvent: any) => {
-      const calendarApi = this.calendarComponent.getApi();
+      const calendarApi = this.calendarComponent?.getApi();
       calendarApi.addEvent({
         ...newEvent,
         id: savedEvent._id,
@@ -406,6 +415,7 @@ addEvent() {
         end: newEvent.end
       });
       this.resetForm();
+      this.refetchEvent.emit();
     },
     error: (err) => {
       console.error("Errore durante il salvataggio dell'evento", err);
@@ -464,7 +474,7 @@ addEvent() {
 updateEvent() {
   if (!this.selectedEvent) return;
 
-  const calendarApi = this.calendarComponent.getApi();
+  const calendarApi = this.calendarComponent?.getApi();
   const idd = this.selectedEvent.id;
   this.selectedEvent.remove();
 

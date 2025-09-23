@@ -21,7 +21,7 @@
     >
       <span class="w-full !text-left px-2 !text-nowrap">
         <h3 class="font-semibold text-xl truncate">{{ event.title }}</h3>
-        <p class="truncate">{{ event.subtitle }}</p>
+        <p class="truncate" [innerHTML]="event.subtitle"></p>
         <small class="text-sm font-semibold">{{
           dateFormat == "time" ? (event.date | time) : (event.date | localDate)
         }}</small>

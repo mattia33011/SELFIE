@@ -197,7 +197,7 @@ Aggiunge un task a un progetto.
 ```json
 	{
 		"id": "string",
-		"tasks": [
+		"tasks": [{
 			"id": "string",
 			"name": "string",
 			"input": "string",
@@ -208,7 +208,7 @@ Aggiunge un task a un progetto.
 			"linkedTask": ["task1", "task2", ...],
 			"status": "string",
 			"authors": ["member1", "member2", ...]
-		],
+		}, ...],
 		"name": "string",
 		"note": "string",
 		"author": "string",
@@ -224,7 +224,7 @@ Aggiorna un progetto.
 ```json
 	{
 		"id": "string",
-		"tasks": [
+		"tasks": [{
 			"id": "string",
 			"name": "string",
 			"input": "string",
@@ -235,7 +235,7 @@ Aggiorna un progetto.
 			"linkedTask": ["task1", "task2", ...],
 			"status": "string",
 			"authors": ["member1", "member2", ...]
-		],
+		}, ...],
 		"name": "string",
 		"note": "string",
 		"author": "string",

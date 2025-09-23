@@ -72,14 +72,14 @@ background: var(--p-primary-500) !important;
 
 
 
-.repeat-grid {
+::ng-deep .repeat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: 0.25rem;
 }
 
 /* Pulsante base: marrone scuro */
-.repeat-grid button {
+::ng-deep .repeat-grid button {
   padding: 0.5rem;
   background-color: #1b1613; /* marrone scuro */
   border: none;
@@ -87,16 +87,17 @@ background: var(--p-primary-500) !important;
   cursor: pointer;
   transition: background-color 0.2s;
   margin-top: 0.5rem;
+  margin-bottom: 0rem;
 }
 
 /*  Hover: verde chiaro */
-.repeat-grid button:hover {
+::ng-deep .repeat-grid button:hover {
   background-color: #adc178;
 }
-.repeat-grid button.selected {
+::ng-deep .repeat-grid button.selected {
   background-color: #adc178;
 }
-.flex-row {
+::ng-deep .flex-row {
   display: flex;
   flex-wrap: wrap; /* va a capo se non c’è spazio */
   gap: 1rem;     /* spazio tra gli elementi */
@@ -105,7 +106,7 @@ background: var(--p-primary-500) !important;
 
 }
 
-.p-iftalabel{
+::ng-deep .p-iftalabel{
   width: 10.5rem;
   height: auto;
 }
@@ -113,13 +114,14 @@ background: var(--p-primary-500) !important;
 ::ng-deep .giorni-ripetizione .p-checkbox {
   transform: scale(0.8);
   margin-right: 0.25rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
-.giorni-ripetizione {
+::ng-deep .giorni-ripetizione {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  align-items: center;
 }
 
 

@@ -10,14 +10,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CommonModule } from '@angular/common';
 import { Tree } from 'primeng/tree';
 import { ApiService } from '../service/api.service';
-import { Notes, Note } from '../../types/events';
+import {  Note } from '../../types/events';
 import { SessionService } from '../service/session.service';
-import { forkJoin, Observable } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { stringToDate } from '../../utils/timeConverter';
 import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
 import { TimeMachineService } from '../service/time-machine.service';
-import { mapNote } from '../../utils/converter';
 
 @Component({
   selector: 'notes',
@@ -46,6 +43,23 @@ import { mapNote } from '../../utils/converter';
   ],
 })
 export class NoteComponent {
+
+  constructor(
+    private messageService: MessageService,
+    private translateService: TranslateService,
+    private readonly apiService: ApiService,
+    protected readonly sessionService: SessionService,
+    protected timeMachine: TimeMachineService
+  ) {
+    Tree.prototype.allowDrop = (
+      dragNode: any,
+      dropNode: any,
+      dragNodeScope: any
+    ): boolean => {
+      return this._overrideAllowDrop(dragNode, dropNode, dragNodeScope);
+    };
+  }
+
   @ViewChild(Tree) tree: Tree | undefined;
   @ViewChild('cm') cm!: ContextMenu;
   text: string | undefined;
@@ -53,24 +67,7 @@ export class NoteComponent {
   selectedNote: any = null;
   selectedFiles!: TreeNode[];
   files: Note[] = [];
-  items: any[] = [
-    {
-      label: 'Delete Note',
-      icon: 'pi pi-trash',
-      command: () => this.deleteNote(),
-    },
-    {
-
-      label: 'duplicate Note',
-      icon: 'pi pi-copy',
-      command: () => {
-        if(this.selectedNote.type=="folder"){
-          return;
-        }
-        this.duplicateNote(this.selectedNote);
-      },
-    },
-  ];
+  items: any[] =[];
 
   ngOnInit(): void {
     this.apiService
@@ -84,10 +81,8 @@ export class NoteComponent {
             if (it.lastEdit) it.lastEdit = new Date(it.lastEdit);
             return it;
           });
-          console.log('Notes loaded:', this.files);
         },
         error: (error) => {
-          console.error('Error loading notes:', error);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
@@ -95,6 +90,24 @@ export class NoteComponent {
           });
         },
       });
+    this.items= [
+    {
+      label: this.translateService.instant('note.deleteNote'),
+      icon: 'pi pi-trash',
+      command: () => this.deleteNote(),
+    },
+    {
+
+      label: this.translateService.instant('note.duplicateNote'),
+      icon: 'pi pi-copy',
+      command: () => {
+        if(this.selectedNote.type=="folder"){
+          return;
+        }
+        this.duplicateNote(this.selectedNote);
+      },
+    },
+  ];
   }
 
   screenWidth: number = window.innerWidth;
@@ -106,20 +119,7 @@ export class NoteComponent {
     this.screenWidth = (event.target as Window).innerWidth;
   }
 
-  constructor(
-    private messageService: MessageService,
-    private readonly apiService: ApiService,
-    protected readonly sessionService: SessionService,
-    protected timeMachine: TimeMachineService
-  ) {
-    Tree.prototype.allowDrop = (
-      dragNode: any,
-      dropNode: any,
-      dragNodeScope: any
-    ): boolean => {
-      return this._overrideAllowDrop(dragNode, dropNode, dragNodeScope);
-    };
-  }
+ 
 
   private _overrideAllowDrop(
     dragNode: any,
@@ -156,12 +156,7 @@ export class NoteComponent {
 
     return undefined;
   };
-  /*
-    onContextMenu(event: any, Note: Note) {
-        this.selectedNote = Note;
-        this.cm.show(event);
-    }
-        */
+
   onHide() {
     this.selectedNote = null;
     this.text = '';
@@ -186,7 +181,6 @@ export class NoteComponent {
       lastEdit: this.timeMachine.today() ?? new Date(),
     };
 
-    // Add to the appropriate parent or root
     const targetArray = this.files;
     targetArray.push(newFolder);
 
@@ -224,7 +218,7 @@ export class NoteComponent {
       icon: note.icon,
       children: note.children ? [...note.children] : [],
       type: note.type,
-      parent: note.parent,
+      parent: null,
       droppableNode: note.droppableNode,
       _id: undefined, // Rimuovi l'ID per creare un nuovo documento
       lastEdit: this.timeMachine.today() ?? new Date(), // Aggiorna la data dell'ultima modifica
@@ -301,7 +295,7 @@ export class NoteComponent {
         },
       });
 
-    this.value = ''; // Clear the input field after adding
+    this.value = '';
   }
   syncronizeNote() {
     this.apiService
@@ -372,10 +366,8 @@ export class NoteComponent {
 
   deleteNote(note: Note | null = null) {
     try {
-      // Get the note to delete
       const noteToDelete = note || this.selectedNote;
 
-      // Validate the note and its ID
       if (!noteToDelete) {
         this.messageService.add({
           severity: 'warn',
@@ -432,7 +424,6 @@ export class NoteComponent {
     }
   }
 
-  // Update the context menu handler
   onContextMenu(event: any, note: Note) {
     if (!note?._id) {
       this.messageService.add({
@@ -446,44 +437,6 @@ export class NoteComponent {
     this.cm.show(event);
   }
 
-  private removeNoteFromStructure(note: Note) {
-    const removeFromParent = (
-      nodes: Note[],
-      parent: Note | null = null
-    ): boolean => {
-      for (let i = 0; i < nodes.length; i++) {
-        // Check if current node is the one to remove
-        if (nodes[i]._id === note._id) {
-          if (parent) {
-            // Remove from parent's children array (which contains IDs)
-            parent.children = parent.children.filter(
-              (childId) => childId !== note._id
-            );
-          } else {
-            // Remove from root files array
-            this.files = this.files.filter((file) => file._id !== note._id);
-          }
-          return true;
-        }
-
-        // If current node has children (array of IDs), we need to find the actual child notes
-        if (nodes[i].children && nodes[i].children.length > 0) {
-          // Get the actual child note objects (not just IDs)
-          const childNotes = this.getChildNotes(nodes[i]);
-
-          // Recursively check the child notes
-          if (removeFromParent(childNotes, nodes[i])) {
-            return true;
-          }
-        }
-      }
-      return false;
-    };
-
-    removeFromParent(this.files);
-  }
-
-  // Helper method to get actual note objects from child IDs
   private getChildNotes(parent: Note): Note[] {
     if (!parent.children) return [];
 
@@ -492,12 +445,10 @@ export class NoteComponent {
       .filter((note) => note !== null) as Note[];
   }
 
-  // Existing findNoteById method (updated to work with new structure)
   private findNoteById(id: any, notes: Note[] = this.files): Note | null {
     for (const note of notes) {
       if (note._id?.toString() === id?.toString()) return note;
 
-      // Check children if they exist as objects (shouldn't happen in new structure)
       if (note.children && note.children.length > 0) {
         const childNotes = this.getChildNotes(note);
         const found = this.findNoteById(id, childNotes);
@@ -510,7 +461,6 @@ export class NoteComponent {
     const dragNode = event.dragNode;
     const dropNode = event.dropNode;
     if (!dragNode || !dropNode) return;
-    //event.dragNode.parent = event.dropNode;
     const isSameFile = dragNode._id == dropNode._id;
     console.log('draggable', event);
     console.log('folder', dropNode);
@@ -522,7 +472,7 @@ export class NoteComponent {
     }
 
     if (event.dragNode.type == 'folder') return;
-    // Save the updated note
+
     this.apiService
       .patchNote(
         this.sessionService.getSession()!.user.username!,

@@ -17,12 +17,9 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { TableModule } from 'primeng/table';
 import { DividerModule } from 'primeng/divider';
 import { DialogModule } from 'primeng/dialog';
-import { timer } from 'rxjs';
 import { Task, Pomodoro, TaskDTO, StudySessionDTO, StudySession, StudyPlan, StudyStep, dayInfo } from '../../types/pomodoro';
 import { SessionService } from '../service/session.service';
-import { forkJoin, Observable } from 'rxjs';
 import { ApiService } from '../service/api.service';
-import { stringToDate } from '../../utils/timeConverter';
 import { ToastModule } from 'primeng/toast';
 import { TimeMachineService } from '../service/time-machine.service';
 import { RadioButtonModule } from 'primeng/radiobutton';
@@ -110,7 +107,6 @@ export class PomodoroComponent implements OnInit {
 
     private readonly messageService: MessageService,
     private readonly translateService: TranslateService,
-    private readonly themeService: ThemeService,
     private readonly apiService: ApiService,
     protected readonly sessionService: SessionService,
     protected readonly timeMachine: TimeMachineService,
@@ -852,7 +848,7 @@ get allDays() {
         .filter(dayInfo => {
           const day = new Date(dayInfo.day);
           day.setHours(0, 0, 0, 0);
-          return day.getTime() >= today.getTime(); // solo giorni >= oggi
+          return day.getTime() >= today.getTime();
         })
         .map(dayInfo => ({
           day: dayInfo.day,

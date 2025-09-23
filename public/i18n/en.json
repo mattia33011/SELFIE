@@ -152,7 +152,9 @@
   "note": {
     "newFolder": "New Folder",
     "newNote": "New Note",
-    "folderSelected": "You have selected a folder!"
+    "folderSelected": "You have selected a folder!",
+    "deleteNote": "Delete",
+    "duplicateNote": "Duplicate Note"
   },
   "event": {
     "name": "Name of the event",

@@ -152,7 +152,9 @@
   "note": {
     "newFolder": "Nuova cartella",
     "newNote": "Nuova nota",
-    "folderSelected": "Hai selezionato una cartella!"
+    "folderSelected": "Hai selezionato una cartella!",
+    "deleteNote": "Elimina",
+    "duplicateNote": "Duplica Nota"
   },
   "event": {
     "name": "Nome evento",

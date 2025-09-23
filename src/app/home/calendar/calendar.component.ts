@@ -1,4 +1,12 @@
-import { AfterViewInit, Component, EventEmitter, OnInit, Output, ViewChild, effect } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+  effect,
+} from '@angular/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core';
@@ -18,10 +26,10 @@ import { SelectButton } from 'primeng/selectbutton';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
-import { IftaLabelModule } from 'primeng/iftalabel'; 
+import { IftaLabelModule } from 'primeng/iftalabel';
 import { CheckboxModule } from 'primeng/checkbox'; // Importa il modulo Checkbox
-import {ChangeDetectorRef} from '@angular/core';
-import {forkJoin, Observable} from 'rxjs';
+import { ChangeDetectorRef } from '@angular/core';
+import { forkJoin, Observable } from 'rxjs';
 import { TimeMachineService } from '../../service/time-machine.service';
 import { ApiService } from '../../service/api.service';
 import { SessionService } from '../../service/session.service';
@@ -31,10 +39,8 @@ import { Router } from '@angular/router';
 
 // COMANDO npm install @fullcalendar/rrule rrule
 
-
 // manca ripeti tutti i primi lunedì del mese (?)
 // traduzione in ing SOLO per il calendario (mesi, mese settimana anno, abbreviazioni della settimana nel calendario ecc) (eventi apposto)
-
 
 @Component({
   selector: 'app-calendar',
@@ -58,10 +64,10 @@ import { Router } from '@angular/router';
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
 })
-export class CalendarComponent implements OnInit, AfterViewInit{
+export class CalendarComponent implements OnInit, AfterViewInit {
   @ViewChild('fullcalendar') calendarComponent!: FullCalendarComponent; // Riferimento al calendario
 
-  today = new Date()
+  today = new Date();
   eventName: string = ''; // nome evento
   theDate: Date | null = null;
   eventEndDate: Date | null = null;
@@ -78,7 +84,7 @@ export class CalendarComponent implements OnInit, AfterViewInit{
   repeatInterval: number = 1; // ogni tot giorni/settimane/mesi
   // repeatCount: number = 1; // per "Ripeti per N volte"
   repeatWeekDays: string[] = []; // es: ['mo', 'we', 'fr']
-  weekDays = [ 
+  weekDays = [
     //così che rrule lo accetti
     { label: 'Lunedì', value: 'MO' },
     { label: 'Martedì', value: 'TU' },
@@ -89,14 +95,14 @@ export class CalendarComponent implements OnInit, AfterViewInit{
     { label: 'Domenica', value: 'SU' },
   ];
 
-  @Output ( ) refetchEvent: EventEmitter<any> = new EventEmitter();
-    
+  @Output() refetchEvent: EventEmitter<any> = new EventEmitter();
+
   calendarOptions: CalendarOptions = {
     selectable: true,
     initialView: 'dayGridMonth',
     headerToolbar: {
       left: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay prev,next' // posso anche aggiungere listWeek per vedere eventi tipo lista
+      right: 'dayGridMonth,timeGridWeek,timeGridDay prev,next', // posso anche aggiungere listWeek per vedere eventi tipo lista
     },
     buttonText: {
       dayGridMonth: window.innerWidth < 768 ? '📅' : 'Mese', //si può cambiare al posto dell'emoji!!!
@@ -106,62 +112,74 @@ export class CalendarComponent implements OnInit, AfterViewInit{
     dayMaxEvents: 2, //max eventi poi viene un popover
     contentHeight: window.innerWidth < 768 ? 400 : 700, // Altezza calendario (se piccola va a 350 se grande 700)
     locale: ['it'],
-    plugins: [dayGridPlugin, ListWeekPlugin, TimeGridPlugin, interactionPlugin, rrulePlugin],
+    plugins: [
+      dayGridPlugin,
+      ListWeekPlugin,
+      TimeGridPlugin,
+      interactionPlugin,
+      rrulePlugin,
+    ],
     dateClick: this.openPopup.bind(this), //bind this perché altrimenti "non tiene il this"
     events: [], // Inizialmente vuoto
-    
-    eventClick: this.handleEventClick.bind(this),
-  
 
-  dayCellDidMount: (info) => {
-        const cellDate = info.date;
-        
-        // Normalizza la data (rimuove ore, minuti, secondi)
-        const normalizeDate = (date: Date) => {
-          return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        };
-        
-        const normalizedCellDate = normalizeDate(cellDate);
-        
-        // Controlla se ci sono piani di studio per questa data
-        const hasPlan = this.fullPlans && this.fullPlans.some(plan => 
-          plan.days.some(planDay => {
+    eventClick: this.handleEventClick.bind(this),
+    eventDidMount: (info) => {
+      if (!info.event.allDay)
+        info.el.style.backgroundColor = info.event.backgroundColor;
+    },
+    dayCellDidMount: (info) => {
+      const cellDate = info.date;
+
+      // Normalizza la data (rimuove ore, minuti, secondi)
+      const normalizeDate = (date: Date) => {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      };
+
+      const normalizedCellDate = normalizeDate(cellDate);
+
+      // Controlla se ci sono piani di studio per questa data
+      const hasPlan =
+        this.fullPlans &&
+        this.fullPlans.some((plan) =>
+          plan.days.some((planDay) => {
             const planDate = new Date(planDay.day);
             const normalizedPlanDate = normalizeDate(planDate);
-            return normalizedPlanDate.getTime() === normalizedCellDate.getTime();
+            return (
+              normalizedPlanDate.getTime() === normalizedCellDate.getTime()
+            );
           })
         );
-        
-        if (hasPlan) {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.innerHTML = '<i class="pi pi-stopwatch"></i>';
-          button.classList.add('study-session-button');
-          button.title = 'Sessione di studio programmata';
 
-          // Stile inline per posizionamento (puoi spostarlo in CSS)
-          button.style.position = 'absolute';
-          button.style.bottom = '4px';
-          button.style.right = '4px';
-          button.style.padding = '2px';
-          button.style.fontSize = '1.2rem';
+      if (hasPlan) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.innerHTML = '<i class="pi pi-stopwatch"></i>';
+        button.classList.add('study-session-button');
+        button.title = 'Sessione di studio programmata';
 
-          info.el.style.position = 'relative'; // necessario per il posizionamento assoluto
-          info.el.appendChild(button);
-        }
+        // Stile inline per posizionamento (puoi spostarlo in CSS)
+        button.style.position = 'absolute';
+        button.style.bottom = '4px';
+        button.style.right = '4px';
+        button.style.padding = '2px';
+        button.style.fontSize = '1.2rem';
+
+        info.el.style.position = 'relative'; // necessario per il posizionamento assoluto
+        info.el.appendChild(button);
       }
- };
+    },
+  };
 
- fullPlans: StudyPlan[]=[];
+  fullPlans: StudyPlan[] = [];
 
   hasStudyPlanOn(date: Date): boolean {
     if (!this.fullPlans) return false;
-    const normalize = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-    return this.fullPlans.some(plan =>
-      plan.days.some(day => normalize(day.day) === normalize(date))
+    const normalize = (d: Date) =>
+      new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    return this.fullPlans.some((plan) =>
+      plan.days.some((day) => normalize(day.day) === normalize(date))
     );
   }
-
 
   loadPlan(ifToday: any) {
     this.apiService
@@ -173,53 +191,54 @@ export class CalendarComponent implements OnInit, AfterViewInit{
         next: (response) => {
           this.fullPlans = response as StudyPlan[];
 
-          let today=new Date;
-          if(ifToday) {today=ifToday;}
-          else {today = this.timeMachine.today() as Date;};
+          let today = new Date();
+          if (ifToday) {
+            today = ifToday;
+          } else {
+            today = this.timeMachine.today() as Date;
+          }
           this.updateStudyIcons();
           this.calendarComponent.getApi().render();
         },
         error: (err) => {
-          console.error("Errore nel caricamento piani:", err);
-          
-        }
+          console.error('Errore nel caricamento piani:', err);
+        },
       });
-      
   }
 
- updateStudyIcons() {
-  if (!this.calendarComponent || !this.fullPlans) return;
-  const allCells = document.querySelectorAll('.fc-daygrid-day'); // tutte le celle giorno
+  updateStudyIcons() {
+    if (!this.calendarComponent || !this.fullPlans) return;
+    const allCells = document.querySelectorAll('.fc-daygrid-day'); // tutte le celle giorno
 
-  allCells.forEach((cell: any) => {
-    const cellDateStr = cell.getAttribute('data-date');
-    if (!cellDateStr) return;
-    const cellDate = new Date(cellDateStr);
+    allCells.forEach((cell: any) => {
+      const cellDateStr = cell.getAttribute('data-date');
+      if (!cellDateStr) return;
+      const cellDate = new Date(cellDateStr);
 
-    const normalize = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-    const hasPlan = this.fullPlans.some(plan =>
-      plan.days.some(day => normalize(new Date(day.day)) === normalize(cellDate))
-    );
+      const normalize = (d: Date) =>
+        new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+      const hasPlan = this.fullPlans.some((plan) =>
+        plan.days.some(
+          (day) => normalize(new Date(day.day)) === normalize(cellDate)
+        )
+      );
 
-    
+      if (hasPlan && !cell.querySelector('.study-session-button')) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.innerHTML = '<i class="pi pi-stopwatch"></i>';
+        button.classList.add('study-session-button');
+        button.title = 'Sessione di studio programmata';
+        button.style.position = 'absolute';
+        button.style.bottom = '4px';
+        button.style.right = '4px';
+        button.style.fontSize = '1.2rem';
 
-    if (hasPlan && !cell.querySelector('.study-session-button')) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.innerHTML = '<i class="pi pi-stopwatch"></i>';
-      button.classList.add('study-session-button');
-      button.title = 'Sessione di studio programmata';
-      button.style.position = 'absolute';
-      button.style.bottom = '4px';
-      button.style.right = '4px';
-      button.style.fontSize = '1.2rem';
-
-
-      cell.style.position = 'relative';
-      cell.appendChild(button);
-    }
-  });
-}
+        cell.style.position = 'relative';
+        cell.appendChild(button);
+      }
+    });
+  }
 
   taskStatuses: any[] = [];
   repeatOptions: any[] = [];
@@ -228,8 +247,8 @@ export class CalendarComponent implements OnInit, AfterViewInit{
     protected readonly timeMachine: TimeMachineService,
     private readonly apiService: ApiService,
     private readonly translateService: TranslateService,
-    private readonly sessionService: SessionService,
-) {
+    private readonly sessionService: SessionService
+  ) {
     effect(() => {
       const date = timeMachine.today();
       if (!date) return;
@@ -243,207 +262,229 @@ export class CalendarComponent implements OnInit, AfterViewInit{
       this.calendarComponent?.getApi().gotoDate(dateString);
     });
   }
-  
-ngAfterViewInit() {
-    
+
+  ngAfterViewInit() {
     // Forza un primo render
     setTimeout(() => {
       if (this.calendarComponent) {
-        
         this.updateStudyIcons();
-
       }
     }, 100);
     this.calendarComponent?.getApi().render();
-    const date= this.timeMachine.today();
-    if(!date) return;
+    const date = this.timeMachine.today();
+    if (!date) return;
     const dateString = `${date.getFullYear()}-${
-      date.getMonth() + 1 <= 9
-        ? `0${date.getMonth() + 1}`
-        : date.getMonth() + 1
+      date.getMonth() + 1 <= 9 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
     }-${date.getDate() <= 9 ? `0${date.getDate()}` : date.getDate()}`;
     this.calendarComponent?.getApi().gotoDate(dateString);
-    
   }
 
   ngOnInit() {
-  this.apiService.getEvents(
-      this.sessionService.getSession()!.user.username!,
-      this.sessionService.getSession()!.token!
-    ).subscribe({
-      next: (events) => {
-        this.calendarOptions.events = events.map(event => ({
-          ...event,
-          start: event.start,
-          end: event.end,
-          id: event._id
-        }));
-      },
-      error: (err) => {
-        console.error('Errore nel caricamento eventi', err);
-      }
-    });
-    this.translate.get([
-      'event.none',
-      'event.daily',
-      'event.weekly',
-      'event.biweekly',
-      'event.monthly',
-      'event.yearly'
-    ]).subscribe(translations => {
-      this.repeatOptions = [
-        { label: translations['event.none'], value: '' },
-        { label: translations['event.daily'], value: 'daily' },
-        { label: translations['event.weekly'], value: 'weekly' },
-        { label: translations['event.biweekly'], value: 'biweekly' },
-        { label: translations['event.monthly'], value: 'monthly' },
-        { label: translations['event.yearly'], value: 'yearly' },
-      ];
-      this.translate
-      .get([
-      'taskStatus.da_fare',
-      'taskStatus.in_corso',
-      'taskStatus.completata'
-    ])
-    .subscribe(translations => {
-      this.taskStatuses = [
-        { label: translations['taskStatus.da_fare'], value: 'da_fare' },
-        { label: translations['taskStatus.in_corso'], value: 'in_corso' },
-        { label: translations['taskStatus.completata'], value: 'completata' }
-      ];
-    });
+    this.apiService
+      .getEvents(
+        this.sessionService.getSession()!.user.username!,
+        this.sessionService.getSession()!.token!
+      )
+      .subscribe({
+        next: (events) => {
+          this.calendarOptions.events = events.map((event) => ({
+            ...event,
+            start: event.start,
+            end: event.end,
+            id: event._id,
+            color: event.color,
+          }));
+        },
+        error: (err) => {
+          console.error('Errore nel caricamento eventi', err);
+        },
+      });
     this.translate
       .get([
-      'day.mon',
-      'day.tue',
-      'day.wed',
-      'day.thurs',
-      'day.fri',
-      'day.sat',
-      'day.sun',
-    ])
-    .subscribe((translations) => {
-      this.weekDays = [
-        { label: translations['day.mon'], value: 'MO' },
-        { label: translations['day.tue'], value: 'TU' },
-        { label: translations['day.wed'], value: 'WE' },
-        { label: translations['day.thurs'], value: 'TH' },
-        { label: translations['day.fri'], value: 'FR' },
-        { label: translations['day.sat'], value: 'SA' },
-        { label: translations['day.sun'], value: 'SU' },
-      ];
-
-    });
-  });
-  this.loadPlan(null);
-  this.calendarComponent?.getApi().render(); 
+        'event.none',
+        'event.daily',
+        'event.weekly',
+        'event.biweekly',
+        'event.monthly',
+        'event.yearly',
+      ])
+      .subscribe((translations) => {
+        this.repeatOptions = [
+          { label: translations['event.none'], value: '' },
+          { label: translations['event.daily'], value: 'daily' },
+          { label: translations['event.weekly'], value: 'weekly' },
+          { label: translations['event.biweekly'], value: 'biweekly' },
+          { label: translations['event.monthly'], value: 'monthly' },
+          { label: translations['event.yearly'], value: 'yearly' },
+        ];
+        this.translate
+          .get([
+            'taskStatus.da_fare',
+            'taskStatus.in_corso',
+            'taskStatus.completata',
+          ])
+          .subscribe((translations) => {
+            this.taskStatuses = [
+              { label: translations['taskStatus.da_fare'], value: 'da_fare' },
+              { label: translations['taskStatus.in_corso'], value: 'in_corso' },
+              {
+                label: translations['taskStatus.completata'],
+                value: 'completata',
+              },
+            ];
+          });
+        this.translate
+          .get([
+            'day.mon',
+            'day.tue',
+            'day.wed',
+            'day.thurs',
+            'day.fri',
+            'day.sat',
+            'day.sun',
+          ])
+          .subscribe((translations) => {
+            this.weekDays = [
+              { label: translations['day.mon'], value: 'MO' },
+              { label: translations['day.tue'], value: 'TU' },
+              { label: translations['day.wed'], value: 'WE' },
+              { label: translations['day.thurs'], value: 'TH' },
+              { label: translations['day.fri'], value: 'FR' },
+              { label: translations['day.sat'], value: 'SA' },
+              { label: translations['day.sun'], value: 'SU' },
+            ];
+          });
+      });
+    this.loadPlan(null);
+    this.calendarComponent?.getApi().render();
   }
-
 
   toggleWeekday(event: any, value: string) {
-  if (event.checked) {
-    if (!this.repeatWeekDays.includes(value)) {
-      this.repeatWeekDays.push(value);
+    if (event.checked) {
+      if (!this.repeatWeekDays.includes(value)) {
+        this.repeatWeekDays.push(value);
+      }
+    } else {
+      this.repeatWeekDays = this.repeatWeekDays.filter((d) => d !== value);
     }
-  } else {
-    this.repeatWeekDays = this.repeatWeekDays.filter(d => d !== value);
   }
-}
   selectedEvent: any = null;
- 
+
   openPopup(arg: any) {
     this.resetForm();
     this.theDate = arg.date; // Salva la data selezionata
     this.visible = true; // Mostra il popup
-    //this.isEditMode = false; 
+    //this.isEditMode = false;
   }
 
-addEvent() {
-  if (!this.eventName.trim()) {
-    alert("Inserisci un nome per l'evento!");
-    return;
-  }
-  if (!this.theDate) {
-    alert("Seleziona una data per l'evento!");
-    return;
-  }
+  addEvent() {
+    if (!this.eventName.trim()) {
+      alert("Inserisci un nome per l'evento!");
+      return;
+    }
+    if (!this.theDate) {
+      alert("Seleziona una data per l'evento!");
+      return;
+    }
 
-  // Calcolo startDateTime (solo data se allDay)
-  const isAllDay = this.isTask || !this.eventTime;
-  const startDateTime = new Date(this.theDate);
+    // Calcolo startDateTime (solo data se allDay) CAMBIA
+    const isAllDay = this.isTask || !this.eventTime;
+    console.log('the date', this.theDate);
+    const startDateTime = this.theDate;
 
-  // Base event
-  const newEvent: any = {
-    title: this.eventName,
-    color: this.eventColor,
-    extendedProps: {
-      luogo: this.eventLocation,
-      tipo: this.isTask ? 'attività' : 'evento',
-      stato: this.taskStatus
-    },
-    allDay: isAllDay
-  };
-
-  // Mappa ripetizioni
-  const freqMap: any = {
-    daily: 'DAILY',
-    weekly: 'WEEKLY',
-    biweekly: 'WEEKLY',
-    monthly: 'MONTHLY',
-    yearly: 'YEARLY'
-  };
-
-  // Se evento NON è task e ha ripetizione valida
-  if (!this.isTask && this.repeatType && freqMap[this.repeatType]) {
-      newEvent.rrule = {
-      freq: freqMap[this.repeatType],
-      dtstart: startDateTime,
-      interval: this.repeatType === 'biweekly' ? 2 : (this.repeatInterval || 1),
-      until: this.repeatUntil || undefined,
-      byweekday: this.repeatWeekDays.length ? this.repeatWeekDays : undefined
+    // Base event
+    const newEvent: any = {
+      title: this.eventName,
+      color: this.eventColor,
+      extendedProps: {
+        luogo: this.eventLocation,
+        tipo: this.isTask ? 'attività' : 'evento',
+        stato: this.taskStatus,
+      },
+      allDay: isAllDay,
     };
 
-    if (!isAllDay && this.eventTime && this.eventEndTime) {
-      newEvent.duration = this.getDuration(this.eventTime, this.eventEndTime);
-    }
-  } else {
-    // Eventi singoli o attività
-    newEvent.start = startDateTime;
+    // Mappa ripetizioni
+    const freqMap: any = {
+      daily: 'DAILY',
+      weekly: 'WEEKLY',
+      biweekly: 'WEEKLY',
+      monthly: 'MONTHLY',
+      yearly: 'YEARLY',
+    };
 
-    if (!isAllDay) {
-      if (this.eventTime) {
-        newEvent.start = new Date(this.eventTime);
+    // Se evento NON è task e ha ripetizione valida
+    if (!this.isTask && this.repeatType && freqMap[this.repeatType]) {
+      newEvent.rrule = {
+        freq: freqMap[this.repeatType],
+        dtstart: startDateTime,
+        interval: this.repeatType === 'biweekly' ? 2 : this.repeatInterval || 1,
+        until: this.repeatUntil || undefined,
+        byweekday: this.repeatWeekDays.length ? this.repeatWeekDays : undefined,
+      };
+
+      if (!isAllDay && this.eventTime && this.eventEndTime) {
+        newEvent.duration = this.getDuration(this.eventTime, this.eventEndTime);
       }
-      if (this.eventEndTime) {
-        newEvent.end = new Date(this.eventEndTime);
-      } else if (this.eventEndDate) {
+    } else {
+      // Eventi singoli o attività
+      newEvent.start = startDateTime;
+
+      if (this.eventTime) {
+        startDateTime.setHours(this.eventTime.getHours());
+        startDateTime.setMinutes(this.eventTime.getMinutes());
+        newEvent.start = startDateTime;
+      }
+      if (this.eventEndDate) {
         newEvent.end = new Date(this.eventEndDate);
       }
+      if (this.eventEndTime) {
+        const end = new Date();
+
+        end.setDate(startDateTime.getDate());
+        end.setMonth(startDateTime.getMonth());
+        end.setFullYear(startDateTime.getFullYear());
+        end.setHours(this.eventEndTime.getHours());
+        end.setMinutes(this.eventEndTime.getMinutes());
+        newEvent.end = end;
+      }
+      if (this.eventEndDate && this.eventEndTime) {
+        const end = this.eventEndDate;
+        end.setHours(this.eventEndTime.getHours());
+        end.setMinutes(this.eventEndTime.getMinutes());
+        newEvent.end = end;
+      }
     }
+
+    console.log('Nuovo evento creato:', newEvent); // Debug
+
+    const username = this.sessionService.getSession()!.user.username!;
+    const token = this.sessionService.getSession()!.token!;
+
+    this.apiService.createEvent(username, newEvent, token).subscribe({
+      next: (savedEvent: any) => {
+        console.log(newEvent);
+        const calendarApi = this.calendarComponent?.getApi();
+        const event = {
+          ...newEvent,
+          id: savedEvent._id,
+          start: newEvent.start,
+          end: newEvent.end,
+        }
+        this.calendarOptions.events = [
+          ...(this.calendarOptions.events as any[]),
+          event,
+        ];
+
+        calendarApi.addEvent(event);
+        this.resetForm();
+        this.refetchEvent.emit();
+      },
+      error: (err) => {
+        console.error("Errore durante il salvataggio dell'evento", err);
+      },
+    });
   }
-
-  console.log("Nuovo evento creato:", newEvent.rrule); // Debug
-
-  const username = this.sessionService.getSession()!.user.username!;
-  const token = this.sessionService.getSession()!.token!;
-
-  this.apiService.createEvent(username, newEvent, token).subscribe({
-    next: (savedEvent: any) => {
-      const calendarApi = this.calendarComponent?.getApi();
-      calendarApi.addEvent({
-        ...newEvent,
-        id: savedEvent._id,
-        start: newEvent.start,
-        end: newEvent.end
-      });
-      this.resetForm();
-      this.refetchEvent.emit();
-    },
-    error: (err) => {
-      console.error("Errore durante il salvataggio dell'evento", err);
-    }
-  });
-}
 
   handleEventClick(clickInfo: any) {
     const event = clickInfo.event;
@@ -452,21 +493,26 @@ addEvent() {
 
     this.eventName = event.title || '';
     this.eventLocation = event.extendedProps?.luogo || '';
-    this.eventColor = event.color || '#99ff63';
+    this.eventColor = event.backgroundColor || '#99ff63';
 
-    const start = event.start;
-    const end = event.end;
+    const start = event.start ? new Date(event.start) : null;
+    const end = event.end ? new Date(event.end) : null;
+    console.log(JSON.stringify(event));
 
-    this.theDate = start ? new Date(start) : null;
-    this.eventTime = start ? new Date(start) : null;
-    
-    this.eventEndDate = end ? new Date(end) : null; //cambiato post fusorario
+    this.theDate = start;
+    if (start && start.getMinutes() > 0 && start.getHours() > 0)
+      this.eventTime = start;
+    else this.eventTime = null;
 
-    this.eventEndTime = end && !event.allDay ? new Date(end) : null;
+    this.eventEndDate = end; //cambiato post fusorario
+    if (end && end.getMinutes() > 0 && end.getHours() > 0)
+      this.eventEndTime = end;
+    else this.eventEndTime = null;
 
     const plainEvent = event.toPlainObject();
-    const rrule = plainEvent.rrule;
-
+    const rrule = (this.calendarOptions.events as any[]).find(
+      (it) => it.id == plainEvent.id
+    )?.rrule;
     if (rrule) {
       this.repeatType = this.getRepeatTypeFromRRule(rrule);
       this.repeatUntil = rrule.until ? new Date(rrule.until) : null;
@@ -481,164 +527,176 @@ addEvent() {
     this.visible = true;
   }
 
-
   getRepeatTypeFromRRule(rrule: any): string {
     if (rrule.freq === 'WEEKLY' && rrule.interval === 2) return 'biweekly';
     const freqMap = {
       DAILY: 'daily',
       WEEKLY: 'weekly',
       MONTHLY: 'monthly',
-      YEARLY: 'yearly'
+      YEARLY: 'yearly',
     };
-    return freqMap[rrule.freq as 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'] || '';
+    return (
+      freqMap[rrule.freq as 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'] || ''
+    );
   }
 
-updateEvent() {
-  if (!this.selectedEvent) return;
+  updateEvent() {
+    if (!this.selectedEvent) return;
 
-  const calendarApi = this.calendarComponent?.getApi();
-  const idd = this.selectedEvent.id;
-  this.selectedEvent.remove();
+    const calendarApi = this.calendarComponent?.getApi();
+    const idd = this.selectedEvent.id;
+    this.selectedEvent.remove();
 
-  if (!this.theDate) {
-    alert("Inserisci una data valida");
-    return;
-  }
-
-  // Se è attività, sempre allDay e start senza ora
-  const isAllDay = this.isTask || !this.eventTime;
-
-  const startDate = this.theDate;
-  let endDate: Date | null = this.eventEndDate;
-//tolto post fusorario
-  let newEvent: any = {
-    title: this.eventName,
-    color: this.eventColor,
-    extendedProps: { 
-      luogo: this.eventLocation,
-      tipo: this.isTask ? 'attività' : 'evento',
-      stato: this.taskStatus
-    },
-    allDay: isAllDay
-  };
-
-  if (!this.isTask && this.repeatType && this.repeatType !== 'none') {
-    // Solo per eventi normali applichiamo rrule
-    const freqMap: any = {
-      daily: 'DAILY',
-      weekly: 'WEEKLY',
-      biweekly: 'WEEKLY',
-      monthly: 'MONTHLY',
-      yearly: 'YEARLY'
-    };
-
-    newEvent.rrule = {
-      freq: freqMap[this.repeatType],
-      dtstart: startDate,
-      interval: this.repeatInterval || 1,
-      until: this.repeatUntil || undefined,
-      byweekday: this.repeatWeekDays.length ? this.repeatWeekDays : undefined
-    };
-
-    if (!isAllDay && this.eventTime && this.eventEndTime) {
-      newEvent.duration = this.getDuration(this.eventTime, this.eventEndTime);
-    } else if (!isAllDay) {
-      newEvent.duration = '01:00';
+    if (!this.theDate) {
+      alert('Inserisci una data valida');
+      return;
     }
-  } else {
-    // start
-    if (!isAllDay && this.eventTime) {
-      newEvent.start = new Date(this.theDate);
+
+    // Se è attività, sempre allDay e start senza ora
+    const isAllDay = this.isTask || !this.eventTime;
+
+    const startDate = this.theDate;
+    let endDate: Date | null = this.eventEndDate;
+    //tolto post fusorario
+    let newEvent: any = {
+      title: this.eventName,
+      color: this.eventColor,
+      extendedProps: {
+        luogo: this.eventLocation,
+        tipo: this.isTask ? 'attività' : 'evento',
+        stato: this.taskStatus,
+      },
+      allDay: isAllDay,
+    };
+
+    if (!this.isTask && this.repeatType && this.repeatType !== 'none') {
+      // Solo per eventi normali applichiamo rrule
+      const freqMap: any = {
+        daily: 'DAILY',
+        weekly: 'WEEKLY',
+        biweekly: 'WEEKLY',
+        monthly: 'MONTHLY',
+        yearly: 'YEARLY',
+      };
+
+      newEvent.rrule = {
+        freq: freqMap[this.repeatType],
+        dtstart: startDate,
+        interval: this.repeatInterval || 1,
+        until: this.repeatUntil || undefined,
+        byweekday: this.repeatWeekDays.length ? this.repeatWeekDays : undefined,
+      };
+
+      if (!isAllDay && this.eventTime && this.eventEndTime) {
+        newEvent.duration = this.getDuration(this.eventTime, this.eventEndTime);
+      } else if (!isAllDay) {
+        newEvent.duration = '01:00';
+      }
     } else {
-      newEvent.start = new Date(this.theDate);
-    }
+      // start
+      const start = new Date(this.theDate);
+      if (!isAllDay && this.eventTime) {
+        if (this.eventTime) {
+          start.setHours(this.eventTime.getHours());
+          start.setMinutes(this.eventTime.getMinutes());
+        }
+        newEvent.start = start;
+      }
 
-    // end (solo per eventi normali)
-    if (!this.isTask && endDate) {
-      if (!isAllDay && this.eventEndTime) {
-        newEvent.end = new Date(this.theDate);
-      } else {
-        newEvent.end = new Date(this.theDate);
+      // end
+      if (!this.isTask) {
+        if (!endDate) endDate = start;
+        if (!isAllDay && this.eventEndTime) {
+          if (this.eventEndTime) {
+            endDate.setHours(this.eventEndTime.getHours());
+            endDate.setMinutes(this.eventEndTime.getMinutes());
+          }
+          newEvent.end = new Date(endDate);
+        }
       }
     }
-  }
-this.apiService.updateEvent(
-    this.sessionService.getSession()!.user.username!,
-    idd,
-    newEvent,
-    this.sessionService.getSession()!.token!
-  ).subscribe({
-    next: (updatedEvent: any) => {
-      calendarApi.addEvent({
-        ...newEvent,
-        id: updatedEvent._id
-      });
+    this.apiService
+      .updateEvent(
+        this.sessionService.getSession()!.user.username!,
+        idd,
+        newEvent,
+        this.sessionService.getSession()!.token!
+      )
+      .subscribe({
+        next: (_: any) => {
+          console.log(newEvent);
+          const event: any = {
+            ...newEvent,
+            eventColor: newEvent.color,
+            id: idd,
+          };
+          calendarApi.addEvent(event);
 
-      this.resetForm();
-    },
-    error: (err) => {
-      console.error('Errore durante aggiornamento evento', err);
-      alert('Errore durante aggiornamento evento');
-    }
-  });
-}
-
-deleteEvent() {
-  if (this.selectedEvent) {
-    if (confirm('Sei sicuro di voler eliminare questo evento?')) {
-      const eventId = this.selectedEvent.id;
-      const userId = this.sessionService.getSession()!.user.username!;
-      const token = this.sessionService.getSession()!.token!;
-
-      this.apiService.deleteEvent(userId, eventId, token).subscribe({
-        next: () => {
-          this.selectedEvent!.remove();
           this.resetForm();
         },
         error: (err) => {
-          console.error('Errore durante eliminazione evento', err);
-          alert('Errore durante eliminazione evento');
-        }
+          console.error('Errore durante aggiornamento evento', err);
+          alert('Errore durante aggiornamento evento');
+        },
       });
+  }
+
+  deleteEvent() {
+    if (this.selectedEvent) {
+      if (confirm('Sei sicuro di voler eliminare questo evento?')) {
+        const eventId = this.selectedEvent.id;
+        const userId = this.sessionService.getSession()!.user.username!;
+        const token = this.sessionService.getSession()!.token!;
+
+        this.apiService.deleteEvent(userId, eventId, token).subscribe({
+          next: () => {
+            this.selectedEvent!.remove();
+            this.resetForm();
+          },
+          error: (err) => {
+            console.error('Errore durante eliminazione evento', err);
+            alert('Errore durante eliminazione evento');
+          },
+        });
+      }
     }
   }
-}
 
+  getDuration(startTime: Date, endTime: Date): string {
+    //non penso sia full corretto
+    const diffMs = endTime.getTime() - startTime.getTime();
+    if (diffMs <= 0) {
+      return '00:00:00';
+    }
 
-getDuration(startTime: Date, endTime: Date): string {
-  const diffMs = endTime.getTime() - startTime.getTime();
-  if (diffMs <= 0) {
-    return "00:00:00";
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const hours = Math.floor(diffSeconds / 3600);
+    const minutes = Math.floor((diffSeconds % 3600) / 60);
+    const seconds = diffSeconds % 60;
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   }
-
-  const diffSeconds = Math.floor(diffMs / 1000);
-  const hours = Math.floor(diffSeconds / 3600);
-  const minutes = Math.floor((diffSeconds % 3600) / 60);
-  const seconds = diffSeconds % 60;
-
-  const pad = (n: number) => String(n).padStart(2, "0");
-
-  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-}
-
 
   //riguarda
   onRepeatTypeChange() {
     this.repeatUntil = null;
     this.repeatWeekDays = [];
-  
+
     if (this.repeatType === 'biweekly') {
       this.repeatInterval = 2;
-      this.autoSelectWeekdayFromDate();
+      this.autoWeekdayFromDate();
     } else if (this.repeatType === 'weekly') {
       this.repeatInterval = 1;
-      this.autoSelectWeekdayFromDate();
+      this.autoWeekdayFromDate();
     }
   }
-  autoSelectWeekdayFromDate() {
+
+  autoWeekdayFromDate() {
     if (!this.theDate) return;
-  
-    const dayIndex = new Date(this.theDate).getDay(); // 0 = Domenica, 1 = Lunedì, ...
+
+    const dayIndex = new Date(this.theDate).getDay();
     const weekdayValues = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
     this.repeatWeekDays = [weekdayValues[dayIndex]];
   }
@@ -646,57 +704,37 @@ getDuration(startTime: Date, endTime: Date): string {
   // Funzione per resettare i campi
   resetForm() {
     this.eventName = '';
-    this.eventTime = null; // Reset dell'ora evento
-    this.eventEndTime = null; // Reset dell'ora fine evento
-    this.eventEndDate = null;
-    this.theDate = null; // Reset della data
-    this.repeatWeekly = false;
-    this.eventLocation = '';
-    this.visible = false; // Chiude il popup
-    this.eventColor = '#99ff63'; // Reset del colore evento 
-    this.repeatType = ''; // Reset del tipo di ripetizione
-    this.repeatUntil = null; // Reset della data di fine ripetizione
-    this.repeatInterval = 1; // Reset dell'intervallo di ripetizione
-    this.repeatWeekDays = []; // Reset dei giorni della settimana 
-    this.selectedEvent = null; 
-    //tolti selectedevent DA TOGLIERE COMMENTO SE VA TUTTO BENE
-    this.isTask = false;
-    this.taskStatus = 'da_fare';
-
-  }
-  onIsTaskChange() {
-  if (this.isTask) {
-    // Resetta i campi non rilevanti se è attività
     this.eventTime = null;
     this.eventEndTime = null;
+    this.eventEndDate = null;
+    this.theDate = null;
+    this.repeatWeekly = false;
     this.eventLocation = '';
+    this.visible = false;
+    this.eventColor = '#99ff63';
     this.repeatType = '';
     this.repeatUntil = null;
+    this.repeatInterval = 1;
     this.repeatWeekDays = [];
+    this.selectedEvent = null;
+    this.isTask = false;
+    this.taskStatus = 'da_fare';
   }
-}
-
-generateLink(place: string) {
-  return `https://www.google.com/maps/search/?api=1&query=${place.replace(
-    ' ',
-    '+'
-  )}`;
-}
-};
-
-
-/*
-  isHoliday(date: Date): boolean {
-    // Logica per compleanno
-    return false;
+  onIsTaskChange() {
+    if (this.isTask) {
+      this.eventTime = null;
+      this.eventEndTime = null;
+      this.eventLocation = '';
+      this.repeatType = '';
+      this.repeatUntil = null;
+      this.repeatWeekDays = [];
+    }
   }
 
-setDefaultTime(step: number = 15) {
-  const now = new Date();
-  const minutes = now.getMinutes();
-  const roundedMinutes = Math.ceil(minutes / step) * step;
-  now.setMinutes(roundedMinutes);
-  now.setSeconds(0);
-  this.time = now;
+  generateLink(place: string) {
+    return `https://www.google.com/maps/search/?api=1&query=${place.replace(
+      ' ',
+      '+'
+    )}`;
+  }
 }
-*/

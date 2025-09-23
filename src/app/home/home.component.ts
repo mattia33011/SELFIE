@@ -89,7 +89,7 @@ export class HomeComponent {
   isEventDialogVisible = false;
   showEvent(event: any) {
     if (!isEvent(event)) return;
-    if(!event.extendedProps?.luogo) return;
+    if (!event.extendedProps?.luogo) return;
     this.eventDialog = {
       title: event.title,
       event: event,
@@ -126,9 +126,7 @@ export class HomeComponent {
     }, delay ?? 1000);
   }
 
-  ngAfterViewInit(){
-    
-  }
+  ngAfterViewInit() {}
 
   protected _setup(today: Date | null = null) {
     forkJoin([
@@ -171,6 +169,10 @@ export class HomeComponent {
       },
       error: (error) => {
         console.log(error);
+        console.log(error.error.status);
+        if (error.error.reason == 'expired') {
+          this.sessionService.signOut();
+        }
       },
     });
     this.loadPlan(today);

@@ -14,8 +14,14 @@
 </full-calendar>
 }
 
-<p-dialog [header]="'event.eventHeader' | translate"  [modal]="true"  [(visible)]="visible"  [style]="{ width: '25rem', height: '50rem' }"  (onHide)="resetForm()">
-
+<p-dialog
+  #updateEvents
+  [header]="'event.eventHeader' | translate"
+  [modal]="true"
+  [(visible)]="visible"
+  [style]="{ width: '25rem', height: '50rem' }"
+  (onHide)="resetForm()"
+>
   <div class="popup" *ngIf="visible">
     <!--dai indicazioni a form-group su css-->
     <div class="popup-container">
@@ -24,7 +30,13 @@
           <label for="isTask">{{ "event.isTask" | translate }}</label>
         </div>
         <div class="flex-item">
-          <p-checkbox label="attività" [(ngModel)]="isTask" binary="true" (onChange)="onIsTaskChange()" aria-label="is Task"></p-checkbox>
+          <p-checkbox
+            label="attività"
+            [(ngModel)]="isTask"
+            binary="true"
+            (onChange)="onIsTaskChange()"
+            aria-label="is Task"
+          ></p-checkbox>
         </div>
         <div class="flex-item">
           <p-select-button
@@ -50,7 +62,7 @@
         </div>
         <div class="flex-item">
           <label for="eventColor">{{ "event.color" | translate }}</label>
-          <p-colorpicker [(ngModel)]="eventColor" />
+          <p-colorpicker [(ngModel)]="eventColor" [appendTo]="updateEvents" />
         </div>
       </div>
       <div class="flex-row">
@@ -61,7 +73,8 @@
               inputId="date"
               showIcon
               iconDisplay="input"
-            />
+              [appendTo]="updateEvents"
+              />
             <label for="date">{{ "event.theDate" | translate }}</label>
           </p-iftalabel>
         </div>
@@ -77,6 +90,7 @@
                   inputId="end_date"
                   showIcon
                   iconDisplay="input"
+                [appendTo]="updateEvents"
                 />
                 <label for="end_date">{{ "event.enddate" | translate }}</label>
               </p-iftalabel>
@@ -92,28 +106,42 @@
                 inputId="eventTime"
                 [(ngModel)]="eventTime"
                 [timeOnly]="true"
+                [appendTo]="updateEvents"
               />
               <label for="eventTime">{{ "event.start" | translate }}</label>
             </p-iftalabel>
           </div>
           <div class="flex-item">
             <p-iftalabel>
-              <p-datepicker inputId="endTime" [(ngModel)]="eventEndTime" [timeOnly]="true"/>
-              <label for="eventEndTime">{{"event.endtime" | translate}}</label>
+              <p-datepicker
+                inputId="endTime"
+                [(ngModel)]="eventEndTime"
+                [timeOnly]="true"
+                [appendTo]="updateEvents"
+              />
+              <label for="eventEndTime">{{
+                "event.endtime" | translate
+              }}</label>
             </p-iftalabel>
           </div>
         </div>
         <div class="flex-row justify-between">
           <div class="">
             <p-iftalabel>
-              <label for="eventLocation">{{"event.location" | translate}}</label>
-              <input type="eventLocation" pInputText [(ngModel)]="eventLocation"/>
+              <label for="eventLocation">{{
+                "event.location" | translate
+              }}</label>
+              <input
+                type="eventLocation"
+                pInputText
+                [(ngModel)]="eventLocation"
+              />
             </p-iftalabel>
           </div>
           @if(eventLocation && eventLocation.length > 0){
-            <a [href]="generateLink(eventLocation)" target="_blank">
-                <p-button icon="pi pi-map"></p-button>
-            </a>
+          <a [href]="generateLink(eventLocation)" target="_blank">
+            <p-button icon="pi pi-map"></p-button>
+          </a>
           }
         </div>
 
@@ -121,7 +149,12 @@
         <div class="flex-col items-left">
           <p-floatlabel class="w-full md:w-56" variant="in">
             <div class="repeat-grid">
-              <button *ngFor="let option of repeatOptions" type="button" (click)="repeatType = option.value; onRepeatTypeChange()" [class.selected]="repeatType === option.value"              >
+              <button
+                *ngFor="let option of repeatOptions"
+                type="button"
+                (click)="repeatType = option.value; onRepeatTypeChange()"
+                [class.selected]="repeatType === option.value"
+              >
                 {{ option.label }}
               </button>
             </div>
@@ -129,9 +162,17 @@
         </div>
 
         <!-- Se settimanale o bi-settimanale: mostra i giorni della settimana -->
-        <div *ngIf="repeatType === 'weekly' || repeatType === 'biweekly'" class="giorni-ripetizione">
+        <div
+          *ngIf="repeatType === 'weekly' || repeatType === 'biweekly'"
+          class="giorni-ripetizione"
+        >
           <div class="weekday-checkbox" *ngFor="let day of weekDays">
-            <p-checkbox [binary]="true" [inputId]="day.value" [ngModel]="repeatWeekDays.includes(day.value)" (onChange)="toggleWeekday($event, day.value)"            >
+            <p-checkbox
+              [binary]="true"
+              [inputId]="day.value"
+              [ngModel]="repeatWeekDays.includes(day.value)"
+              (onChange)="toggleWeekday($event, day.value)"
+            >
             </p-checkbox>
             <label [for]="day.value">{{ day.label }}</label>
           </div>
@@ -148,7 +189,8 @@
             inputId="dateuntil"
             showIcon
             iconDisplay="input"
-          />
+            [appendTo]="updateEvents"
+            />
         </div>
 
         <!-- 

@@ -60,6 +60,7 @@ export class SessionService {
           profilePictureSubject.next(res);
         },
         error: (err) => {
+          console.log(err)
           profilePictureSubject.next(undefined);
         },
       });

@@ -4,6 +4,13 @@ export  type CalendarEvent = {
   start?: Date | string;
   end?: Date | string;
   allDay?: boolean;
+  rrule?:{
+    freq: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY',
+    dtstart: Date,
+    interval?: number,
+    until?: Date,
+    byweekday?: string[],
+  }
   _id: string;
   extendedProps?: {
     luogo?: string;

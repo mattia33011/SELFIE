@@ -636,6 +636,13 @@ getDuration(startTime: Date, endTime: Date): string {
     this.repeatWeekDays = [];
   }
 }
+
+generateLink(place: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${place.replace(
+    ' ',
+    '+'
+  )}`;
+}
 };
 
 

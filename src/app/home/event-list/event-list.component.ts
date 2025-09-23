@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   CalendarEvent,
   Events,
@@ -12,6 +12,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { PanelModule } from 'primeng/panel';
 import { LocalDatePipe, TimePipe } from '../../../utils/timeConverter';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-event-list',
@@ -22,7 +23,8 @@ import { DatePipe } from '@angular/common';
     TranslatePipe,
     TimePipe,
     LocalDatePipe,
-  ],
+    RouterLink
+],
   templateUrl: './event-list.component.html',
   styleUrl: './event-list.component.css',
 })
@@ -32,13 +34,20 @@ export class EventListComponent {
   @Input() title!: string;
   @Input() emptyLabel: string = 'home.noEvents';
   @Input() dateFormat: 'time' | 'date' = 'time';
+  @Input() redirect?: string
+  @Output() onItemClick = new EventEmitter<CalendarEvent | Note>()
   get _content(): Content[] {
     return this.content?.map(this.castContent);
+  }
+
+  getEventFromContent(content: Content): CalendarEvent | Note{
+    return this.content.find(it => it._id == content.id && it)!
   }
 
   castContent(e: CalendarEvent | Note): Content {
     if (isEvent(e)) {
       return {
+        id: e._id,
         title: e.title,
         color: e.color,
         date: new Date(e.end ?? e.start ?? new Date()),
@@ -46,6 +55,7 @@ export class EventListComponent {
       };
     } else {
       return {
+        id: e._id,
         title: e.label,
         date: e.lastEdit,
         subtitle:
@@ -55,4 +65,4 @@ export class EventListComponent {
   }
 }
 
-type Content = { title: string; color?: string; date: Date; subtitle: string };
+type Content = { id?: string,title: string; color?: string; date: Date; subtitle: string };

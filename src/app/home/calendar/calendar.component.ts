@@ -276,7 +276,8 @@ ngAfterViewInit() {
           ...event,
           start: event.start,
           end: event.end,
-          id: event._id
+          id: event._id,
+          color: event.color
         }));
       },
       error: (err) => {
@@ -368,7 +369,7 @@ addEvent() {
     return;
   }
 
-  // Calcolo startDateTime (solo data se allDay)
+  // Calcolo startDateTime (solo data se allDay) CAMBIA
   const isAllDay = this.isTask || !this.eventTime;
   const startDateTime = new Date(this.theDate);
 
@@ -549,15 +550,11 @@ updateEvent() {
     // start
     if (!isAllDay && this.eventTime) {
       newEvent.start = new Date(this.theDate);
-    } else {
-      newEvent.start = new Date(this.theDate);
     }
 
-    // end (solo per eventi normali)
+    // end
     if (!this.isTask && endDate) {
       if (!isAllDay && this.eventEndTime) {
-        newEvent.end = new Date(this.theDate);
-      } else {
         newEvent.end = new Date(this.theDate);
       }
     }
@@ -605,7 +602,7 @@ deleteEvent() {
 }
 
 
-getDuration(startTime: Date, endTime: Date): string {
+getDuration(startTime: Date, endTime: Date): string { //non penso sia full corretto
   const diffMs = endTime.getTime() - startTime.getTime();
   if (diffMs <= 0) {
     return "00:00:00";
@@ -629,16 +626,17 @@ getDuration(startTime: Date, endTime: Date): string {
   
     if (this.repeatType === 'biweekly') {
       this.repeatInterval = 2;
-      this.autoSelectWeekdayFromDate();
+      this.autoWeekdayFromDate();
     } else if (this.repeatType === 'weekly') {
       this.repeatInterval = 1;
-      this.autoSelectWeekdayFromDate();
+      this.autoWeekdayFromDate();
     }
   }
-  autoSelectWeekdayFromDate() {
+
+  autoWeekdayFromDate() {
     if (!this.theDate) return;
   
-    const dayIndex = new Date(this.theDate).getDay(); // 0 = Domenica, 1 = Lunedì, ...
+    const dayIndex = new Date(this.theDate).getDay();
     const weekdayValues = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
     this.repeatWeekDays = [weekdayValues[dayIndex]];
   }
@@ -646,27 +644,25 @@ getDuration(startTime: Date, endTime: Date): string {
   // Funzione per resettare i campi
   resetForm() {
     this.eventName = '';
-    this.eventTime = null; // Reset dell'ora evento
-    this.eventEndTime = null; // Reset dell'ora fine evento
+    this.eventTime = null;
+    this.eventEndTime = null;
     this.eventEndDate = null;
-    this.theDate = null; // Reset della data
+    this.theDate = null;
     this.repeatWeekly = false;
     this.eventLocation = '';
-    this.visible = false; // Chiude il popup
-    this.eventColor = '#99ff63'; // Reset del colore evento 
-    this.repeatType = ''; // Reset del tipo di ripetizione
-    this.repeatUntil = null; // Reset della data di fine ripetizione
-    this.repeatInterval = 1; // Reset dell'intervallo di ripetizione
-    this.repeatWeekDays = []; // Reset dei giorni della settimana 
+    this.visible = false;
+    this.eventColor = '#99ff63';
+    this.repeatType = '';
+    this.repeatUntil = null;
+    this.repeatInterval = 1;
+    this.repeatWeekDays = [];
     this.selectedEvent = null; 
-    //tolti selectedevent DA TOGLIERE COMMENTO SE VA TUTTO BENE
     this.isTask = false;
     this.taskStatus = 'da_fare';
 
   }
   onIsTaskChange() {
   if (this.isTask) {
-    // Resetta i campi non rilevanti se è attività
     this.eventTime = null;
     this.eventEndTime = null;
     this.eventLocation = '';
@@ -685,18 +681,3 @@ generateLink(place: string) {
 };
 
 
-/*
-  isHoliday(date: Date): boolean {
-    // Logica per compleanno
-    return false;
-  }
-
-setDefaultTime(step: number = 15) {
-  const now = new Date();
-  const minutes = now.getMinutes();
-  const roundedMinutes = Math.ceil(minutes / step) * step;
-  now.setMinutes(roundedMinutes);
-  now.setSeconds(0);
-  this.time = now;
-}
-*/

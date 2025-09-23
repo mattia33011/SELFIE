@@ -26,6 +26,7 @@ import { TimeMachineService } from '../../service/time-machine.service';
 import { ApiService } from '../../service/api.service';
 import { SessionService } from '../../service/session.service';
 import { StudyPlan } from '../../../types/pomodoro';
+import { Router } from '@angular/router';
 //import { RouterOutlet } from '@angular/router';
 
 // COMANDO npm install @fullcalendar/rrule rrule
@@ -109,7 +110,7 @@ export class CalendarComponent implements OnInit, AfterViewInit{
     
     eventClick: this.handleEventClick.bind(this),
 
-    dayCellDidMount: (info) => {
+  dayCellDidMount: (info) => {
         const cellDate = info.date;
         
         // Normalizza la data (rimuove ore, minuti, secondi)
@@ -172,7 +173,8 @@ export class CalendarComponent implements OnInit, AfterViewInit{
           let today=new Date;
           if(ifToday) {today=ifToday;}
           else {today = this.timeMachine.today() as Date;};
-
+          this.updateStudyIcons();
+          this.calendarComponent.getApi().render();
         },
         error: (err) => {
           console.error("Errore nel caricamento piani:", err);
@@ -182,9 +184,8 @@ export class CalendarComponent implements OnInit, AfterViewInit{
       
   }
 
-  updateStudyIcons() {
+ updateStudyIcons() {
   if (!this.calendarComponent || !this.fullPlans) return;
-
   const allCells = document.querySelectorAll('.fc-daygrid-day'); // tutte le celle giorno
 
   allCells.forEach((cell: any) => {
@@ -224,9 +225,10 @@ export class CalendarComponent implements OnInit, AfterViewInit{
     protected readonly timeMachine: TimeMachineService,
     private readonly apiService: ApiService,
     private readonly translateService: TranslateService,
-    private readonly sessionService: SessionService
+    private readonly sessionService: SessionService,
 
 ) {
+  
     effect(() => {
       const date = timeMachine.today();
       if (!date) return;
@@ -240,14 +242,19 @@ export class CalendarComponent implements OnInit, AfterViewInit{
       this.calendarComponent.getApi().gotoDate(dateString);
     });
   }
+  
 ngAfterViewInit() {
     
     // Forza un primo render
     setTimeout(() => {
       if (this.calendarComponent) {
-        this.calendarComponent.getApi().render();
+        
+        this.updateStudyIcons();
+
       }
     }, 100);
+    this.calendarComponent.getApi().render();
+    
   }
 
   ngOnInit() {

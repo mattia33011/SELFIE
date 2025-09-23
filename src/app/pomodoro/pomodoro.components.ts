@@ -435,6 +435,7 @@ chiamataPlan() {
       this.showNotification("break");
     }
     this.startStop = 'START';
+    this.pomodoro.pomodoroNumber++;
     this.pause = !this.pause;
     this.updateKnobTime();
     this.chiamataPomodoro();
@@ -610,13 +611,14 @@ chiamataPlan() {
       return;
     }
     const now = this.timeMachine.today();
+    const forHours = new Date;
     if(!now)
       return;
     
       const dateCompleted =
       now.toLocaleDateString() +
       ' ' +
-      now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      forHours.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     this.pomodoroHistory.push({
       id: this.pomodoroHistory.length + 1,
       pomodoroNumber: this.pomodoro.pomodoroNumber,

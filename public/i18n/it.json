@@ -176,13 +176,24 @@
     "update": "Aggiorna evento",
     "delete": "Elimina evento",
     "isTask": "È un task?",
-    "task": "Task"
+    "task": "Task",
+    "eventHeader": "Popup evento o task"
   },
     "taskStatus": {
     "da_fare": "Da fare",
     "in_corso": "In corso",
     "completata": "Completata"
   },
+  "day":{
+    "mon":"Lunedì",
+    "tue":"Martedì",
+    "wed":"Mercoledì",
+    "thurs":"Giovedì",
+    "fri":"Venerdì",
+    "sat":"Sabato",
+    "sun":"Domenica"
+  },
+
   "add-event": "Aggiungi evento",
   "add-project": "Aggiungi progetto",
   "project-view": "Guarda i progetti",

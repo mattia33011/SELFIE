@@ -305,12 +305,34 @@ ngAfterViewInit() {
       'taskStatus.in_corso',
       'taskStatus.completata'
     ])
-          .subscribe((translations) => {
+    .subscribe(translations => {
       this.taskStatuses = [
-          { label: this.translate.instant('taskStatus.da_fare'), value: 'da_fare' },
-          { label: this.translate.instant('taskStatus.in_corso'), value: 'in_corso' },
-          { label: this.translate.instant('taskStatus.completata'), value: 'completata' }
+        { label: translations['taskStatus.da_fare'], value: 'da_fare' },
+        { label: translations['taskStatus.in_corso'], value: 'in_corso' },
+        { label: translations['taskStatus.completata'], value: 'completata' }
       ];
+    });
+    this.translate
+      .get([
+      'day.mon',
+      'day.tue',
+      'day.wed',
+      'day.thurs',
+      'day.fri',
+      'day.sat',
+      'day.sun',
+    ])
+    .subscribe((translations) => {
+      this.weekDays = [
+        { label: translations['day.mon'], value: 'MO' },
+        { label: translations['day.tue'], value: 'TU' },
+        { label: translations['day.wed'], value: 'WE' },
+        { label: translations['day.thurs'], value: 'TH' },
+        { label: translations['day.fri'], value: 'FR' },
+        { label: translations['day.sat'], value: 'SA' },
+        { label: translations['day.sun'], value: 'SU' },
+      ];
+
     });
   });
   this.loadPlan(null);

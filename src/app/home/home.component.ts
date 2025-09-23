@@ -4,12 +4,12 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Events, Notes, CalendarEvent } from '../../types/events';
+import { Events, Notes, CalendarEvent, isEvent } from '../../types/events';
 import { EventListComponent } from './event-list/event-list.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ApiService } from '../service/api.service';
 import { forkJoin } from 'rxjs';
-import { stringToDate } from '../../utils/timeConverter';
+import { LocalDatePipe, stringToDate } from '../../utils/timeConverter';
 import { TimeMachineService } from '../service/time-machine.service';
 import { NotificationService } from '../service/notification.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -21,10 +21,17 @@ import { FormsModule } from '@angular/forms';
 import { Knob } from 'primeng/knob';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CardModule } from 'primeng/card';
+import { InputText } from 'primeng/inputtext';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 
 @Component({
   selector: 'app-home',
   imports: [
+    LocalDatePipe,
+    InputText,
+    InputGroupModule,
+    InputGroupAddonModule,
     PanelModule,
     SkeletonModule,
     ButtonModule,
@@ -52,14 +59,18 @@ export class HomeComponent {
     onclose: () => void;
     onsnooze: () => void;
   };
-
+  eventDialog?: {
+    title: string;
+    event: CalendarEvent;
+    onclose: () => void;
+  };
   constructor(
     protected readonly sessionService: SessionService,
     private readonly apiService: ApiService,
     private readonly timeMachine: TimeMachineService,
     private readonly notificationService: NotificationService,
     private readonly cd: ChangeDetectorRef,
-    router: Router
+    private readonly router: Router
   ) {
     effect(() => {
       const today = timeMachine.today();
@@ -72,8 +83,22 @@ export class HomeComponent {
     });
 
     this.todayEvents = [];
+    this._setup(null);
   }
 
+  isEventDialogVisible = false;
+  showEvent(event: any) {
+    if (!isEvent(event)) return;
+    if(!event.extendedProps?.luogo) return;
+    this.eventDialog = {
+      title: event.title,
+      event: event,
+      //description: event.description,
+      onclose: () => (this.eventDialog = undefined),
+    };
+    this.isEventDialogVisible = true;
+    this.cd.detectChanges();
+  }
   isNotificationVisible = false;
   showNotification(event: CalendarEvent, delay?: number) {
     setTimeout(() => {
@@ -113,14 +138,14 @@ export class HomeComponent {
       ),
     ]).subscribe({
       next: (response) => {
-        this.recentNotes = []
+        this.recentNotes = [];
         this.recentNotes.push(
           ...response[1].map((it) => ({
             ...it,
             lastEdit: stringToDate(it.lastEdit.toString()),
           }))
         );
-        this.recentNotes.splice(5)
+        this.recentNotes.splice(5);
         console.log(this.recentNotes);
         this.deadlineEvents = [];
         this.deadlineEvents.push(
@@ -129,20 +154,16 @@ export class HomeComponent {
             .map((it) => ({ ...it, end: stringToDate(it.end!.toString()) }))
         );
 
-        this.todayEvents = this.deadlineEvents.filter((event) => {
-          const format = (date: Date) =>
-            `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        this.todayEvents = response[0].map((it) => ({
+          ...it,
+          end: it.end ? stringToDate(it.end.toString()) : undefined,
+        }));
+        this.todayEvents.splice(5);
 
-
-          this.todayEvents.forEach((it) => {
-            this.showNotification(it);
-          });
-          this.todayEvents.splice(5)
-          return (
-            event.end instanceof Date &&
-            format(event.end) === format(new Date())
-          );
+        this.todayEvents.forEach((it) => {
+          this.showNotification(it);
         });
+        this.todayEvents.splice(5);
       },
       error: (error) => {
         console.log(error);
@@ -181,39 +202,41 @@ export class HomeComponent {
           const today = this.timeMachine.today();
           if (!today) return;
           today.setHours(0, 0, 0, 0);
-  
+
           const normalizeDate = (d: Date): number => {
             const date = new Date(d);
             date.setHours(0, 0, 0, 0);
             return date.getTime();
           };
-  
+
           const matchingPlan = this.fullPlans.find((plan) =>
             plan.days.some((d) => normalizeDate(d.day) === today.getTime())
           );
-  
+
           if (matchingPlan) {
             const dayIndex = matchingPlan.days.findIndex(
-            (d) => normalizeDate(d.day) === today.getTime()
+              (d) => normalizeDate(d.day) === today.getTime()
             );
-            
-              this.todayPlan = matchingPlan;
-              const completedStepIndex = this.todayPlan.days[dayIndex].step;
-              if (completedStepIndex < 0) return;
-              if(completedStepIndex==0){
-                this.planDone=0;
-                this.planToDo=true;
-                return
-              }
 
-              // somma le durate degli step completati
-              const doneMinutes = this.todayPlan.plan
-                .slice(0, completedStepIndex + 1)
-                .reduce((sum, step) => sum + step.duration, 0);
-              
-              // percentuale rispetto al totale
-              this.planDone= Math.round((doneMinutes / this.todayPlan.totalTime) * 100);
-              this.planToDo=true;
+            this.todayPlan = matchingPlan;
+            const completedStepIndex = this.todayPlan.days[dayIndex].step;
+            if (completedStepIndex < 0) return;
+            if (completedStepIndex == 0) {
+              this.planDone = 0;
+              this.planToDo = true;
+              return;
+            }
+
+            // somma le durate degli step completati
+            const doneMinutes = this.todayPlan.plan
+              .slice(0, completedStepIndex + 1)
+              .reduce((sum, step) => sum + step.duration, 0);
+
+            // percentuale rispetto al totale
+            this.planDone = Math.round(
+              (doneMinutes / this.todayPlan.totalTime) * 100
+            );
+            this.planToDo = true;
           } else {
             //NON ho un piano per oggi
             this.planToDo = false;
@@ -223,6 +246,12 @@ export class HomeComponent {
       });
   }
 
+  generateLink(place: string) {
+    return `https://www.google.com/maps/search/?api=1&query=${place.replace(
+      ' ',
+      '+'
+    )}`;
+  }
   deadlineEvents: CalendarEvent[] = [];
   todayEvents: CalendarEvent[] = [];
 

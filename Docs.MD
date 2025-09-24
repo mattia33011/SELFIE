@@ -28,9 +28,10 @@
 
 	- Gestione Calendario
 	
-	- Creazione modifica e eliminazione eventi (e ripetizione)
-	
-	- Gestione attività
+  - Gestione degli eventi
+  
+  - Gestione delle attività
+
 
 
 3. Elena Dattilo:

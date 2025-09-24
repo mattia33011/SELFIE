@@ -10,37 +10,38 @@
 
 ## Suddivisione progetto
 
-- Mattia Iaria:
+1. Mattia Iaria:
+	- Architettura di Selfie
+	
+	- Gestione degli Account
+	
+	- Gestione dei "Progetti"
+	
+	- Gestione delle Notifiche (Notification API e E-Mail)
+	
+	- Autenticazione delle API
+	
+	- TimeMachine
 
-- Architettura di Selfie
 
-- Gestione degli Account
+2. Sara Negrini:
 
-- Gestione dei "Progetti"
+	- Gestione Calendario
+	
+	- Creazione modifica e eliminazione eventi (e ripetizione)
+	
+	- Gestione attività
 
-- Gestione delle Notifiche (Notification API e E-Mail)
 
-- Autenticazione delle API
+3. Elena Dattilo:
 
-- TimeMachine
-
-- Sara Negrini:
-
-- Gestione Calendario
-
-- Creazione modifica e eliminazione eventi (e ripetizione)
-
-- Gestione attività
-
-- Elena Dattilo:
-
-- Timer pomodoro
-
-- Cicli di studio del pomodoro e connessione alla Home
-
-- Task e legate al pomodoro
-
-- Note e funzioni legate
+	- Timer pomodoro
+	
+	- Cicli di studio del pomodoro e connessione alla Home
+	
+	- Task e legate al pomodoro
+	
+	- Note e funzioni legate
 
 ---
 

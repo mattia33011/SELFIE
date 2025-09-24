@@ -67,7 +67,7 @@
     "delete": "Elimina profilo",
     "uploadSuccess": "Immagine profilo caricata correttamente",
     "uploadFailed": "C'è stato un errore nel caricamento dell'immagine",
-    "fileTooBig": "Il file è troppo grande (Max 2MB)",
+    "fileTooBig": "Il file è troppo grande (Max 1MB)",
     "selectProfilePicture": "Seleziona immagine profilo",
     "editPassword": "Cambia password",
     "preferences": "Preferenze",

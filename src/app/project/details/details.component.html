@@ -161,6 +161,8 @@
   [(visible)]="isInputVisible"
   [header]="'enterInput' | translate"
 >
+@if (isAuthor) {
+
   <textarea
     [(ngModel)]="inputValue!.value"
     pTextarea
@@ -173,6 +175,10 @@
       "close" | translate
     }}</p-button>
   </div>
+}
+@else {
+  <div [innerHTML]="inputValue.value"></div>
+}
 </p-dialog>
 } @if (outputValue) {
 <p-dialog

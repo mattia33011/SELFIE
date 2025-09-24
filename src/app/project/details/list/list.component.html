@@ -65,7 +65,7 @@
         } @case ("input") {
         <div class="flex-row flex gap-2">
           <p-button
-            [disabled]="!isAuthor"
+            [disabled]="rowData['input']?.length == 0  && !isAuthor"
             icon="pi-arrow-circle-down pi"
             rounded="true"
             (click)="inputAction.emit(t(rowData['id']))"

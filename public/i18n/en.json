@@ -52,7 +52,7 @@
     "delete": "Delete account",
     "uploadSuccess": "Profile picture uploaded successfully",
     "uploadFailed": "There was an error uploading your profile picture",
-    "fileTooBig": "The file is too big (Max 2MB)",
+    "fileTooBig": "The file is too big (Max 1MB)",
     "selectProfilePicture": "Select profile picture",
     "editPassword": "Edit password",
     "preferences": "Preferences",

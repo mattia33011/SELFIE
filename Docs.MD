@@ -109,6 +109,12 @@ Sono presenti 4 pulsanti con la quale è possibile raggiungere le pagine princip
 - Progetti
 - Note
 
+## Notifiche
+
+L'applicazione lancia delle notifiche utilizzando Notification API di javascript.  
+Nello specifico verranno lanciate se ci sono degli eventi in scadenza nel giorno corrente quando si accede alla home page ed è possibile rimandare la notifica per 5 minuti.  
+Inoltre verrà inviata una notifica nel momento in cui la pausa o la sessione di studio terminano nella sezione pomodoro.
+
 --- 
 ## Account 👤
 
@@ -142,7 +148,7 @@ Il pomodoro è uno strumento per gestire le sessioni di studio, per bilanciare a
 
 Abbiamo implementato un'interfaccia del timer pomodoro che racchiude assieme diverse funzionalità, oltre al classico timer è possibile registrare le sessioni (indipendenti dal ciclo di studio), avere delle task da completare e visualizzare il proprio ciclo di studio programmato per la giornata.
 
-### Il timer
+#### Il timer
 
 ```json
 
@@ -184,7 +190,7 @@ Ogni volta che viene finita una pausa o pomodoro compare un popup a lato, che si
 
   
 
-### Le sessioni di studio
+#### Le sessioni di studio
 
 ```typescript
 
@@ -208,7 +214,7 @@ Ogni sessione di studio ha un suo id unico generato dal server, è possibile eli
 
   
 
-### Le attività
+#### Le attività
 
 ``` typescript
 
@@ -232,7 +238,7 @@ Per lo studio è importante potersi segnare cose da fare e argomenti che mancano
 
   
 
-### I cicli di studio
+#### I cicli di studio
 
 ```typescript
 
@@ -286,7 +292,7 @@ In caso venga eliminato un piano che è parte di una struttura più grande allor
 
   
 
-### Nella home
+#### Nella home
 
 Nella home è possibile vedere i giorni in cui è programmato un ciclo di studio, tramite l'icona del timer che compare in basso a destra nei giorni, e se per il giorno corrente hai programmato un ciclo di studi, ti viene mostrata la percentuale completata e hai la possibilità di andare direttamente al pomodoro cliccando il pulsante.
 
@@ -341,7 +347,7 @@ La gestione dell'albero è gestita tramite il campo parent, il backend ci restit
 Le note nella home sono raccolte in basso a destra, con una preview delle ultime 5 note modificate. Se ci si clicca sopra porta direttamente alla schermata delle note.
 
 
-## Progetti
+### Progetti
 
 È possibile accedere tramite il footer alla sezione "Progetti"  
 Nella pagina principale vengono visualizzati i progetti di cui si fa parte e alcune delle informazioni  principali.  
@@ -384,19 +390,19 @@ export enum TaskStatus {
 	Abandoned,
 }
 ```
-### Dettagli
+#### Dettagli
 
 Il layout dei dettagli del progetto è così composta:
 - Lista Attività / Vista GANTT
 - Gestione Membri
 
-#### Vista GANTT
+##### Vista GANTT
 È presente una vista GANTT delle task del progetto.
-#### Lista attività
+##### Lista attività
 La lista di task è modificabile solo dal leader del gruppo.  
 Si può visualizzare sempre la consegna di ogni task, ma è modificabile solo dal leader. 
 
-#### Gestione Membri
+##### Gestione Membri
 
 In basso a destra è presente un pulsante per aggiungere dei membri al progetto, al click verrà aperto un modale per cercare un utente e aggiungerlo.
  
@@ -444,7 +450,6 @@ Come DB abbiamo usato mongoDB, abbiamo astratto la definizione di repository cos
 
   
   
-
 ## Architettura
 
 ### Middlewares
@@ -1863,3 +1868,4 @@ Inserisco le note recenti, salvo la nota con la nuova ultima modifica.
 }
 
 ```
+

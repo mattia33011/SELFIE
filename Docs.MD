@@ -139,9 +139,71 @@ Nella pagina del profilo è possibile vedere le proprie informazioni personali, 
 
 ### Calendario 📅
 
-Il calendario gode di diverse view: quella mensile, la settimanale e la giornaliera. Consente all'utente di passare tra le diverse view e di navigare tra i mesi tramite i bottoni in alto a destra della sua parte nella home. L'utente con il calendario può creare eventi o attività cliccando nel giorno stesso in cui vuole posizionarle. Per gli eventi, la data selezionata, è la data d'inizio. Per le attività la data selezionata è la data di fine. Basta selezionare o deselezionare il checkbox per cambiare da un'attività ad un evento. Le attività hanno solo un titolo, una data di scadenza, un colore e tre diversi stati che si possono cambiare a seconda del punto in cui si è nel suo svolgimento. Per modificare un'attività, come un evento, basta cliccare sopra il riquadro creato, apparirà allora un popup di modifica.
+Il calendario offre diverse view: quella mensile, la settimanale e la giornaliera. L'utente può passare tra le diverse viste e di navigare tra i mesi tramite i bottoni del calendario in alto a destra.
+L'utente con il calendario può creare eventi o attività cliccando nel giorno desiderato:
+Per scegliere se creare un evento o un'attività, basta selezionare o deselezionare il riquadro nel popup di creazione/modifica.
 
-Gli eventi, invece, godono di più personalizzazione. Negli eventi sono obbligatori il titolo e la data di inizio (che viene automaticamente selezionata al click del giorno sul calendario). Si possono, in aggiunta, selezionare il suo colore, la sua data di fine, il suo orario (con orario di inizio e di fine), e si può aggiungere la ripetizione degli eventi: giornaliera, settimanale, bisettimanale (quindi una settimana sì e una no), mensile e annuale. Ogni scelta con una ripetizione ha una data di fine
+### Type
+```typescript
+export  type CalendarEvent = {
+  title: string;
+  
+  color?: string;                                     //esiste un colore predefinito 
+  
+  start?: Date | string;                              //viene selezionata automaticamente quando viene cliccato il calendario
+  
+  end?: Date | string;
+  
+  allDay?: boolean;                                   //se dura tutta la giornata o no
+  
+  rrule?:{                                            //se un evento si ripete i campi sotto saranno riempiti
+    
+    freq: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY',
+    
+    dtstart: Date,
+    
+    interval?: number,                                //impostato a 1 in tutte le occasioni tranne per la ripetizione bisettimanale (a 2)
+    
+    until?: Date,
+    
+    byweekday?: string[],                             //array con tutti i giorni della settimana in cui l'evento si ripete
+  
+  }
+  
+  _id: string;
+  
+  extendedProps?: {                                   //per dettagli aggiuntivi come luogo e per attività
+    
+    luogo?: string;
+    
+    tipo?: 'attività' | 'evento';                     //per distinguere tra attività ed evento
+    
+    stato?: 'da_fare' | 'in_corso' | 'completata';
+  
+  };
+
+}
+
+
+export type Events = CalendarEvent[];                 //lista degli eventi del calendario.
+```
+
+Il type CalendarEvent rappresenta un evento o un attività del calendario.
+
+Le attività hanno solo un titolo, una data, un colore e tre diversi stati che possono essere cambiati manualmente nel tempo a seconda del loro svolgimento.
+
+Per modificarle, come per gli eventi, basta cliccare sul rettangolo corrispondente sul calendario.
+
+Gli eventi offrono maggior personalizzazione delle attività. Possono avere, infatti, anche una data di fine, un orario di inizio e di fine, un luogo e possono essere ricorrenti. Se venisse inserito un luogo nel form dell'evento comparirà un bottone che quando premuto apre una scheda all'indirizzo scritto in Google Maps.
+
+La ricorrenza degli eventi è gestita tramite rrule. Le frequenze disponibili sono giornaliera, settimanale, bisettimanale (una settimana sì e una no), mensile e annuale. Se verrà selezionata una ricorrenza settimanale o bisettimanale apparirà una lista selezionabile dei giorni della settimana. I giorni scelti vengono salvati nel campo byweekday del JSON dell'evento.
+
+
+### Nella home
+
+Nella home, in basso a sinistra, si possono vedere gli eventi e le attività in scadenza della giornata. Se un evento ha un luogo, cliccarlo dalla home ti permetterà di aprire la sua pagina su Google Maps.
+
+
 
 ### Pomodoro 🍅
 
@@ -1035,7 +1097,295 @@ Reset del giorno corrente.
 
 **Risposta**: 204 -- Empty
 
+
+## Calendario 📅
+
+#### **GET `/users/:userid/events`**
+
+Recupera gli eventi
+
+
+
+
+**Risposta**: 200.
+
+
+
+**Auth**: JWT richiesto.
+
+
+**Body**:
+  ```json
+  {
   
+  "_id": "string",
+  
+  "title": "string",
+  
+  "color": "string | null",
+  
+  "start": "Date | string",
+  
+  "end": "Date | string | null",
+  
+  "allDay": "boolean",
+  
+  "rrule": {
+    
+    "freq": "'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'",
+    
+    "dtstart": "Date",
+    
+    "interval": "number",
+    
+    "until": "Date | null",
+  
+    "byweekday": " [ 'SU' | 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' ] | null"
+  
+  },
+  
+  "extendedProps": {
+    
+    "luogo": "string | null",
+    
+    "tipo": "'attività' | 'evento'",
+    
+    "stato": "'da_fare' | 'in_corso' | 'completata'"
+
+  }
+
+}
+  ```
+
+
+
+#### **GET `/users/:userid/events/today`**
+
+Recupera gli eventi di oggi
+
+
+
+**Risposta**: 200.
+
+
+
+**Auth**: JWT richiesto.
+
+
+**Body**:
+  ```json
+  {
+  
+  "_id": "string",
+  
+  "title": "string",
+  
+  "color": "string | null",
+  
+  "start": "Date | string",
+  
+  "end": "Date | string | null",
+  
+  "allDay": "boolean",
+  
+  "rrule": {
+    
+    "freq": "'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'",
+    
+    "dtstart": "Date",
+    
+    "interval": "number",
+    
+    "until": "Date | null",
+  
+    "byweekday": " [ 'SU' | 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' ] | null"
+  
+  },
+  
+  "extendedProps": {
+    
+    "luogo": "string | null",
+    
+    "tipo": "'attività' | 'evento'",
+    
+    "stato": "'da_fare' | 'in_corso' | 'completata'"
+
+  }
+
+}
+  ```
+
+
+#### **POST `/users/:userid/events`**
+
+Inserisce un evento
+
+
+
+**Risposta**: 200.
+
+
+
+**Auth**: JWT richiesto.
+
+
+**Body**:
+  ```json
+  {
+  
+  "_id": "string",
+  
+  "title": "string",
+  
+  "color": "string | null",
+  
+  "start": "Date | string",
+  
+  "end": "Date | string | null",
+  
+  "allDay": "boolean",
+  
+  "rrule": {
+    
+    "freq": "'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'",
+    
+    "dtstart": "Date",
+    
+    "interval": "number",
+    
+    "until": "Date | null",
+  
+    "byweekday": " [ 'SU' | 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' ] | null"
+  
+  },
+  
+  "extendedProps": {
+    
+    "luogo": "string | null",
+    
+    "tipo": "'attività' | 'evento'",
+    
+    "stato": "'da_fare' | 'in_corso' | 'completata'"
+
+  }
+
+}
+  ```
+
+
+#### **PUT `/users/:userid/events/:eventid`**
+
+Modifica un evento
+
+
+
+**Risposta**: 200.
+
+
+
+**Auth**: JWT richiesto.
+
+
+**Body**:
+  ```json
+  {
+  
+  "_id": "string",
+  
+  "title": "string",
+  
+  "color": "string | null",
+  
+  "start": "Date | string",
+  
+  "end": "Date | string | null",
+  
+  "allDay": "boolean",
+  
+  "rrule": {
+    
+    "freq": "'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'",
+    
+    "dtstart": "Date",
+    
+    "interval": "number",
+    
+    "until": "Date | null",
+  
+    "byweekday": " [ 'SU' | 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' ] | null"
+  
+  },
+  
+  "extendedProps": {
+    
+    "luogo": "string | null",
+    
+    "tipo": "'attività' | 'evento'",
+    
+    "stato": "'da_fare' | 'in_corso' | 'completata'"
+
+  }
+
+}
+  ```
+
+
+
+#### **DELETE `/users/:userid/events/:eventid`**
+Elimina un evento
+
+
+
+**Risposta**: 200.
+
+
+
+**Auth**: JWT richiesto.
+
+
+**Body**:
+  ```json
+  {
+  
+  "_id": "string",
+  
+  "title": "string",
+  
+  "color": "string | null",
+  
+  "start": "Date | string",
+  
+  "end": "Date | string | null",
+  
+  "allDay": "boolean",
+  
+  "rrule": {
+    
+    "freq": "'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'",
+    
+    "dtstart": "Date",
+    
+    "interval": "number",
+    
+    "until": "Date | null",
+  
+    "byweekday": " [ 'SU' | 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' ] | null"
+  
+  },
+  
+  "extendedProps": {
+    
+    "luogo": "string | null",
+    
+    "tipo": "'attività' | 'evento'",
+    
+    "stato": "'da_fare' | 'in_corso' | 'completata'"
+
+  }
+
+}
+  ```
+
 
 ## Pomodoro 🍅
 

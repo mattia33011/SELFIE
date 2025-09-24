@@ -1,6 +1,6 @@
 ## Partecipanti:
 - Mattia Iaria
-- Sara --
+- Sara Negrini
 - Elena Dattilo
 
 ## Suddivisione progetto
@@ -11,8 +11,11 @@
 	- Gestione delle Notifiche (Notification API e E-Mail)
 	- Autenticazione delle API 
 	- TimeMachine
-- Sara:
-- Elena:
+- Sara Negrini:
+  - Gestione Calendario
+  - Creazione modifica e eliminazione eventi (e ripetizione)
+  - Gestione attività
+- Elena Dattilo:
 	- Timer pomodoro
 	- Cicli di studio del pomodoro e connessione alla Home
 	- Task e legate al pomodoro
@@ -25,6 +28,7 @@
 2. PrimeNG
 3. Tailwind CSS
 4. Ngx-translate (per i18n)
+5. Rrule (per la ricorrenza degli eventi)
 
 ## Introduzione
 Il front end è stato sviluppato con Angular, utilizzando un'architettura basata su componenti, il  codice è suddiviso in moduli e componenti per mantenere un'architettura chiara.
@@ -37,6 +41,9 @@ In /public abbiamo i file per gestire le traduzioni, i diversi assets usati nell
 
 ---
 # Componenti
+## Calendario 📅
+Il calendario gode di diverse view: quella mensile, la settimanale e la giornaliera. Consente all'utente di passare tra le diverse view e di navigare tra i mesi tramite i bottoni in alto a destra della sua parte nella home. L'utente con il calendario può creare eventi o attività cliccando nel giorno stesso in cui vuole posizionarle. Per gli eventi, la data selezionata, è la data d'inizio. Per le attività la data selezionata è la data di fine. Basta selezionare o deselezionare il checkbox per cambiare da un'attività ad un evento. Le attività hanno solo un titolo, una data di scadenza, un colore e tre diversi stati che si possono cambiare a seconda del punto in cui si è nel suo svolgimento. Per modificare un'attività, come un evento, basta cliccare sopra il riquadro creato, apparirà allora un popup di modifica.
+Gli eventi, invece, godono di più personalizzazione. Negli eventi sono obbligatori il titolo e la data di inizio (che viene automaticamente selezionata al click del giorno sul calendario). Si possono, in aggiunta, selezionare il suo colore, la sua data di fine, il suo orario (con orario di inizio e di fine), e si può aggiungere la ripetizione degli eventi: giornaliera, settimanale, bisettimanale (quindi una settimana sì e una no), mensile e annuale. Ogni scelta con una ripetizione ha una data di fine
 ## Pomodoro 🍅
 Il pomodoro è uno strumento per gestire le sessioni di studio, per bilanciare al meglio studio e riposo.
 Abbiamo implementato un'interfaccia del timer pomodoro che racchiude assieme diverse funzionalità, oltre al classico timer è possibile registrare le sessioni (indipendenti dal ciclo di studio), avere delle task da completare e visualizzare il proprio ciclo di studio programmato per la giornata.

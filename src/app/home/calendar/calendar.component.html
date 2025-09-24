@@ -145,22 +145,24 @@
         </div>
 
         <!-- Per la ripetizione -->
-        <div class="flex-col items-left">
-          <p-floatlabel class="w-full md:w-56" variant="in">
-            <div class="repeat-grid">
-              <button
-                *ngFor="let option of repeatOptions"
-                type="button"
-                (click)="repeatType = option.value; onRepeatTypeChange()"
-                [class.selected]="repeatType === option.value"
-              >
-                {{ option.label }}
-              </button>
-            </div>
-          </p-floatlabel>
-        </div>
+         
+              <p-floatlabel class="w-full md:w-56" variant="in">
+                <div class="repeat-grid">
+                  <button
+                    *ngFor="let option of repeatOptions"
+                    type="button"
+                    (click)="repeatType = option.value; onRepeatTypeChange()"
+                    [class.selected]="repeatType === option.value"
+                  >
+                    {{ option.label }}
+                  </button>
+                </div>
+              </p-floatlabel>
+          
+          
 
         <!-- Se settimanale o bi-settimanale: mostra i giorni della settimana -->
+        <div class="flex-row">
         <div
           *ngIf="repeatType === 'weekly' || repeatType === 'biweekly'"
           class="giorni-ripetizione"
@@ -176,22 +178,25 @@
             <label [for]="day.value">{{ day.label }}</label>
           </div>
         </div>
+        </div>
 
         <!-- Data fine ripetizione -->
-        <div
-          *ngIf="repeatType && repeatType !== 'custom'"
-          class="flex-col items-left"
-        >
-          <label for="repeatUntil">{{ "event.repeatUntil" | translate }}</label>
-          <p-datepicker
-            [(ngModel)]="repeatUntil"
-            inputId="dateuntil"
-            showIcon
-            iconDisplay="input"
-            [appendTo]="updateEvents"
-            />
+         <div class="flex-row">
+            <div
+              *ngIf="repeatType && repeatType !== 'custom'"
+              class="flex-col items-left"
+            >
+              <label for="repeatUntil">{{ "event.repeatUntil" | translate }} </label>
+              <p-datepicker
+                [(ngModel)]="repeatUntil"
+                inputId="dateuntil"
+                showIcon
+                iconDisplay="input"
+                [appendTo]="updateEvents"
+                />
+            </div>
+          </div>
         </div>
-      </div>
       <div class="form-group">
         <p-button
           *ngIf="!selectedEvent"

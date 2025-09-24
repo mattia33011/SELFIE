@@ -374,7 +374,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       extendedProps: {
         luogo: this.eventLocation,
         tipo: this.isTask ? 'attività' : 'evento',
-        stato: this.taskStatus,
+        stato: this.isTask ? this.taskStatus : undefined
       },
       allDay: isAllDay,
     };
@@ -464,6 +464,8 @@ export class CalendarComponent implements OnInit, AfterViewInit {
 
     this.eventName = event.title || '';
     this.eventLocation = event.extendedProps?.luogo || '';
+    this.isTask = event.extendedProps?.tipo === 'attività';
+    this.taskStatus = event.extendedProps?.stato || 'da_fare';
     this.eventColor = event.backgroundColor || '#99ff63';
 
     const start = event.start ? new Date(event.start) : null;
@@ -536,12 +538,13 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       extendedProps: {
         luogo: this.eventLocation,
         tipo: this.isTask ? 'attività' : 'evento',
-        stato: this.taskStatus,
+        stato: this.isTask ? this.taskStatus : undefined
       },
       allDay: isAllDay,
     };
-
-    if (!this.isTask && this.repeatType && this.repeatType !== 'none') {
+    if (this.isTask) {
+      newEvent.start = startDate;
+    } else if(!this.isTask && this.repeatType && this.repeatType !== 'none') {
       const freqMap: any = {
         daily: 'DAILY',
         weekly: 'WEEKLY',
@@ -598,6 +601,9 @@ export class CalendarComponent implements OnInit, AfterViewInit {
             ...newEvent,
             eventColor: newEvent.color,
             id: idd,
+             extendedProps: {
+              ...newEvent.extendedProps
+            }
           };
           calendarApi.addEvent(event);
 

@@ -99,7 +99,7 @@ background: var(--p-primary-500) !important;
   flex-wrap: wrap;
   gap: 1rem;
   align-items: center !important;
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
 }
 
 ::ng-deep .p-iftalabel{
@@ -111,7 +111,6 @@ background: var(--p-primary-500) !important;
   transform: scale(0.8);
   margin-right: 0.25rem;
   margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
 }
 
 ::ng-deep .giorni-ripetizione {

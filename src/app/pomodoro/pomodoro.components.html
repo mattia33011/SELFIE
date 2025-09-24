@@ -1,5 +1,5 @@
 <p-card>
-    <div class="w-full flex flex-wrap md:flex-nowrap items-center justify-center gap-2 py-51" [ngClass]="{'flex-col': screenWidth < 1089, 'flex-row': screenWidth >= 1090}">
+    <div class="w-full flex max-w-[90rem] mx-auto flex-wrap md:flex-nowrap items-center justify-center gap-2 py-51" [ngClass]="{'flex-col': screenWidth < 1089, 'flex-row': screenWidth >= 1090}">
         <div class="w-full md:w-5/12 flex flex-col items-center justify-center gap-2">
             <div class="flex items-end gap-5 ml-auto md:ml-0 md:self-end">
             <div *ngIf="!studyCicle">
@@ -57,7 +57,7 @@
                                 [styleClass]="selectedDays.includes(day) ? 'p-button-primary day-btn' : 'p-button-outlined day-btn'">
                     </p-button>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group max-w-[90rem] mx-auto">
                     <p-iftalabel>
                         <p-datepicker [(ngModel)]="endDate" inputId="end_date" showIcon iconDisplay="input" />
                         <label for="end_date">{{ 'event.enddate' | translate }}</label>
@@ -184,7 +184,7 @@
             
             <p-button label="{{'pomodoro.endSession' | translate}}" [style]="{ height: '2.5rem', marginTop: '3rem' }" (click)="endSession()"></p-button>
             
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 max-w-[90rem] mx-auto">
                 
                 <p-table [value]="pomodoroHistory" dataKey="id" [tableStyle]="{ 'max-width': '40rem'}">
                     <ng-template #header>
@@ -206,9 +206,8 @@
                 </p-table>
             </div>
         </div>
-        <div class="w-full md:w-5/12 flex flex-col items-center justify-start gap-3 pt-3 md:pt-0 md:pl-3">
-            <div class="flex flex-col items-start justify-center gap-3">
-                <div class="task-input">
+        <div class="w-full max-w-[90rem] mx-auto md:w-5/12 flex flex-col items-center gap-3 pt-3 md:pt-0 md:pl-3">
+                <div class="task-input flex-col items-center">
                     <input type="text" pInputText [(ngModel)]="newTaskName" placeholder="{{'pomodoro.taskName' | translate }}"/>
                     <p-button label="{{'pomodoro.addTask' | translate }}" (click)="addTask()"></p-button>
                 </div>
@@ -247,7 +246,7 @@
                                 <td>{{ task.completed ? ("pomodoro.completedTask" | translate) : ("pomodoro.pendingTask" | translate) }}</td>
                                 <td>
                                     <div class="flex items-center gap-2">
-                                        <p-button label="{{'pomodoro.completeTask' | translate }}" (click)="completeTask(index)" *ngIf="!task.completed"></p-button>
+                                        <p-button icon="pi pi-check" (click)="completeTask(index)" *ngIf="!task.completed"></p-button>
                                         <p-button icon="pi pi-trash" [style]="{ 'height': '2.6rem', 'width': '2.6rem', 'margin-left':'0.6rem'}" (click)="removeTask(index)"></p-button>
                                     </div>
                                 </td>
@@ -256,5 +255,4 @@
                     </p-table>
                 </div>
         </div>
-    </div>
 </p-card>

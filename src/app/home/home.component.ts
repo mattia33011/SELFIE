@@ -93,7 +93,6 @@ export class HomeComponent {
     this.eventDialog = {
       title: event.title,
       event: event,
-      //description: event.description,
       onclose: () => (this.eventDialog = undefined),
     };
     this.isEventDialogVisible = true;
@@ -102,7 +101,7 @@ export class HomeComponent {
   isNotificationVisible = false;
   showNotification(event: CalendarEvent, delay?: number) {
     setTimeout(() => {
-      const options = { body: `Scade oggi ${event.title ?? ''}` }; //non ha desccription
+      const options = { body: `Scade oggi ${event.title ?? ''}` };
 
       this.notificationService.showNotification(
         event.title,
@@ -110,7 +109,6 @@ export class HomeComponent {
           window.focus();
           this.notificationDialog = {
             title: event.title,
-            //description: event.description,
             onclose: () => (this.notificationDialog = undefined),
             onsnooze: () => {
               this.notificationDialog = undefined;

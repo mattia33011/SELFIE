@@ -1,12 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  OnInit,
-  Output,
-  ViewChild,
-  effect,
-} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, OnInit, Output, ViewChild, effect,} from '@angular/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core';
@@ -27,7 +19,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { IftaLabelModule } from 'primeng/iftalabel';
-import { CheckboxModule } from 'primeng/checkbox'; // Importa il modulo Checkbox
+import { CheckboxModule } from 'primeng/checkbox';
 import { ChangeDetectorRef } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { TimeMachineService } from '../../service/time-machine.service';
@@ -35,16 +27,10 @@ import { ApiService } from '../../service/api.service';
 import { SessionService } from '../../service/session.service';
 import { StudyPlan } from '../../../types/pomodoro';
 import { Router } from '@angular/router';
-//import { RouterOutlet } from '@angular/router';
-
-// COMANDO npm install @fullcalendar/rrule rrule
-
-// manca ripeti tutti i primi lunedì del mese (?)
-// traduzione in ing SOLO per il calendario (mesi, mese settimana anno, abbreviazioni della settimana nel calendario ecc) (eventi apposto)
 
 @Component({
   selector: 'app-calendar',
-  standalone: true, //standalone
+  standalone: true,
   imports: [
     FullCalendarModule,
     PanelModule,
@@ -60,32 +46,30 @@ import { Router } from '@angular/router';
     InputTextModule,
     IftaLabelModule,
     CheckboxModule,
-  ], //standalone
+  ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
 })
 export class CalendarComponent implements OnInit, AfterViewInit {
-  @ViewChild('fullcalendar') calendarComponent!: FullCalendarComponent; // Riferimento al calendario
+  @ViewChild('fullcalendar') calendarComponent!: FullCalendarComponent;
 
   today = new Date();
   eventName: string = ''; // nome evento
-  theDate: Date | null = null;
-  eventEndDate: Date | null = null;
-  repeatUntil: Date | null = null;
+  theDate: Date | null = null; // data
+  eventEndDate: Date | null = null; //data fine
+  repeatUntil: Date | null = null; // ripeti fino a
   eventTime: Date | null = null; // ora evento
   eventEndTime: Date | null = null; // ora fine evento
   eventColor: string = '#99ff63'; // colore evento
   eventLocation: string = ''; // luogo evento
-  repeatWeekly: boolean = false;
-  isTask: boolean = false;
-  taskStatus: string = 'da_fare';
-  visible: boolean = false;
-  repeatType: string = ''; // 'none', 'daily', 'weekly', 'monthly', // 'custom'
-  repeatInterval: number = 1; // ogni tot giorni/settimane/mesi
-  // repeatCount: number = 1; // per "Ripeti per N volte"
-  repeatWeekDays: string[] = []; // es: ['mo', 'we', 'fr']
+  repeatWeekly: boolean = false; // ripeti settimanalmente
+  isTask: boolean = false; // è attività
+  taskStatus: string = 'da_fare'; // status
+  visible: boolean = false; // popup
+  repeatType: string = ''; // type repeat
+  repeatInterval: number = 1; // ogni n settimane
+  repeatWeekDays: string[] = [];
   weekDays = [
-    //così che rrule lo accetti
     { label: 'Lunedì', value: 'MO' },
     { label: 'Martedì', value: 'TU' },
     { label: 'Mercoledì', value: 'WE' },
@@ -102,27 +86,21 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     initialView: 'dayGridMonth',
     headerToolbar: {
       left: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay prev,next', // posso anche aggiungere listWeek per vedere eventi tipo lista
+      right: 'dayGridMonth,timeGridWeek,timeGridDay prev,next',
     },
     buttonText: {
-      dayGridMonth: window.innerWidth < 768 ? '📅' : 'Mese', //si può cambiare al posto dell'emoji!!!
-      timeGridWeek: window.innerWidth < 768 ? '📆' : 'Settimana',
-      timeGridDay: window.innerWidth < 768 ? '🕒' : 'Giorno',
+      dayGridMonth: window.innerWidth < 768 ? 'M' : 'Mese',
+      timeGridWeek: window.innerWidth < 768 ? 'W' : 'Settimana',
+      timeGridDay: window.innerWidth < 768 ? 'D' : 'Giorno',
     },
     dayMaxEvents: 2, //max eventi poi viene un popover
-    contentHeight: window.innerWidth < 768 ? 400 : 700, // Altezza calendario (se piccola va a 350 se grande 700)
+    contentHeight: window.innerWidth < 768 ? 400 : 700, // altezza calendario (se piccola va a 400 se grande 700)
     locale: ['it'],
-    plugins: [
-      dayGridPlugin,
-      ListWeekPlugin,
-      TimeGridPlugin,
-      interactionPlugin,
-      rrulePlugin,
-    ],
-    dateClick: this.openPopup.bind(this), //bind this perché altrimenti "non tiene il this"
-    events: [], // Inizialmente vuoto
-
+    plugins: [dayGridPlugin, ListWeekPlugin, TimeGridPlugin, interactionPlugin, rrulePlugin,],
+    dateClick: this.openPopup.bind(this),
+    events: [], // Inizia vuota
     eventClick: this.handleEventClick.bind(this),
+
     eventDidMount: (info) => {
       if (!info.event.allDay)
         info.el.style.backgroundColor = info.event.backgroundColor;
@@ -130,14 +108,14 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     dayCellDidMount: (info) => {
       const cellDate = info.date;
 
-      // Normalizza la data (rimuove ore, minuti, secondi)
+      // normalizza la data (rimuove ore, minuti, secondi)
       const normalizeDate = (date: Date) => {
         return new Date(date.getFullYear(), date.getMonth(), date.getDate());
       };
 
       const normalizedCellDate = normalizeDate(cellDate);
 
-      // Controlla se ci sono piani di studio per questa data
+      // controlla se ci sono piani di studio per questa data
       const hasPlan =
         this.fullPlans &&
         this.fullPlans.some((plan) =>
@@ -157,14 +135,14 @@ export class CalendarComponent implements OnInit, AfterViewInit {
         button.classList.add('study-session-button');
         button.title = 'Sessione di studio programmata';
 
-        // Stile inline per posizionamento (puoi spostarlo in CSS)
+        // stile inline per posizionamento
         button.style.position = 'absolute';
         button.style.bottom = '4px';
         button.style.right = '4px';
         button.style.padding = '2px';
         button.style.fontSize = '1.2rem';
 
-        info.el.style.position = 'relative'; // necessario per il posizionamento assoluto
+        info.el.style.position = 'relative';
         info.el.appendChild(button);
       }
     },
@@ -327,10 +305,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
             this.taskStatuses = [
               { label: translations['taskStatus.da_fare'], value: 'da_fare' },
               { label: translations['taskStatus.in_corso'], value: 'in_corso' },
-              {
-                label: translations['taskStatus.completata'],
-                value: 'completata',
-              },
+              { label: translations['taskStatus.completata'], value: 'completata' },
             ];
           });
         this.translate
@@ -359,6 +334,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     this.calendarComponent?.getApi().render();
   }
 
+  // per popup parte rrule (selezione giorni settimana)
   toggleWeekday(event: any, value: string) {
     if (event.checked) {
       if (!this.repeatWeekDays.includes(value)) {
@@ -368,31 +344,30 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       this.repeatWeekDays = this.repeatWeekDays.filter((d) => d !== value);
     }
   }
+
   selectedEvent: any = null;
 
   openPopup(arg: any) {
     this.resetForm();
-    this.theDate = arg.date; // Salva la data selezionata
-    this.visible = true; // Mostra il popup
-    //this.isEditMode = false;
+    this.theDate = arg.date; // preimposta nel popup la data selezionata
+    this.visible = true; // mostra il form
   }
 
+  // Funzione per aggiungere un evento
   addEvent() {
     if (!this.eventName.trim()) {
-      alert("Inserisci un nome per l'evento!");
+      alert("Inserisci un nome per l'evento");
       return;
     }
     if (!this.theDate) {
-      alert("Seleziona una data per l'evento!");
+      alert("Seleziona una data per l'evento");
       return;
     }
 
-    // Calcolo startDateTime (solo data se allDay) CAMBIA
     const isAllDay = this.isTask || !this.eventTime;
-    console.log('the date', this.theDate);
+    
     const startDateTime = this.theDate;
 
-    // Base event
     const newEvent: any = {
       title: this.eventName,
       color: this.eventColor,
@@ -404,7 +379,6 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       allDay: isAllDay,
     };
 
-    // Mappa ripetizioni
     const freqMap: any = {
       daily: 'DAILY',
       weekly: 'WEEKLY',
@@ -413,7 +387,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       yearly: 'YEARLY',
     };
 
-    // Se evento NON è task e ha ripetizione valida
+    // Se evento e ha ripetizione
     if (!this.isTask && this.repeatType && freqMap[this.repeatType]) {
       newEvent.rrule = {
         freq: freqMap[this.repeatType],
@@ -423,7 +397,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
         byweekday: this.repeatWeekDays.length ? this.repeatWeekDays : undefined,
       };
 
-      if (!isAllDay && this.eventTime && this.eventEndTime) {
+      if (!isAllDay && this.eventTime && this.eventEndTime) { //per rrule serve string duration per calcolo orario
         newEvent.duration = this.getDuration(this.eventTime, this.eventEndTime);
       }
     } else {
@@ -455,15 +429,12 @@ export class CalendarComponent implements OnInit, AfterViewInit {
         newEvent.end = end;
       }
     }
-
-    console.log('Nuovo evento creato:', newEvent); // Debug
-
+    // chiamata al backend per salvare l'evento
     const username = this.sessionService.getSession()!.user.username!;
     const token = this.sessionService.getSession()!.token!;
 
     this.apiService.createEvent(username, newEvent, token).subscribe({
       next: (savedEvent: any) => {
-        console.log(newEvent);
         const calendarApi = this.calendarComponent?.getApi();
         const event = {
           ...newEvent,
@@ -497,22 +468,23 @@ export class CalendarComponent implements OnInit, AfterViewInit {
 
     const start = event.start ? new Date(event.start) : null;
     const end = event.end ? new Date(event.end) : null;
-    console.log(JSON.stringify(event));
+    
 
     this.theDate = start;
     if (start && start.getMinutes() > 0 && start.getHours() > 0)
       this.eventTime = start;
     else this.eventTime = null;
 
-    this.eventEndDate = end; //cambiato post fusorario
+    this.eventEndDate = end;
     if (end && end.getMinutes() > 0 && end.getHours() > 0)
       this.eventEndTime = end;
     else this.eventEndTime = null;
 
-    const plainEvent = event.toPlainObject();
+    const plainEvent = event.toPlainObject(); //ricava plain json
     const rrule = (this.calendarOptions.events as any[]).find(
       (it) => it.id == plainEvent.id
     )?.rrule;
+
     if (rrule) {
       this.repeatType = this.getRepeatTypeFromRRule(rrule);
       this.repeatUntil = rrule.until ? new Date(rrule.until) : null;
@@ -540,6 +512,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     );
   }
 
+  // Parte per la modifica degli eventi
   updateEvent() {
     if (!this.selectedEvent) return;
 
@@ -552,12 +525,11 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // Se è attività, sempre allDay e start senza ora
     const isAllDay = this.isTask || !this.eventTime;
 
     const startDate = this.theDate;
     let endDate: Date | null = this.eventEndDate;
-    //tolto post fusorario
+
     let newEvent: any = {
       title: this.eventName,
       color: this.eventColor,
@@ -570,7 +542,6 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     };
 
     if (!this.isTask && this.repeatType && this.repeatType !== 'none') {
-      // Solo per eventi normali applichiamo rrule
       const freqMap: any = {
         daily: 'DAILY',
         weekly: 'WEEKLY',
@@ -589,11 +560,9 @@ export class CalendarComponent implements OnInit, AfterViewInit {
 
       if (!isAllDay && this.eventTime && this.eventEndTime) {
         newEvent.duration = this.getDuration(this.eventTime, this.eventEndTime);
-      } else if (!isAllDay) {
-        newEvent.duration = '01:00';
       }
+      
     } else {
-      // start
       const start = new Date(this.theDate);
       if (!isAllDay && this.eventTime) {
         if (this.eventTime) {
@@ -603,7 +572,6 @@ export class CalendarComponent implements OnInit, AfterViewInit {
         newEvent.start = start;
       }
 
-      // end
       if (!this.isTask) {
         if (!endDate) endDate = start;
         if (!isAllDay && this.eventEndTime) {
@@ -615,6 +583,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
         }
       }
     }
+
     this.apiService
       .updateEvent(
         this.sessionService.getSession()!.user.username!,
@@ -624,7 +593,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       )
       .subscribe({
         next: (_: any) => {
-          console.log(newEvent);
+
           const event: any = {
             ...newEvent,
             eventColor: newEvent.color,
@@ -641,9 +610,11 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       });
   }
 
+  // Elimina evento
   deleteEvent() {
     if (this.selectedEvent) {
       if (confirm('Sei sicuro di voler eliminare questo evento?')) {
+
         const eventId = this.selectedEvent.id;
         const userId = this.sessionService.getSession()!.user.username!;
         const token = this.sessionService.getSession()!.token!;
@@ -663,23 +634,20 @@ export class CalendarComponent implements OnInit, AfterViewInit {
   }
 
   getDuration(startTime: Date, endTime: Date): string {
-    //non penso sia full corretto
-    const diffMs = endTime.getTime() - startTime.getTime();
-    if (diffMs <= 0) {
-      return '00:00:00';
+    const diffMillisec = endTime.getTime() - startTime.getTime();
+    if (diffMillisec <= 0) {
+      return '00:00';
     }
 
-    const diffSeconds = Math.floor(diffMs / 1000);
-    const hours = Math.floor(diffSeconds / 3600);
-    const minutes = Math.floor((diffSeconds % 3600) / 60);
-    const seconds = diffSeconds % 60;
+    const diffMins = Math.floor(diffMillisec / (1000*60));
+    const hours = Math.floor(diffMins / 60);
+    const minutes = (diffMins % 60);  
 
     const pad = (n: number) => String(n).padStart(2, '0');
-
-    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    return `${pad(hours)}:${pad(minutes)}`;
   }
 
-  //riguarda
+  // Intervallo e auto selezione giorno settimana
   onRepeatTypeChange() {
     this.repeatUntil = null;
     this.repeatWeekDays = [];
@@ -692,7 +660,6 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       this.autoWeekdayFromDate();
     }
   }
-
   autoWeekdayFromDate() {
     if (!this.theDate) return;
 
@@ -720,6 +687,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     this.isTask = false;
     this.taskStatus = 'da_fare';
   }
+  // reset campi per non rilevanti per attività
   onIsTaskChange() {
     if (this.isTask) {
       this.eventTime = null;
@@ -731,6 +699,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // link a maps
   generateLink(place: string) {
     return `https://www.google.com/maps/search/?api=1&query=${place.replace(
       ' ',

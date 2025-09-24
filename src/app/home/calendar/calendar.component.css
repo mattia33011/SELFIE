@@ -66,7 +66,7 @@ height: fit-content !important;
 ::ng-deep .fc-popover-body {
 background: var(--p-primary-500) !important;
 }
-::ng-deep .form-group { /*aggiungi*/
+::ng-deep .form-group {
   padding: 0.5rem !important;
 }
 
@@ -78,19 +78,16 @@ background: var(--p-primary-500) !important;
   gap: 0.25rem;
 }
 
-/* Pulsante base: marrone scuro */
 ::ng-deep .repeat-grid button {
   padding: 0.5rem;
-  background-color: #1b1613; /* marrone scuro */
+  background-color: #1b1613;
   border: none;
   border-radius: 4px;
-  cursor: pointer;
   transition: background-color 0.2s;
   margin-top: 0.5rem;
   margin-bottom: 0rem;
 }
 
-/*  Hover: verde chiaro */
 ::ng-deep .repeat-grid button:hover {
   background-color: #adc178;
 }
@@ -99,11 +96,10 @@ background: var(--p-primary-500) !important;
 }
 ::ng-deep .flex-row {
   display: flex;
-  flex-wrap: wrap; /* va a capo se non c’è spazio */
-  gap: 1rem;     /* spazio tra gli elementi */
-  align-items: center !important; /* allinea verticalmente */
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center !important;
   margin-top: 0.5rem;
-
 }
 
 ::ng-deep .p-iftalabel{
@@ -127,7 +123,7 @@ background: var(--p-primary-500) !important;
 
 
 @media (max-width: 48rem) {
-  ::ng-deep .fc { /*il calendario ha meno padding nella box*/
+  ::ng-deep .fc {
     padding: 0rem !important;
     margin: 0rem !important;
   }

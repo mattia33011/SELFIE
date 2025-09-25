@@ -154,7 +154,7 @@ L'utente con il calendario può creare eventi o attività cliccando nel giorno d
 
 Per scegliere se creare un evento o un'attività, basta selezionare o deselezionare il riquadro nel popup di creazione/modifica.
 
-### Type
+#### Type
 
 ```typescript
 export type CalendarEvent = {
@@ -206,9 +206,9 @@ Per modificarle, come per gli eventi, basta cliccare sul rettangolo corrisponden
 
 Gli eventi offrono maggior personalizzazione delle attività. Possono avere, infatti, anche una data di fine, un orario di inizio e di fine, un luogo e possono essere ricorrenti. Se venisse inserito un luogo nel form dell'evento comparirà un bottone che quando premuto apre una scheda all'indirizzo scritto in Google Maps.
 
-La ricorrenza degli eventi è gestita tramite rrule. Le frequenze disponibili sono giornaliera, settimanale, bisettimanale (una settimana sì e una no), mensile e annuale. Se verrà selezionata una ricorrenza settimanale o bisettimanale apparirà una lista selezionabile dei giorni della settimana. I giorni scelti vengono salvati nel campo byweekday del JSON dell'evento.
+La ricorrenza degli eventi è gestita tramite rrule. Le frequenze disponibili sono giornaliera, settimanale, bisettimanale (una settimana sì e una no), mensile e annuale. Si può selezionare una data di fine della ripetizione che è inclusiva del giorno selezionato (a differenza di quella per gli eventi singoli). Se verrà selezionata una ricorrenza settimanale o bisettimanale apparirà una lista selezionabile dei giorni della settimana. I giorni scelti vengono salvati nel campo byweekday del JSON dell'evento.
 
-### Nella home
+#### Nella home
 
 Nella home, in basso a sinistra, si possono vedere gli eventi e le attività in scadenza della giornata. Se un evento ha un luogo, cliccarlo dalla home ti permetterà di aprire la sua pagina su Google Maps.
 

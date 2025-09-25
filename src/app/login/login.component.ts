@@ -24,7 +24,6 @@ import { onMessageSubject } from '../service/toast.service';
     Password,
     ReactiveFormsModule,
     ButtonModule,
-    Checkbox,
     StyleClassModule,
     InputTextModule,
     TranslatePipe,

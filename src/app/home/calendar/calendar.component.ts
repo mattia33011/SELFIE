@@ -435,19 +435,8 @@ export class CalendarComponent implements OnInit, AfterViewInit {
 
     this.apiService.createEvent(username, newEvent, token).subscribe({
       next: (savedEvent: any) => {
-        const calendarApi = this.calendarComponent?.getApi();
-        const event = {
-          ...newEvent,
-          id: savedEvent._id,
-          start: newEvent.start,
-          end: newEvent.end,
-        }
-        this.calendarOptions.events = [
-          ...(this.calendarOptions.events as any[]),
-          event,
-        ];
-
-        calendarApi.addEvent(event);
+        
+        this.rimappa();
         this.resetForm();
         this.refetchEvent.emit();
       },
@@ -456,6 +445,35 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       },
     });
   }
+
+  //risolve refresh
+  rimappa() {
+    const username = this.sessionService.getSession()!.user.username!;
+    const token = this.sessionService.getSession()!.token!;
+    this.apiService.getEvents(username, token).subscribe({
+      next: (events: any[]) => {
+        this.calendarOptions.events = events.map(event => ({
+          ...event,
+          start: event.start,
+          end: event.end,
+          id: event._id,
+          color: event.color,
+          allDay: event.allDay,
+          extendedProps: event.extendedProps,
+          rrule: event.rrule
+        }));
+
+        // aggiorno visivamente il calendario
+        const calen = this.calendarComponent?.getApi();
+        if (!calen) return;
+        calen.removeAllEvents();
+        (this.calendarOptions.events as any[]).forEach(e => calen.addEvent(e));
+        calen.render();
+      },
+      error: err => console.error('Errore rimappa', err)
+    });
+  }
+
 
   handleEventClick(clickInfo: any) {
     const event = clickInfo.event;
